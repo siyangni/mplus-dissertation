@@ -1,0 +1,167 @@
+TITLE: Three-class growth mixture on continuous wave factor scores
+       with complex survey features and time-invariant covariates as predictors of class membership.
+
+DATA:
+  FILE = sc_wave_fscores_complete.dat;
+
+VARIABLE: 
+      NAMES = 
+		SC3THAC SC3TCOM SC3OBEY SC3DIST SC3TEMP SC3REST SC3FIDG 
+		SC5THAC SC5TCOM SC5OBEY SC5DIST SC5TEMP SC5REST SC5FIDG 
+		SC7THAC SC7TCOM SC7OBEY SC7DIST SC7TEMP SC7REST SC7FIDG 
+		SC11THAC SC11TCOM SC11OBEY SC11DIST SC11TEMP SC11REST SC11FIDG 
+		SC14THAC SC14TCOM SC14OBEY SC14DIST SC14TEMP SC14REST SC14FIDG 
+		SC17THAC SC17TCOM SC17OBEY SC17DIST SC17TEMP SC17REST SC17FIDG 
+		IGNORE3 SMACK3 SHOUT3 BEDROOM3 TREATS3 TELLOFF3 BRIBE3
+		IGNORE5 SMACK5 SHOUT5 BEDROOM5 TREATS5 TELLOFF5 BRIBE5 REASON5 
+		RINDOOR5 DINNER5 CLOSE5 READ5 STORY5 MUSIC5 PAINT5 ACTIVE5 GAMES5 PARK5 
+		IGNORE7 SMACK7 SHOUT7 BEDROOM7 TREATS7 TELLOFF7 BRIBE7 REASON7 
+		RINDOOR7 DINNER7 CLOSE7 READ7 STORY7 MUSIC7 PAINT7 ACTIVE7 GAMES7 PARK7 TVRULES7
+		BEDROOM11 TREATS11 REASON11 CLOSE11 ACTIVE11 GAMES11 
+		PWHERE14 PWHO14 PWHAT14 CMWHERE14 CMWHO14 CMWHAT14 
+		CMWHERE17 CMTBACK17 PWHERE17 PTBACK17 LIVEWP17 
+		PEDU BPEDU SEX RACE BRACE BMARRIED INCOMEC INCOMEL INCOMEF LBW 
+		NAMHAPNA NAMUNFAA NAMBRUSA NAMFEEDA NAMINJUA NAMBATHA NAMWARYA 
+		NAMBSHYA NAMFRETA NAMSLEEA NAMMILKA NAMSLTIA NAMNAPSA NAMSOFOA 
+		INFTEMPR INFTEMP DFPW DUPD DUPW HFAE COGA SCOGA AGE3
+		AGE5 AGE7 AGE11 AGE14 AGE17 
+		SC_3 SC_3_SE SC_5 SC_5_SE SC_7 SC_7_SE SC_11 SC_11_SE 
+		SC_14 SC_14_SE SC_17 SC_17_SE 
+		GOVWT1 MCSID PTTYPE2 SPTN00;
+
+      USEVARIABLES =
+		SC_3 SC_5 SC_7 SC_11 SC_14 SC_17
+        scoga lbw inftemp hfae bmarried brace sex bpedu incomef;
+
+  IDVARIABLE = mcsid;
+  MISSING = *;
+
+  ! ---- Complex survey design retained in mixture ----
+  STRATIFICATION = pttype2;
+  CLUSTER       = sptn00;
+  WEIGHT        = govwt1;
+  SUBPOPULATION = (govwt1 > 0);
+
+  ! ---- Two latent classes ----
+  CLASSES = c(3);
+  AUXILIARY = scoga (R3STEP) 
+			  lbw (R3STEP) 
+		      inftemp (R3STEP) 
+			  hfae (R3STEP) 
+			  bmarried (R3STEP) 
+			  brace (R3STEP) 
+			  sex (R3STEP) 
+			  bpedu (R3STEP) 
+			  incomef (R3STEP);
+
+ANALYSIS:
+  TYPE = COMPLEX MIXTURE;   ! mixture + survey adjustments are allowed
+  ESTIMATOR = MLR;          ! robust ML for continuous outcomes in mixtures
+  PROCESSORS = 12;
+  STARTS = 0;
+  STITERATIONS = 30;
+  LRTSTARTS = 800 200 2000 500; ! for TECH14 bootstrapped LRT
+  STSEED = 20251021;     ! sets the global seed for random starts
+
+
+MODEL:
+ !MODEL COMMAND WITH FINAL ESTIMATES USED AS STARTING VALUES
+
+     %OVERALL%
+
+     i s | sc_3@0 sc_5* sc_7* sc_11* sc_14* sc_17@1;
+
+     [ c#1*-0.86603 ];
+     [ c#2*-2.44592 ];
+
+     %C#1%
+
+     s BY sc_5*0.17957 (1);
+     s BY sc_7*0.33848 (2);
+     s BY sc_11*0.69828 (3);
+     s BY sc_14*0.85020 (4);
+
+     i WITH s*-0.26211 (14);
+
+     [ sc_3@0 ];
+     [ sc_5@0 ];
+     [ sc_7@0 ];
+     [ sc_11@0 ];
+     [ sc_14@0 ];
+     [ sc_17@0 ];
+     [ i*0.18647 ] (mi1);
+     [ s*0.80228 ] (ms1);
+
+     sc_3*0.16701 (5);
+     sc_5*0.04785 (6);
+     sc_7*0.07107 (7);
+     sc_11*0.04605 (8);
+     sc_14*0.04728 (9);
+     sc_17*0.06182 (10);
+     i*0.70597 (13);
+     s*0.26777 (15);
+
+     %C#2%
+
+     s BY sc_5*0.17957 (1);
+     s BY sc_7*0.33848 (2);
+     s BY sc_11*0.69828 (3);
+     s BY sc_14*0.85020 (4);
+
+     i WITH s*-0.26211 (14);
+
+     [ sc_3@0 ];
+     [ sc_5@0 ];
+     [ sc_7@0 ];
+     [ sc_11@0 ];
+     [ sc_14@0 ];
+     [ sc_17@0 ];
+     [ i*-0.98496 ] (mi2);
+     [ s*-0.87792 ] (ms2);
+
+     sc_3*0.16701 (5);
+     sc_5*0.04785 (6);
+     sc_7*0.07107 (7);
+     sc_11*0.04605 (8);
+     sc_14*0.04728 (9);
+     sc_17*0.06182 (10);
+     i*0.70597 (13);
+     s*0.26777 (15);
+
+     %C#3%
+
+     s BY sc_5*0.17957 (1);
+     s BY sc_7*0.33848 (2);
+     s BY sc_11*0.69828 (3);
+     s BY sc_14*0.85020 (4);
+
+     i WITH s*-0.26211 (14);
+
+     [ sc_3@0 ];
+     [ sc_5@0 ];
+     [ sc_7@0 ];
+     [ sc_11@0 ];
+     [ sc_14@0 ];
+     [ sc_17@0 ];
+     [ i*-0.24335 ] (mi3);
+     [ s*0.09717 ] (ms3);
+
+     sc_3*0.16701 (5);
+     sc_5*0.04785 (6);
+     sc_7*0.07107 (7);
+     sc_11*0.04605 (8);
+     sc_14*0.04728 (9);
+     sc_17*0.06182 (10);
+     i*0.70597 (13);
+     s*0.26777 (15);
+
+
+OUTPUT:
+  TECH1 TECH4 STANDARDIZED;
+
+PLOT:
+  TYPE = PLOT2 PLOT3;
+
+SAVEDATA:
+	FILE = sc_sogmm_r3step.dat; 
+	SAVE = CPROBABILITIES;

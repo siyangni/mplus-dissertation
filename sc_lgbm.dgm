@@ -1,0 +1,706 @@
+VERSION 1.1.0
+INPUT
+TITLE:
+ Second-order LGBM with categorical indicators
+DATA:
+  FILE = recoded_only_sc_pa_cov.dat;
+VARIABLE:
+  Names are
+     pttype2 nh2 bovwt1 covwt1 dovwt1 eovwt1 fovwt1 govwt1 sptn00 sc3thac
+     sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg sc5thac sc5tcom sc5obey
+     sc5dist sc5temp sc5rest sc5fidg sc5lyin sc7thac sc7tcom sc7obey sc7dist
+     sc7temp sc7rest sc7fidg sc7lyin sc11thac sc11tcom sc11obey sc11dist
+     sc11temp sc11rest sc11fidg sc11lyin sc14thac sc14tcom sc14obey sc14dist
+     sc14temp sc14rest sc14fidg sc14lyin sc17thac sc17tcom sc17obey sc17dist
+     sc17temp sc17rest sc17fidg sc17lyin ignore3 smack3 shout3 bedroom3
+     treats3 telloff3 bribe3 ignore5 smack5 shout5 bedroom5 treats5 telloff5
+     bribe5 reason5 rindoor5 dinner5 close5 read5 story5 music5 paint5
+     active5 games5 park5 ignore7 smack7 shout7 bedroom7 treats7 telloff7
+     bribe7 reason7 rindoor7 dinner7 close7 read7 story7 music7 paint7
+     active7 games7 park7 tvrules7 bedroom11 treats11 reason11 close11
+     active11 games11 pwhere14 pwho14 pwhat14 cmwhere14 cmwho14 cmwhat14
+     cmwhere17 cmtback17 pwhere17 ptback17 livewp17 pedu bpedu sex race
+     brace bmarried incomec incomel incomef lbw namhapna0 namunfaa0 nambrusa0
+     namfeeda0 naminjua0 nambatha0 namwarya0 nambshya0 namfreta0 namsleea0
+     nammilka0 namsltia0 namnapsa0 namsofoa0 inftempr inftemp dfpw dupd
+     dupw hfae coga scoga age3 age5 age7 age11 age14 age17 mcsid;
+  USEVARIABLES =
+      sc3thac sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg
+      sc5thac sc5tcom sc5obey sc5dist sc5temp sc5rest sc5fidg
+      sc7thac sc7tcom sc7obey sc7dist sc7temp sc7rest sc7fidg
+      sc11thac sc11tcom sc11obey sc11dist sc11temp sc11rest sc11fidg
+      sc14thac sc14tcom sc14obey sc14dist sc14temp sc14rest sc14fidg
+      sc17thac sc17tcom sc17obey sc17dist sc17temp sc17rest sc17fidg;
+  CATEGORICAL = ALL;
+  MISSING ARE ALL (-9999);
+  IDVARIABLE IS mcsid;
+    STRATIFICATION = pttype2;
+    CLUSTER       = sptn00;
+    WEIGHT        = govwt1;
+    SUBPOPULATION = (govwt1 > 0);
+ANALYSIS:
+  TYPE = COMPLEX;
+  ESTIMATOR = WLSMV;
+  PARAMETERIZATION = DELTA;
+OUTPUT:
+ STANDARDIZED MODINDICES(10) TECH1 TECH4;
+MODEL:
+  SC_3  BY sc3thac@1
+            sc3tcom (l2)
+   sc3obey (l3)
+   sc3dist (l4)
+   sc3temp (l5)
+   sc3rest (l6)
+   sc3fidg (l7);
+  SC_5  BY sc5thac@1
+            sc5tcom (l2)
+   sc5obey (l3)
+   sc5dist (l4)
+   sc5temp (l5)
+   sc5rest (l6)
+   sc5fidg (l7);
+  SC_7  BY sc7thac@1
+            sc7tcom (l2)
+   sc7obey (l3)
+   sc7dist (l4)
+   sc7temp (l5)
+   sc7rest (l6)
+   sc7fidg (l7);
+  SC_11 BY sc11thac@1
+            sc11tcom (l2)
+   sc11obey (l3)
+   sc11dist (l4)
+   sc11temp (l5)
+   sc11rest (l6)
+   sc11fidg (l7);
+  SC_14 BY sc14thac@1
+            sc14tcom (l2)
+   sc14obey (l3)
+   sc14dist (l4)
+   sc14temp (l5)
+   sc14rest (l6)
+   sc14fidg (l7);
+  SC_17 BY sc17thac@1
+            sc17tcom (l2)
+   sc17obey (l3)
+   sc17dist (l4)
+   sc17temp (l5)
+   sc17rest (l6)
+   sc17fidg (l7);
+  SC_3*; SC_5*; SC_7*; SC_11*; SC_14*; SC_17*;
+  [SC_3-SC_17@0];
+  [sc3thac$1] (t_thac1);  [sc5thac$1] (t_thac1);  [sc7thac$1] (t_thac1);
+[sc11thac$1] (t_thac1);  [sc14thac$1] (t_thac1);  [sc17thac$1] (t_thac1);
+  [sc3thac$2] (t_thac2);  [sc5thac$2] (t_thac2);  [sc7thac$2] (t_thac2);
+[sc11thac$2] (t_thac2);  [sc14thac$2] (t_thac2);  [sc17thac$2] (t_thac2);
+  [sc3tcom$1](t_tcom1);  [sc5tcom$1](t_tcom1);  [sc7tcom$1](t_tcom1);
+[sc11tcom$1](t_tcom1);  [sc14tcom$1](t_tcom1);  [sc17tcom$1](t_tcom1);
+  [sc3tcom$2](t_tcom2);  [sc5tcom$2](t_tcom2);  [sc7tcom$2](t_tcom2);
+[sc11tcom$2](t_tcom2);  [sc14tcom$2](t_tcom2);  [sc17tcom$2](t_tcom2);
+  [sc3obey$1](t_obey1);  [sc5obey$1](t_obey1);  [sc7obey$1](t_obey1);
+[sc11obey$1](t_obey1);  [sc14obey$1](t_obey1);  [sc17obey$1](t_obey1);
+  [sc3obey$2](t_obey2);  [sc5obey$2](t_obey2);  [sc7obey$2](t_obey2);
+[sc11obey$2](t_obey2);  [sc14obey$2](t_obey2);  [sc17obey$2](t_obey2);
+  [sc3dist$1](t_dist1);  [sc5dist$1](t_dist1);  [sc7dist$1](t_dist1);
+[sc11dist$1](t_dist1);  [sc14dist$1](t_dist1);  [sc17dist$1](t_dist1);
+  [sc3dist$2](t_dist2);  [sc5dist$2](t_dist2);  [sc7dist$2](t_dist2);
+[sc11dist$2](t_dist2);  [sc14dist$2](t_dist2);  [sc17dist$2](t_dist2);
+  [sc3temp$1](t_temp1);  [sc5temp$1](t_temp1);  [sc7temp$1](t_temp1);
+[sc11temp$1](t_temp1);  [sc14temp$1](t_temp1);  [sc17temp$1](t_temp1);
+  [sc3temp$2](t_temp2);  [sc5temp$2](t_temp2);  [sc7temp$2](t_temp2);
+[sc11temp$2](t_temp2);  [sc14temp$2](t_temp2);  [sc17temp$2](t_temp2);
+  [sc3rest$1](t_rest1);  [sc5rest$1](t_rest1);  [sc7rest$1](t_rest1);
+[sc11rest$1](t_rest1);  [sc14rest$1](t_rest1);  [sc17rest$1](t_rest1);
+  [sc3rest$2](t_rest2);  [sc5rest$2](t_rest2);  [sc7rest$2](t_rest2);
+[sc11rest$2](t_rest2);  [sc14rest$2](t_rest2);  [sc17rest$2](t_rest2);
+  [sc3fidg$1](t_fidg1);  [sc5fidg$1](t_fidg1);  [sc7fidg$1](t_fidg1);
+[sc11fidg$1](t_fidg1);  [sc14fidg$1](t_fidg1);  [sc17fidg$1](t_fidg1);
+  [sc3fidg$2](t_fidg2);  [sc5fidg$2](t_fidg2);  [sc7fidg$2](t_fidg2);
+[sc11fidg$2](t_fidg2);  [sc14fidg$2](t_fidg2);  [sc17fidg$2](t_fidg2);
+  sc3thac WITH sc5thac;  sc5thac WITH sc7thac;  sc7thac WITH sc11thac;
+sc11thac WITH sc14thac; sc14thac WITH sc17thac;
+  sc3tcom WITH sc5tcom;  sc5tcom WITH sc7tcom;  sc7tcom WITH sc11tcom;
+sc11tcom WITH sc14tcom; sc14tcom WITH sc17tcom;
+  sc3obey WITH sc5obey;  sc5obey WITH sc7obey;  sc7obey WITH sc11obey;
+sc11obey WITH sc14obey; sc14obey WITH sc17obey;
+  sc3dist WITH sc5dist;  sc5dist WITH sc7dist;  sc7dist WITH sc11dist;
+sc11dist WITH sc14dist; sc14dist WITH sc17dist;
+  sc3temp WITH sc5temp;  sc5temp WITH sc7temp;  sc7temp WITH sc11temp;
+sc11temp WITH sc14temp; sc14temp WITH sc17temp;
+  sc3rest WITH sc5rest;  sc5rest WITH sc7rest;  sc7rest WITH sc11rest;
+sc11rest WITH sc14rest; sc14rest WITH sc17rest;
+  sc3fidg WITH sc5fidg;  sc5fidg WITH sc7fidg;  sc7fidg WITH sc11fidg;
+sc11fidg WITH sc14fidg; sc14fidg WITH sc17fidg;
+  { sc3thac-sc3fidg@1  sc5thac-sc5fidg  sc7thac-sc7fidg
+sc11thac-sc11fidg  sc14thac-sc14fidg  sc17thac-sc17fidg };
+  i s | SC_3@0 SC_5* SC_7* SC_11* SC_14* SC_17@1;
+  [i@0 s];
+  i* s*;
+  i WITH s;
+INPUT_END
+2
+2
+2
+2
+WLSMV
+1
+GENERAL
+0
+42
+8
+0
+sc3thac sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg sc5thac sc5tcom sc5obey sc5dist sc5temp sc5rest sc5fidg sc7thac sc7tcom sc7obey sc7dist sc7temp sc7rest sc7fidg sc11thac sc11tcom sc11obey sc11dist sc11temp sc11rest sc11fidg sc14thac sc14tcom sc14obey sc14dist sc14temp sc14rest sc14fidg sc17thac sc17tcom sc17obey sc17dist sc17temp sc17rest sc17fidg sc_3 sc_5 sc_7 sc_11 sc_14 sc_17 i s
+2
+-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 1 1 1 1 1 1 0 0
+1
+i s
+sc_3 sc_5 sc_7 sc_11 sc_14 sc_17
+6
+sc_3
+sc3thac sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg
+sc_5
+sc5thac sc5tcom sc5obey sc5dist sc5temp sc5rest sc5fidg
+sc_7
+sc7thac sc7tcom sc7obey sc7dist sc7temp sc7rest sc7fidg
+sc_11
+sc11thac sc11tcom sc11obey sc11dist sc11temp sc11rest sc11fidg
+sc_14
+sc14thac sc14tcom sc14obey sc14dist sc14temp sc14rest sc14fidg
+sc_17
+sc17thac sc17tcom sc17obey sc17dist sc17temp sc17rest sc17fidg
+1 1 sc_3 sc3thac 1.000 0.000
+1 1 sc_3 sc3tcom 1.582 0.053
+91 1 sc_3 sc3tcom l2
+1 1 sc_3 sc3obey 1.348 0.052
+91 1 sc_3 sc3obey l3
+1 1 sc_3 sc3dist 1.862 0.068
+91 1 sc_3 sc3dist l4
+1 1 sc_3 sc3temp 1.362 0.053
+91 1 sc_3 sc3temp l5
+1 1 sc_3 sc3rest 1.927 0.068
+91 1 sc_3 sc3rest l6
+1 1 sc_3 sc3fidg 1.729 0.062
+91 1 sc_3 sc3fidg l7
+1 1 sc_5 sc5thac 1.000 0.000
+1 1 sc_5 sc5tcom 1.582 0.053
+91 1 sc_5 sc5tcom l2
+1 1 sc_5 sc5obey 1.348 0.052
+91 1 sc_5 sc5obey l3
+1 1 sc_5 sc5dist 1.862 0.068
+91 1 sc_5 sc5dist l4
+1 1 sc_5 sc5temp 1.362 0.053
+91 1 sc_5 sc5temp l5
+1 1 sc_5 sc5rest 1.927 0.068
+91 1 sc_5 sc5rest l6
+1 1 sc_5 sc5fidg 1.729 0.062
+91 1 sc_5 sc5fidg l7
+1 1 sc_7 sc7thac 1.000 0.000
+1 1 sc_7 sc7tcom 1.582 0.053
+91 1 sc_7 sc7tcom l2
+1 1 sc_7 sc7obey 1.348 0.052
+91 1 sc_7 sc7obey l3
+1 1 sc_7 sc7dist 1.862 0.068
+91 1 sc_7 sc7dist l4
+1 1 sc_7 sc7temp 1.362 0.053
+91 1 sc_7 sc7temp l5
+1 1 sc_7 sc7rest 1.927 0.068
+91 1 sc_7 sc7rest l6
+1 1 sc_7 sc7fidg 1.729 0.062
+91 1 sc_7 sc7fidg l7
+1 1 sc_11 sc11thac 1.000 0.000
+1 1 sc_11 sc11tcom 1.582 0.053
+91 1 sc_11 sc11tcom l2
+1 1 sc_11 sc11obey 1.348 0.052
+91 1 sc_11 sc11obey l3
+1 1 sc_11 sc11dist 1.862 0.068
+91 1 sc_11 sc11dist l4
+1 1 sc_11 sc11temp 1.362 0.053
+91 1 sc_11 sc11temp l5
+1 1 sc_11 sc11rest 1.927 0.068
+91 1 sc_11 sc11rest l6
+1 1 sc_11 sc11fidg 1.729 0.062
+91 1 sc_11 sc11fidg l7
+1 1 sc_14 sc14thac 1.000 0.000
+1 1 sc_14 sc14tcom 1.582 0.053
+91 1 sc_14 sc14tcom l2
+1 1 sc_14 sc14obey 1.348 0.052
+91 1 sc_14 sc14obey l3
+1 1 sc_14 sc14dist 1.862 0.068
+91 1 sc_14 sc14dist l4
+1 1 sc_14 sc14temp 1.362 0.053
+91 1 sc_14 sc14temp l5
+1 1 sc_14 sc14rest 1.927 0.068
+91 1 sc_14 sc14rest l6
+1 1 sc_14 sc14fidg 1.729 0.062
+91 1 sc_14 sc14fidg l7
+1 1 sc_17 sc17thac 1.000 0.000
+1 1 sc_17 sc17tcom 1.582 0.053
+91 1 sc_17 sc17tcom l2
+1 1 sc_17 sc17obey 1.348 0.052
+91 1 sc_17 sc17obey l3
+1 1 sc_17 sc17dist 1.862 0.068
+91 1 sc_17 sc17dist l4
+1 1 sc_17 sc17temp 1.362 0.053
+91 1 sc_17 sc17temp l5
+1 1 sc_17 sc17rest 1.927 0.068
+91 1 sc_17 sc17rest l6
+1 1 sc_17 sc17fidg 1.729 0.062
+91 1 sc_17 sc17fidg l7
+1 1 i sc_3 1.000 0.000
+1 1 i sc_5 1.000 0.000
+1 1 i sc_7 1.000 0.000
+1 1 i sc_11 1.000 0.000
+1 1 i sc_14 1.000 0.000
+1 1 i sc_17 1.000 0.000
+1 1 s sc_3 0.000 0.000
+1 1 s sc_5 0.350 0.023
+1 1 s sc_7 0.430 0.024
+1 1 s sc_11 0.671 0.028
+1 1 s sc_14 0.754 0.030
+1 1 s sc_17 1.000 0.000
+2 1 sc3thac sc5thac 0.093 0.011
+2 1 sc5thac sc7thac 0.131 0.011
+2 1 sc7thac sc11thac 0.106 0.009
+2 1 sc11thac sc14thac 0.099 0.009
+2 1 sc14thac sc17thac 0.151 0.015
+2 1 sc3tcom sc5tcom 0.165 0.013
+2 1 sc5tcom sc7tcom 0.228 0.014
+2 1 sc7tcom sc11tcom 0.210 0.013
+2 1 sc11tcom sc14tcom 0.249 0.017
+2 1 sc14tcom sc17tcom 0.301 0.023
+2 1 sc3obey sc5obey 0.235 0.015
+2 1 sc5obey sc7obey 0.246 0.017
+2 1 sc7obey sc11obey 0.235 0.017
+2 1 sc11obey sc14obey 0.378 0.025
+2 1 sc14obey sc17obey 0.582 0.042
+2 1 sc3dist sc5dist 0.103 0.011
+2 1 sc5dist sc7dist 0.199 0.014
+2 1 sc7dist sc11dist 0.223 0.015
+2 1 sc11dist sc14dist 0.230 0.018
+2 1 sc14dist sc17dist 0.342 0.026
+2 1 sc3temp sc5temp 0.289 0.015
+2 1 sc5temp sc7temp 0.372 0.021
+2 1 sc7temp sc11temp 0.311 0.020
+2 1 sc11temp sc14temp 0.446 0.025
+2 1 sc14temp sc17temp 0.580 0.040
+2 1 sc3rest sc5rest 0.179 0.012
+2 1 sc5rest sc7rest 0.224 0.015
+2 1 sc7rest sc11rest 0.193 0.015
+2 1 sc11rest sc14rest 0.256 0.021
+2 1 sc14rest sc17rest 0.416 0.053
+2 1 sc3fidg sc5fidg 0.195 0.015
+2 1 sc5fidg sc7fidg 0.318 0.018
+2 1 sc7fidg sc11fidg 0.241 0.016
+2 1 sc11fidg sc14fidg 0.232 0.020
+2 1 sc14fidg sc17fidg 0.295 0.029
+2 1 i s -0.033 0.008
+4 1 sc_3 0.017 0.005
+4 1 sc_5 0.047 0.004
+4 1 sc_7 0.051 0.004
+4 1 sc_11 0.037 0.004
+4 1 sc_14 0.066 0.006
+4 1 sc_17 0.078 0.010
+5 1 i 0.151 0.011
+5 1 s 0.268 0.026
+11 1 sc_3 sc3thac 0.410 0.014
+11 1 sc_3 sc3tcom 0.648 0.012
+91 1 sc_3 sc3tcom l2
+11 1 sc_3 sc3obey 0.552 0.012
+91 1 sc_3 sc3obey l3
+11 1 sc_3 sc3dist 0.763 0.010
+91 1 sc_3 sc3dist l4
+11 1 sc_3 sc3temp 0.558 0.012
+91 1 sc_3 sc3temp l5
+11 1 sc_3 sc3rest 0.789 0.010
+91 1 sc_3 sc3rest l6
+11 1 sc_3 sc3fidg 0.708 0.012
+91 1 sc_3 sc3fidg l7
+11 1 sc_5 sc5thac 0.608 0.010
+11 1 sc_5 sc5tcom 0.711 0.009
+91 1 sc_5 sc5tcom l2
+11 1 sc_5 sc5obey 0.615 0.011
+91 1 sc_5 sc5obey l3
+11 1 sc_5 sc5dist 0.782 0.008
+91 1 sc_5 sc5dist l4
+11 1 sc_5 sc5temp 0.619 0.011
+91 1 sc_5 sc5temp l5
+11 1 sc_5 sc5rest 0.801 0.008
+91 1 sc_5 sc5rest l6
+11 1 sc_5 sc5fidg 0.707 0.009
+91 1 sc_5 sc5fidg l7
+11 1 sc_7 sc7thac 0.614 0.010
+11 1 sc_7 sc7tcom 0.742 0.008
+91 1 sc_7 sc7tcom l2
+11 1 sc_7 sc7obey 0.643 0.011
+91 1 sc_7 sc7obey l3
+11 1 sc_7 sc7dist 0.812 0.006
+91 1 sc_7 sc7dist l4
+11 1 sc_7 sc7temp 0.646 0.010
+91 1 sc_7 sc7temp l5
+11 1 sc_7 sc7rest 0.823 0.007
+91 1 sc_7 sc7rest l6
+11 1 sc_7 sc7fidg 0.735 0.009
+91 1 sc_7 sc7fidg l7
+11 1 sc_11 sc11thac 0.692 0.011
+11 1 sc_11 sc11tcom 0.737 0.010
+91 1 sc_11 sc11tcom l2
+11 1 sc_11 sc11obey 0.617 0.016
+91 1 sc_11 sc11obey l3
+11 1 sc_11 sc11dist 0.812 0.008
+91 1 sc_11 sc11dist l4
+11 1 sc_11 sc11temp 0.653 0.012
+91 1 sc_11 sc11temp l5
+11 1 sc_11 sc11rest 0.817 0.010
+91 1 sc_11 sc11rest l6
+11 1 sc_11 sc11fidg 0.792 0.011
+91 1 sc_11 sc11fidg l7
+11 1 sc_14 sc14thac 0.677 0.011
+11 1 sc_14 sc14tcom 0.782 0.009
+91 1 sc_14 sc14tcom l2
+11 1 sc_14 sc14obey 0.604 0.013
+91 1 sc_14 sc14obey l3
+11 1 sc_14 sc14dist 0.812 0.008
+91 1 sc_14 sc14dist l4
+11 1 sc_14 sc14temp 0.636 0.011
+91 1 sc_14 sc14temp l5
+11 1 sc_14 sc14rest 0.777 0.011
+91 1 sc_14 sc14rest l6
+11 1 sc_14 sc14fidg 0.819 0.011
+91 1 sc_14 sc14fidg l7
+11 1 sc_17 sc17thac 0.689 0.014
+11 1 sc_17 sc17tcom 0.767 0.013
+91 1 sc_17 sc17tcom l2
+11 1 sc_17 sc17obey 0.586 0.017
+91 1 sc_17 sc17obey l3
+11 1 sc_17 sc17dist 0.831 0.012
+91 1 sc_17 sc17dist l4
+11 1 sc_17 sc17temp 0.659 0.016
+91 1 sc_17 sc17temp l5
+11 1 sc_17 sc17rest 0.770 0.015
+91 1 sc_17 sc17rest l6
+11 1 sc_17 sc17fidg 0.804 0.016
+91 1 sc_17 sc17fidg l7
+11 1 i sc_3 0.949 0.015
+11 1 i sc_5 0.852 0.013
+11 1 i sc_7 0.822 0.014
+11 1 i sc_11 0.755 0.020
+11 1 i sc_14 0.686 0.018
+11 1 i sc_17 0.591 0.023
+11 1 s sc_3 0.000 0.0000000001000
+11 1 s sc_5 0.397 0.022
+11 1 s sc_7 0.471 0.021
+11 1 s sc_11 0.675 0.018
+11 1 s sc_14 0.689 0.018
+11 1 s sc_17 0.787 0.020
+12 1 sc3thac sc5thac 0.172 0.019
+12 1 sc5thac sc7thac 0.361 0.017
+12 1 sc7thac sc11thac 0.325 0.019
+12 1 sc11thac sc14thac 0.299 0.016
+12 1 sc14thac sc17thac 0.355 0.024
+12 1 sc3tcom sc5tcom 0.303 0.023
+12 1 sc5tcom sc7tcom 0.473 0.020
+12 1 sc7tcom sc11tcom 0.417 0.020
+12 1 sc11tcom sc14tcom 0.467 0.021
+12 1 sc14tcom sc17tcom 0.485 0.028
+12 1 sc3obey sc5obey 0.358 0.020
+12 1 sc5obey sc7obey 0.412 0.019
+12 1 sc7obey sc11obey 0.350 0.019
+12 1 sc11obey sc14obey 0.425 0.019
+12 1 sc14obey sc17obey 0.473 0.025
+12 1 sc3dist sc5dist 0.235 0.024
+12 1 sc5dist sc7dist 0.464 0.024
+12 1 sc7dist sc11dist 0.512 0.028
+12 1 sc11dist sc14dist 0.441 0.026
+12 1 sc14dist sc17dist 0.549 0.032
+12 1 sc3temp sc5temp 0.443 0.019
+12 1 sc5temp sc7temp 0.620 0.016
+12 1 sc7temp sc11temp 0.502 0.019
+12 1 sc11temp sc14temp 0.586 0.015
+12 1 sc14temp sc17temp 0.607 0.023
+12 1 sc3rest sc5rest 0.443 0.027
+12 1 sc5rest sc7rest 0.545 0.027
+12 1 sc7rest sc11rest 0.438 0.027
+12 1 sc11rest sc14rest 0.413 0.026
+12 1 sc14rest sc17rest 0.449 0.048
+12 1 sc3fidg sc5fidg 0.351 0.025
+12 1 sc5fidg sc7fidg 0.534 0.020
+12 1 sc7fidg sc11fidg 0.465 0.026
+12 1 sc11fidg sc14fidg 0.491 0.032
+12 1 sc14fidg sc17fidg 0.512 0.042
+12 1 i s -0.162 0.036
+14 1 sc_3 0.100 0.028
+14 1 sc_5 0.226 0.011
+14 1 sc_7 0.228 0.010
+14 1 sc_11 0.140 0.011
+14 1 sc_14 0.207 0.011
+14 1 sc_17 0.181 0.019
+15 1 i 1.000 0.0000000001000
+15 1 s 1.000 0.0000000001000
+21 1 sc_3 sc3thac 0.410 0.014
+21 1 sc_3 sc3tcom 0.648 0.012
+91 1 sc_3 sc3tcom l2
+21 1 sc_3 sc3obey 0.552 0.012
+91 1 sc_3 sc3obey l3
+21 1 sc_3 sc3dist 0.763 0.010
+91 1 sc_3 sc3dist l4
+21 1 sc_3 sc3temp 0.558 0.012
+91 1 sc_3 sc3temp l5
+21 1 sc_3 sc3rest 0.789 0.010
+91 1 sc_3 sc3rest l6
+21 1 sc_3 sc3fidg 0.708 0.012
+91 1 sc_3 sc3fidg l7
+21 1 sc_5 sc5thac 0.608 0.010
+21 1 sc_5 sc5tcom 0.711 0.009
+91 1 sc_5 sc5tcom l2
+21 1 sc_5 sc5obey 0.615 0.011
+91 1 sc_5 sc5obey l3
+21 1 sc_5 sc5dist 0.782 0.008
+91 1 sc_5 sc5dist l4
+21 1 sc_5 sc5temp 0.619 0.011
+91 1 sc_5 sc5temp l5
+21 1 sc_5 sc5rest 0.801 0.008
+91 1 sc_5 sc5rest l6
+21 1 sc_5 sc5fidg 0.707 0.009
+91 1 sc_5 sc5fidg l7
+21 1 sc_7 sc7thac 0.614 0.010
+21 1 sc_7 sc7tcom 0.742 0.008
+91 1 sc_7 sc7tcom l2
+21 1 sc_7 sc7obey 0.643 0.011
+91 1 sc_7 sc7obey l3
+21 1 sc_7 sc7dist 0.812 0.006
+91 1 sc_7 sc7dist l4
+21 1 sc_7 sc7temp 0.646 0.010
+91 1 sc_7 sc7temp l5
+21 1 sc_7 sc7rest 0.823 0.007
+91 1 sc_7 sc7rest l6
+21 1 sc_7 sc7fidg 0.735 0.009
+91 1 sc_7 sc7fidg l7
+21 1 sc_11 sc11thac 0.692 0.011
+21 1 sc_11 sc11tcom 0.737 0.010
+91 1 sc_11 sc11tcom l2
+21 1 sc_11 sc11obey 0.617 0.016
+91 1 sc_11 sc11obey l3
+21 1 sc_11 sc11dist 0.812 0.008
+91 1 sc_11 sc11dist l4
+21 1 sc_11 sc11temp 0.653 0.012
+91 1 sc_11 sc11temp l5
+21 1 sc_11 sc11rest 0.817 0.010
+91 1 sc_11 sc11rest l6
+21 1 sc_11 sc11fidg 0.792 0.011
+91 1 sc_11 sc11fidg l7
+21 1 sc_14 sc14thac 0.677 0.011
+21 1 sc_14 sc14tcom 0.782 0.009
+91 1 sc_14 sc14tcom l2
+21 1 sc_14 sc14obey 0.604 0.013
+91 1 sc_14 sc14obey l3
+21 1 sc_14 sc14dist 0.812 0.008
+91 1 sc_14 sc14dist l4
+21 1 sc_14 sc14temp 0.636 0.011
+91 1 sc_14 sc14temp l5
+21 1 sc_14 sc14rest 0.777 0.011
+91 1 sc_14 sc14rest l6
+21 1 sc_14 sc14fidg 0.819 0.011
+91 1 sc_14 sc14fidg l7
+21 1 sc_17 sc17thac 0.689 0.014
+21 1 sc_17 sc17tcom 0.767 0.013
+91 1 sc_17 sc17tcom l2
+21 1 sc_17 sc17obey 0.586 0.017
+91 1 sc_17 sc17obey l3
+21 1 sc_17 sc17dist 0.831 0.012
+91 1 sc_17 sc17dist l4
+21 1 sc_17 sc17temp 0.659 0.016
+91 1 sc_17 sc17temp l5
+21 1 sc_17 sc17rest 0.770 0.015
+91 1 sc_17 sc17rest l6
+21 1 sc_17 sc17fidg 0.804 0.016
+91 1 sc_17 sc17fidg l7
+21 1 i sc_3 0.949 0.015
+21 1 i sc_5 0.852 0.013
+21 1 i sc_7 0.822 0.014
+21 1 i sc_11 0.755 0.020
+21 1 i sc_14 0.686 0.018
+21 1 i sc_17 0.591 0.023
+21 1 s sc_3 0.000 0.0000000001000
+21 1 s sc_5 0.397 0.022
+21 1 s sc_7 0.471 0.021
+21 1 s sc_11 0.675 0.018
+21 1 s sc_14 0.689 0.018
+21 1 s sc_17 0.787 0.020
+22 1 sc3thac sc5thac 0.172 0.019
+22 1 sc5thac sc7thac 0.361 0.017
+22 1 sc7thac sc11thac 0.325 0.019
+22 1 sc11thac sc14thac 0.299 0.016
+22 1 sc14thac sc17thac 0.355 0.024
+22 1 sc3tcom sc5tcom 0.303 0.023
+22 1 sc5tcom sc7tcom 0.473 0.020
+22 1 sc7tcom sc11tcom 0.417 0.020
+22 1 sc11tcom sc14tcom 0.467 0.021
+22 1 sc14tcom sc17tcom 0.485 0.028
+22 1 sc3obey sc5obey 0.358 0.020
+22 1 sc5obey sc7obey 0.412 0.019
+22 1 sc7obey sc11obey 0.350 0.019
+22 1 sc11obey sc14obey 0.425 0.019
+22 1 sc14obey sc17obey 0.473 0.025
+22 1 sc3dist sc5dist 0.235 0.024
+22 1 sc5dist sc7dist 0.464 0.024
+22 1 sc7dist sc11dist 0.512 0.028
+22 1 sc11dist sc14dist 0.441 0.026
+22 1 sc14dist sc17dist 0.549 0.032
+22 1 sc3temp sc5temp 0.443 0.019
+22 1 sc5temp sc7temp 0.620 0.016
+22 1 sc7temp sc11temp 0.502 0.019
+22 1 sc11temp sc14temp 0.586 0.015
+22 1 sc14temp sc17temp 0.607 0.023
+22 1 sc3rest sc5rest 0.443 0.027
+22 1 sc5rest sc7rest 0.545 0.027
+22 1 sc7rest sc11rest 0.438 0.027
+22 1 sc11rest sc14rest 0.413 0.026
+22 1 sc14rest sc17rest 0.449 0.048
+22 1 sc3fidg sc5fidg 0.351 0.025
+22 1 sc5fidg sc7fidg 0.534 0.020
+22 1 sc7fidg sc11fidg 0.465 0.026
+22 1 sc11fidg sc14fidg 0.491 0.032
+22 1 sc14fidg sc17fidg 0.512 0.042
+22 1 i s -0.162 0.036
+24 1 sc_3 0.100 0.028
+24 1 sc_5 0.226 0.011
+24 1 sc_7 0.228 0.010
+24 1 sc_11 0.140 0.011
+24 1 sc_14 0.207 0.011
+24 1 sc_17 0.181 0.019
+25 1 i 1.000 0.0000000001000
+25 1 s 1.000 0.0000000001000
+31 1 sc_3 sc3thac 0.410 0.014
+31 1 sc_3 sc3tcom 0.648 0.012
+91 1 sc_3 sc3tcom l2
+31 1 sc_3 sc3obey 0.552 0.012
+91 1 sc_3 sc3obey l3
+31 1 sc_3 sc3dist 0.763 0.010
+91 1 sc_3 sc3dist l4
+31 1 sc_3 sc3temp 0.558 0.012
+91 1 sc_3 sc3temp l5
+31 1 sc_3 sc3rest 0.789 0.010
+91 1 sc_3 sc3rest l6
+31 1 sc_3 sc3fidg 0.708 0.012
+91 1 sc_3 sc3fidg l7
+31 1 sc_5 sc5thac 0.456 0.015
+31 1 sc_5 sc5tcom 0.721 0.015
+91 1 sc_5 sc5tcom l2
+31 1 sc_5 sc5obey 0.615 0.015
+91 1 sc_5 sc5obey l3
+31 1 sc_5 sc5dist 0.849 0.017
+91 1 sc_5 sc5dist l4
+31 1 sc_5 sc5temp 0.621 0.014
+91 1 sc_5 sc5temp l5
+31 1 sc_5 sc5rest 0.879 0.018
+91 1 sc_5 sc5rest l6
+31 1 sc_5 sc5fidg 0.789 0.017
+91 1 sc_5 sc5fidg l7
+31 1 sc_7 sc7thac 0.473 0.016
+31 1 sc_7 sc7tcom 0.748 0.016
+91 1 sc_7 sc7tcom l2
+31 1 sc_7 sc7obey 0.637 0.015
+91 1 sc_7 sc7obey l3
+31 1 sc_7 sc7dist 0.880 0.017
+91 1 sc_7 sc7dist l4
+31 1 sc_7 sc7temp 0.644 0.015
+91 1 sc_7 sc7temp l5
+31 1 sc_7 sc7rest 0.911 0.018
+91 1 sc_7 sc7rest l6
+31 1 sc_7 sc7fidg 0.818 0.017
+91 1 sc_7 sc7fidg l7
+31 1 sc_11 sc11thac 0.515 0.018
+31 1 sc_11 sc11tcom 0.814 0.021
+91 1 sc_11 sc11tcom l2
+31 1 sc_11 sc11obey 0.693 0.018
+91 1 sc_11 sc11obey l3
+31 1 sc_11 sc11dist 0.958 0.024
+91 1 sc_11 sc11dist l4
+31 1 sc_11 sc11temp 0.701 0.020
+91 1 sc_11 sc11temp l5
+31 1 sc_11 sc11rest 0.991 0.026
+91 1 sc_11 sc11rest l6
+31 1 sc_11 sc11fidg 0.890 0.023
+91 1 sc_11 sc11fidg l7
+31 1 sc_14 sc14thac 0.566 0.020
+31 1 sc_14 sc14tcom 0.896 0.021
+91 1 sc_14 sc14tcom l2
+31 1 sc_14 sc14obey 0.763 0.019
+91 1 sc_14 sc14obey l3
+31 1 sc_14 sc14dist 1.054 0.025
+91 1 sc_14 sc14dist l4
+31 1 sc_14 sc14temp 0.771 0.020
+91 1 sc_14 sc14temp l5
+31 1 sc_14 sc14rest 1.091 0.026
+91 1 sc_14 sc14rest l6
+31 1 sc_14 sc14fidg 0.979 0.023
+91 1 sc_14 sc14fidg l7
+31 1 sc_17 sc17thac 0.657 0.027
+31 1 sc_17 sc17tcom 1.039 0.036
+91 1 sc_17 sc17tcom l2
+31 1 sc_17 sc17obey 0.886 0.031
+91 1 sc_17 sc17obey l3
+31 1 sc_17 sc17dist 1.224 0.043
+91 1 sc_17 sc17dist l4
+31 1 sc_17 sc17temp 0.895 0.032
+91 1 sc_17 sc17temp l5
+31 1 sc_17 sc17rest 1.266 0.046
+91 1 sc_17 sc17rest l6
+31 1 sc_17 sc17fidg 1.137 0.040
+91 1 sc_17 sc17fidg l7
+31 1 i sc_3 0.949 0.015
+31 1 i sc_5 0.852 0.013
+31 1 i sc_7 0.822 0.014
+31 1 i sc_11 0.755 0.020
+31 1 i sc_14 0.686 0.018
+31 1 i sc_17 0.591 0.023
+31 1 s sc_3 0.000 0.0000000001000
+31 1 s sc_5 0.397 0.022
+31 1 s sc_7 0.471 0.021
+31 1 s sc_11 0.675 0.018
+31 1 s sc_14 0.689 0.018
+31 1 s sc_17 0.787 0.020
+32 1 sc3thac sc5thac 0.093 0.011
+32 1 sc5thac sc7thac 0.131 0.011
+32 1 sc7thac sc11thac 0.106 0.009
+32 1 sc11thac sc14thac 0.099 0.009
+32 1 sc14thac sc17thac 0.151 0.015
+32 1 sc3tcom sc5tcom 0.165 0.013
+32 1 sc5tcom sc7tcom 0.228 0.014
+32 1 sc7tcom sc11tcom 0.210 0.013
+32 1 sc11tcom sc14tcom 0.249 0.017
+32 1 sc14tcom sc17tcom 0.301 0.023
+32 1 sc3obey sc5obey 0.235 0.015
+32 1 sc5obey sc7obey 0.246 0.017
+32 1 sc7obey sc11obey 0.235 0.017
+32 1 sc11obey sc14obey 0.378 0.025
+32 1 sc14obey sc17obey 0.582 0.042
+32 1 sc3dist sc5dist 0.103 0.011
+32 1 sc5dist sc7dist 0.199 0.014
+32 1 sc7dist sc11dist 0.223 0.015
+32 1 sc11dist sc14dist 0.230 0.018
+32 1 sc14dist sc17dist 0.342 0.026
+32 1 sc3temp sc5temp 0.289 0.015
+32 1 sc5temp sc7temp 0.372 0.021
+32 1 sc7temp sc11temp 0.311 0.020
+32 1 sc11temp sc14temp 0.446 0.025
+32 1 sc14temp sc17temp 0.580 0.040
+32 1 sc3rest sc5rest 0.179 0.012
+32 1 sc5rest sc7rest 0.224 0.015
+32 1 sc7rest sc11rest 0.193 0.015
+32 1 sc11rest sc14rest 0.256 0.021
+32 1 sc14rest sc17rest 0.416 0.053
+32 1 sc3fidg sc5fidg 0.195 0.015
+32 1 sc5fidg sc7fidg 0.318 0.018
+32 1 sc7fidg sc11fidg 0.241 0.016
+32 1 sc11fidg sc14fidg 0.232 0.020
+32 1 sc14fidg sc17fidg 0.295 0.029
+32 1 i s -0.162 0.036
+34 1 sc_3 0.100 0.028
+34 1 sc_5 0.226 0.011
+34 1 sc_7 0.228 0.010
+34 1 sc_11 0.140 0.011
+34 1 sc_14 0.207 0.011
+34 1 sc_17 0.181 0.019
+35 1 i 1.000 0.0000000001000
+35 1 s 1.000 0.0000000001000

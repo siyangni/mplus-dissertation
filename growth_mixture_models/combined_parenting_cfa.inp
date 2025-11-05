@@ -1,0 +1,94 @@
+TITLE: Combined CFA for parenting constructs (ages 3,5,7,11,14,17)
+	   ordinal indicators, WLSMV, THETA, complex survey; save all FS
+
+DATA: FILE = recoded_only_sc_pa_cov.dat;
+
+VARIABLE:
+  NAMES ARE
+    pttype2 nh2 bovwt1 covwt1 dovwt1 eovwt1 fovwt1 govwt1 sptn00
+    sc3thac sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg
+    sc5thac sc5tcom sc5obey sc5dist sc5temp sc5rest sc5fidg sc5lyin
+    sc7thac sc7tcom sc7obey sc7dist sc7temp sc7rest sc7fidg sc7lyin
+    sc11thac sc11tcom sc11obey sc11dist sc11temp sc11rest sc11fidg sc11lyin
+    sc14thac sc14tcom sc14obey sc14dist sc14temp sc14rest sc14fidg sc14lyin
+    sc17thac sc17tcom sc17obey sc17dist sc17temp sc17rest sc17fidg sc17lyin
+    ignore3 smack3 shout3 bedroom3 treats3 telloff3 bribe3
+    ignore5 smack5 shout5 bedroom5 treats5 telloff5 bribe5 reason5
+    rindoor5 dinner5 close5 read5 story5 music5 paint5 active5 games5 park5
+    ignore7 smack7 shout7 bedroom7 treats7 telloff7 bribe7 reason7
+    rindoor7 dinner7 close7 read7 story7 music7 paint7 active7 games7 park7
+    tvrules7
+    bedroom11 treats11 reason11 close11 active11 games11
+    pwhere14 pwho14 pwhat14 cmwhere14 cmwho14 cmwhat14
+    cmwhere17 cmtback17 pwhere17 ptback17
+    livewp17 pedu bpedu sex race brace bmarried
+    incomec incomel incomef lbw namhapna0 namunfaa0 nambrusa0 namfeeda0
+    naminjua0 nambatha0 namwarya0 nambshya0 namfreta0 namsleea0 nammilka0
+    namsltia0 namnapsa0 namsofoa0 inftempr inftemp dfpw dupd dupw
+    hfae coga scoga age3 age5 age7 age11 age14 age17 mcsid;
+
+  USEVARIABLES =
+    ignore3 smack3 shout3 bedroom3 treats3 telloff3 bribe3
+    ignore5 smack5 shout5 bedroom5 treats5 telloff5 bribe5 reason5
+    ignore7 smack7 shout7 bedroom7 treats7 telloff7 bribe7 reason7
+    bedroom11 treats11 reason11
+    pwhere14 pwho14 pwhat14 cmwhere14 cmwho14 cmwhat14
+    pwhere17 cmwhere17 ptback17 cmtback17;
+
+  CATEGORICAL =
+    ignore3 smack3 shout3 bedroom3 treats3 telloff3 bribe3
+    ignore5 smack5 shout5 bedroom5 treats5 telloff5 bribe5 reason5
+    ignore7 smack7 shout7 bedroom7 treats7 telloff7 bribe7 reason7
+    bedroom11 treats11 reason11
+    pwhere14 pwho14 pwhat14 cmwhere14 cmwho14 cmwhat14
+    pwhere17 cmwhere17 ptback17 cmtback17;
+
+  IDVARIABLE = mcsid;
+  MISSING = ALL (-9999);
+
+  STRATIFICATION = pttype2;
+  CLUSTER       = sptn00;
+  WEIGHT        = govwt1;
+  SUBPOPULATION = (govwt1 > 0);
+
+ANALYSIS:
+  TYPE = COMPLEX;
+  ESTIMATOR = WLSMV;
+  PARAMETERIZATION = THETA;
+
+MODEL:
+  ! Age 3
+  H3  BY ignore3* smack3* shout3* bedroom3* treats3* telloff3* bribe3*;
+  H3@1;  [H3@0];
+
+  ! Age 5
+  H5  BY ignore5* smack5* shout5* bedroom5* treats5* telloff5* bribe5* reason5*;
+  H5@1;  [H5@0];
+
+  ! Age 7
+  H7  BY ignore7* smack7* shout7* bedroom7* treats7* telloff7* bribe7* reason7*;
+  H7@1;  [H7@0];
+
+  ! Age 11
+  H11 BY bedroom11* treats11* reason11*;
+  H11@1; [H11@0];
+
+  ! Age 14 monitoring (one factor) + reporter residual correlations
+  MON14 BY pwhere14* pwho14* pwhat14* cmwhere14* cmwho14* cmwhat14*;
+  MON14@1; [MON14@0];
+
+  pwho14    WITH pwhat14;
+  cmwho14   WITH cmwhat14;
+  pwhere14  WITH pwho14 pwhat14;
+  cmwhere14 WITH cmwho14 cmwhat14;
+
+  ! Age 17 monitoring (two factors) + reporter-pair residual correlations
+  MON17_K  BY pwhere17*  cmwhere17*;    MON17_K@1;  [MON17_K@0];
+  CURFEW17 BY ptback17*  cmtback17*;    CURFEW17@1; [CURFEW17@0];
+  MON17_K WITH CURFEW17;
+
+  pwhere17  WITH ptback17;
+  cmwhere17 WITH cmtback17;
+
+OUTPUT: STDYX TECH1 MODINDICES(10);
+SAVEDATA: FILE = Parenting_FS_all.dat; SAVE = FSCORES;

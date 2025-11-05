@@ -1,0 +1,200 @@
+TITLE: Baseline Latent Growth Curve Model of Self-Control
+
+DATA:
+  FILE = recoded_only_sc_pa_cov.dat;
+
+VARIABLE:
+  NAMES = weight1 sc3thac sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg sc5thac
+     sc5tcom sc5obey sc5dist sc5temp sc5rest sc5fidg sc5lyin sc7thac sc7tcom
+     sc7obey sc7dist sc7temp sc7rest sc7fidg sc7lyin sc11thac sc11tcom
+     sc11obey sc11dist sc11temp sc11rest sc11fidg sc11lyin sc14thac sc14tcom
+     sc14obey sc14dist sc14temp sc14rest sc14fidg sc14lyin sc17thac sc17tcom
+     sc17obey sc17dist sc17temp sc17rest sc17fidg sc17lyin ignore5 smack5
+     shout5 bedroom5 treats5 telloff5 bribe5 reason5 rindoor5 dinner5 close5
+     read5 story5 music5 paint5 active5 games5 park5 ignore7 smack7 shout7
+     bedroom7 treats7 telloff7 bribe7 reason7 rindoor7 dinner7 close7 read7
+     story7 music7 paint7 active7 games7 park7 tvrules7 bedroom11 treats11
+     reason11 close11 active11 games11 pwhere14 pwho14 pwhat14 cmwhere14
+     cmwho14 cmwhat14 cmwhere17 cmtback17 pwhere17 ptback17 livewp17 pedu
+     bpedu sex race brace bmarried incomec incomel incomef lbw namhapna0
+     namunfaa0 nambrusa0 namfeeda0 naminjua0 nambatha0 namwarya0 nambshya0
+     namfreta0 namsleea0 nammilka0 namsltia0 namnapsa0 namsofoa0 inftempr
+     inftemp dfpw dupd dupw hfae coga scoga age3 age5 age7 age11 age14
+     age17 mcsid;
+
+  USEVARIABLES =
+    sc5tcom sc5dist sc5fidg sc5thac sc5temp sc5obey sc5lyin
+    sc7tcom sc7dist sc7fidg sc7thac sc7temp sc7obey sc7lyin
+    sc11tcom sc11dist sc11fidg sc11thac sc11temp sc11obey sc11lyin
+    sc14tcom sc14dist sc14fidg sc14thac sc14temp sc14obey sc14lyin
+    sc17tcom sc17dist sc17fidg sc17thac sc17temp sc17obey sc17lyin
+    age5 age7 age11 age14 age17;
+  
+  CATEGORICAL = 
+    sc5tcom sc5dist sc5fidg sc5thac sc5temp sc5obey sc5lyin
+    sc7tcom sc7dist sc7fidg sc7thac sc7temp sc7obey sc7lyin
+    sc11tcom sc11dist sc11fidg sc11thac sc11temp sc11obey sc11lyin
+    sc14tcom sc14dist sc14fidg sc14thac sc14temp sc14obey sc14lyin
+    sc17tcom sc17dist sc17fidg sc17thac sc17temp sc17obey sc17lyin;
+
+  MISSING ARE ALL (-9999);
+
+  ! Individually varying time scores: use raw ages directly (no centering)
+  TSCORES ARE age5 age7 age11 age14 age17;
+
+ANALYSIS:
+  TYPE        = RANDOM;          ! required for TSCORES
+  ESTIMATOR   = MLR;             ! WLSMV not allowed with TYPE=RANDOM
+  LINK        = PROBIT;          ! keeps the probit metric for ordinal items
+  ALGORITHM   = INTEGRATION;
+  INTEGRATION = MONTECARLO (200);      ! increase draws if needed (e.g., 5000)
+  PROCESSORS  = 11;               ! optional parallelization
+
+
+MODEL:
+  SC_t5 BY sc5tcom@1
+sc5dist (l_dist) 
+sc5fidg (l_fidg) 
+sc5thac (l_thac)
+sc5temp (l_temp) 
+sc5obey (l_obey) 
+sc5lyin (l_lyin);
+  SC_t7 BY 
+sc7tcom@1    
+sc7dist (l_dist) 
+sc7fidg (l_fidg) 
+sc7thac (l_thac)
+sc7temp (l_temp) 
+sc7obey (l_obey) 
+sc7lyin (l_lyin);
+  SC_t11 BY sc11tcom@1
+sc11dist (l_dist) 
+sc11fidg (l_fidg) 
+sc11thac (l_thac)
+sc11temp (l_temp) 
+sc11obey (l_obey) 
+sc11lyin (l_lyin);
+  SC_t14 BY 
+sc14tcom@1
+sc14dist (l_dist) 
+sc14fidg (l_fidg) 
+sc14thac (l_thac)
+sc14temp (l_temp) 
+sc14obey (l_obey) 
+sc14lyin (l_lyin);
+  SC_t17 BY 
+sc17tcom@1
+sc17dist (l_dist) 
+sc17fidg (l_fidg) 
+sc17thac (l_thac)
+sc17temp (l_temp) 
+sc17obey (l_obey) 
+sc17lyin (l_lyin);
+
+! Equal thresholds across time (two per item)
+
+! TCOM: equal across 5,7,11,14; free at 17
+  [sc5tcom$1] (t_tcom1);  
+[sc7tcom$1] (t_tcom1);  
+[sc11tcom$1] (t_tcom1);  
+[sc14tcom$1] (t_tcom1);  
+[sc17tcom$1];
+  [sc5tcom$2] (t_tcom2);  
+[sc7tcom$2] (t_tcom2);  
+[sc11tcom$2] (t_tcom2);  
+[sc14tcom$2] (t_tcom2);  
+[sc17tcom$2];
+
+! DIST: equal across 5,11,14; free at 7 and 17
+  [sc5dist$1] (t_dist1);  
+[sc7dist$1];  
+[sc11dist$1] (t_dist1);  
+[sc14dist$1] (t_dist1);  
+[sc17dist$1];
+  [sc5dist$2] (t_dist2);  
+[sc7dist$2];  
+[sc11dist$2] (t_dist2);  
+[sc14dist$2] (t_dist2);  
+[sc17dist$2];
+
+! FIDG: free at all waves (clear non-invariance)
+  [sc5fidg$1];  
+[sc7fidg$1];  
+[sc11fidg$1];  
+[sc14fidg$1];  
+[sc17fidg$1];
+  [sc5fidg$2];  
+[sc7fidg$2];  
+[sc11fidg$2];  
+[sc14fidg$2];  
+[sc17fidg$2];
+
+! THAC: equal across 7,11,14; free at 5 and 17
+  [sc5thac$1];  
+[sc7thac$1] (t_thac1);  
+[sc11thac$1] (t_thac1);  
+[sc14thac$1] (t_thac1);  
+[sc17thac$1];
+  [sc5thac$2];  
+[sc7thac$2] (t_thac2);  
+[sc11thac$2] (t_thac2);  
+[sc14thac$2] (t_thac2);  
+[sc17thac$2];
+
+! TEMP: equal across 7,11,14; free at 5 and 17
+  [sc5temp$1];  
+[sc7temp$1] (t_temp1);  
+[sc11temp$1] (t_temp1);  
+[sc14temp$1] (t_temp1);  
+[sc17temp$1];
+  [sc5temp$2];  
+[sc7temp$2] (t_temp2);  
+[sc11temp$2] (t_temp2);  
+[sc14temp$2] (t_temp2);  
+[sc17temp$2];
+
+! OBEY: equal across 7,11,17; free at 5 and 14 (big MIs at 5 & 14; 17 was small)
+  [sc5obey$1];  
+[sc7obey$1] (t_obey1);  
+[sc11obey$1] (t_obey1);  
+[sc14obey$1];  
+[sc17obey$1] (t_obey1);
+  [sc5obey$2];  
+[sc7obey$2] (t_obey2);  
+[sc11obey$2] (t_obey2);  
+[sc14obey$2];  
+[sc17obey$2] (t_obey2);
+
+! LYIN: equal across 11,14; free at 5,7,17
+  [sc5lyin$1];  
+[sc7lyin$1];  
+[sc11lyin$1] (t_lyin1);  
+[sc14lyin$1] (t_lyin1);  
+[sc17lyin$1];
+  [sc5lyin$2];  
+[sc7lyin$2];  
+[sc11lyin$2] (t_lyin2);  
+[sc14lyin$2] (t_lyin2);  
+[sc17lyin$2];
+
+
+! Anchor the first-order latent factors’ intercepts at zero
+[SC_t5@0 SC_t7@0 SC_t11@0 SC_t14@0 SC_t17@0];
+
+! Intercept i defined at age = 0 (because time scores are raw ages)
+! Slope s = change per 1 year of age
+i s | SC_t5 SC_t7 SC_t11 SC_t14 SC_t17 AT age5 age7 age11 age14 age17;
+
+[i@0 s];
+i WITH s;
+
+! (Optional) Homoscedastic latent residuals across waves
+! SC_t5-SC_t17 (res);   ! uncomment to constrain equal residual variances
+
+
+OUTPUT:
+TECH1;
+
+
+
+

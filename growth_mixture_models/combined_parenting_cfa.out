@@ -1,0 +1,2590 @@
+Mplus VERSION 8.8
+MUTHEN & MUTHEN
+11/01/2025  11:20 PM
+
+INPUT INSTRUCTIONS
+
+  TITLE: Combined CFA for parenting constructs (ages 3,5,7,11,14,17)
+  	   ordinal indicators, WLSMV, THETA, complex survey; save all FS
+
+  DATA: FILE = recoded_only_sc_pa_cov.dat;
+
+  VARIABLE:
+    NAMES ARE
+      pttype2 nh2 bovwt1 covwt1 dovwt1 eovwt1 fovwt1 govwt1 sptn00
+      sc3thac sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg
+      sc5thac sc5tcom sc5obey sc5dist sc5temp sc5rest sc5fidg sc5lyin
+      sc7thac sc7tcom sc7obey sc7dist sc7temp sc7rest sc7fidg sc7lyin
+      sc11thac sc11tcom sc11obey sc11dist sc11temp sc11rest sc11fidg sc11lyin
+      sc14thac sc14tcom sc14obey sc14dist sc14temp sc14rest sc14fidg sc14lyin
+      sc17thac sc17tcom sc17obey sc17dist sc17temp sc17rest sc17fidg sc17lyin
+      ignore3 smack3 shout3 bedroom3 treats3 telloff3 bribe3
+      ignore5 smack5 shout5 bedroom5 treats5 telloff5 bribe5 reason5
+      rindoor5 dinner5 close5 read5 story5 music5 paint5 active5 games5 park5
+      ignore7 smack7 shout7 bedroom7 treats7 telloff7 bribe7 reason7
+      rindoor7 dinner7 close7 read7 story7 music7 paint7 active7 games7 park7
+      tvrules7
+      bedroom11 treats11 reason11 close11 active11 games11
+      pwhere14 pwho14 pwhat14 cmwhere14 cmwho14 cmwhat14
+      cmwhere17 cmtback17 pwhere17 ptback17
+      livewp17 pedu bpedu sex race brace bmarried
+      incomec incomel incomef lbw namhapna0 namunfaa0 nambrusa0 namfeeda0
+      naminjua0 nambatha0 namwarya0 nambshya0 namfreta0 namsleea0 nammilka0
+      namsltia0 namnapsa0 namsofoa0 inftempr inftemp dfpw dupd dupw
+      hfae coga scoga age3 age5 age7 age11 age14 age17 mcsid;
+
+    USEVARIABLES =
+      ignore3 smack3 shout3 bedroom3 treats3 telloff3 bribe3
+      ignore5 smack5 shout5 bedroom5 treats5 telloff5 bribe5 reason5
+      ignore7 smack7 shout7 bedroom7 treats7 telloff7 bribe7 reason7
+      bedroom11 treats11 reason11
+      pwhere14 pwho14 pwhat14 cmwhere14 cmwho14 cmwhat14
+      pwhere17 cmwhere17 ptback17 cmtback17;
+
+    CATEGORICAL =
+      ignore3 smack3 shout3 bedroom3 treats3 telloff3 bribe3
+      ignore5 smack5 shout5 bedroom5 treats5 telloff5 bribe5 reason5
+      ignore7 smack7 shout7 bedroom7 treats7 telloff7 bribe7 reason7
+      bedroom11 treats11 reason11
+      pwhere14 pwho14 pwhat14 cmwhere14 cmwho14 cmwhat14
+      pwhere17 cmwhere17 ptback17 cmtback17;
+
+    IDVARIABLE = mcsid;
+    MISSING = ALL (-9999);
+
+    STRATIFICATION = pttype2;
+    CLUSTER       = sptn00;
+    WEIGHT        = govwt1;
+    SUBPOPULATION = (govwt1 > 0);
+
+  ANALYSIS:
+    TYPE = COMPLEX;
+    ESTIMATOR = WLSMV;
+    PARAMETERIZATION = THETA;
+
+  MODEL:
+    ! Age 3
+    H3  BY ignore3* smack3* shout3* bedroom3* treats3* telloff3* bribe3*;
+    H3@1;  [H3@0];
+
+    ! Age 5
+    H5  BY ignore5* smack5* shout5* bedroom5* treats5* telloff5* bribe5* reason5*;
+    H5@1;  [H5@0];
+
+    ! Age 7
+    H7  BY ignore7* smack7* shout7* bedroom7* treats7* telloff7* bribe7* reason7*;
+    H7@1;  [H7@0];
+
+    ! Age 11
+    H11 BY bedroom11* treats11* reason11*;
+    H11@1; [H11@0];
+
+    ! Age 14 monitoring (one factor) + reporter residual correlations
+    MON14 BY pwhere14* pwho14* pwhat14* cmwhere14* cmwho14* cmwhat14*;
+    MON14@1; [MON14@0];
+
+    pwho14    WITH pwhat14;
+    cmwho14   WITH cmwhat14;
+    pwhere14  WITH pwho14 pwhat14;
+    cmwhere14 WITH cmwho14 cmwhat14;
+
+    ! Age 17 monitoring (two factors) + reporter-pair residual correlations
+    MON17_K  BY pwhere17*  cmwhere17*;    MON17_K@1;  [MON17_K@0];
+    CURFEW17 BY ptback17*  cmtback17*;    CURFEW17@1; [CURFEW17@0];
+    MON17_K WITH CURFEW17;
+
+    pwhere17  WITH ptback17;
+    cmwhere17 WITH cmtback17;
+
+  OUTPUT: STDYX TECH1 MODINDICES(10);
+  SAVEDATA: FILE = Parenting_FS_all.dat; SAVE = FSCORES;
+
+
+
+*** WARNING in VARIABLE command
+  Note that only the first 8 characters of variable names are used in the output.
+  Shorten variable names to avoid any confusion.
+*** WARNING
+  Data set contains cases with missing on all variables.
+  These cases were not included in the analysis.
+  Number of cases with missing on all variables:  2192
+   2 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
+
+
+
+Combined CFA for parenting constructs (ages 3,5,7,11,14,17)
+ordinal indicators, WLSMV, THETA, complex survey; save all FS
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                       10593
+
+Number of dependent variables                                   36
+Number of independent variables                                  0
+Number of continuous latent variables                            7
+
+Observed dependent variables
+
+  Binary and ordered categorical (ordinal)
+   IGNORE3     SMACK3      SHOUT3      BEDROOM3    TREATS3     TELLOFF3
+   BRIBE3      IGNORE5     SMACK5      SHOUT5      BEDROOM5    TREATS5
+   TELLOFF5    BRIBE5      REASON5     IGNORE7     SMACK7      SHOUT7
+   BEDROOM7    TREATS7     TELLOFF7    BRIBE7      REASON7     BEDROOM1
+   TREATS11    REASON11    PWHERE14    PWHO14      PWHAT14     CMWHERE1
+   CMWHO14     CMWHAT14    PWHERE17    CMWHERE1    PTBACK17    CMTBACK1
+
+Continuous latent variables
+   H3          H5          H7          H11         MON14       MON17_K
+   CURFEW17
+
+Variables with special functions
+
+  Stratification        PTTYPE2
+  Cluster variable      SPTN00
+  Weight variable       GOVWT1
+  ID variable           MCSID
+
+Estimator                                                    WLSMV
+Maximum number of iterations                                  1000
+Convergence criterion                                    0.500D-04
+Maximum number of steepest descent iterations                   20
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+Parameterization                                             THETA
+Link                                                        PROBIT
+
+Input data file(s)
+  recoded_only_sc_pa_cov.dat
+
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns          1201
+     Number of strata                            9
+     Number of clusters                        398
+
+
+UNIVARIATE PROPORTIONS AND COUNTS FOR CATEGORICAL VARIABLES
+
+    IGNORE3
+      Category 1    0.218         1650.790
+      Category 2    0.355         2684.312
+      Category 3    0.055          416.116
+      Category 4    0.259         1954.443
+      Category 5    0.113          851.324
+    SMACK3
+      Category 1    0.335         2591.596
+      Category 2    0.525         4060.360
+      Category 3    0.050          389.077
+      Category 4    0.082          632.356
+      Category 5    0.009           66.655
+    SHOUT3
+      Category 1    0.028          216.956
+      Category 2    0.326         2516.277
+      Category 3    0.076          583.026
+      Category 4    0.395         3050.225
+      Category 5    0.175         1346.820
+    BEDROOM3
+      Category 1    0.235         1827.355
+      Category 2    0.276         2149.813
+      Category 3    0.121          938.856
+      Category 4    0.295         2293.975
+      Category 5    0.074          574.207
+    TREATS3
+      Category 1    0.141         1083.412
+      Category 2    0.363         2777.766
+      Category 3    0.129          987.220
+      Category 4    0.310         2378.556
+      Category 5    0.057          434.131
+    TELLOFF3
+      Category 1    0.005           41.459
+      Category 2    0.127          982.465
+      Category 3    0.041          318.668
+      Category 4    0.445         3439.992
+      Category 5    0.381         2945.609
+    BRIBE3
+      Category 1    0.290         2255.849
+      Category 2    0.321         2494.626
+      Category 3    0.087          678.818
+      Category 4    0.228         1775.397
+      Category 5    0.073          570.151
+    IGNORE5
+      Category 1    0.206         1722.126
+      Category 2    0.296         2479.570
+      Category 3    0.316         2644.241
+      Category 4    0.155         1297.415
+      Category 5    0.028          232.464
+    SMACK5
+      Category 1    0.453         3821.237
+      Category 2    0.439         3698.752
+      Category 3    0.095          799.303
+      Category 4    0.012          102.579
+      Category 5    0.001            8.822
+    SHOUT5
+      Category 1    0.027          226.248
+      Category 2    0.261         2203.537
+      Category 3    0.353         2976.662
+      Category 4    0.310         2616.263
+      Category 5    0.049          411.605
+    BEDROOM5
+      Category 1    0.109          920.444
+      Category 2    0.260         2198.944
+      Category 3    0.388         3273.888
+      Category 4    0.221         1868.806
+      Category 5    0.022          184.025
+    TREATS5
+      Category 1    0.094          794.083
+      Category 2    0.268         2259.242
+      Category 3    0.438         3696.591
+      Category 4    0.188         1585.456
+      Category 5    0.012          100.306
+    TELLOFF5
+      Category 1    0.005           38.229
+      Category 2    0.109          918.426
+      Category 3    0.303         2554.436
+      Category 4    0.468         3952.138
+      Category 5    0.116          980.503
+    BRIBE5
+      Category 1    0.370         3122.269
+      Category 2    0.302         2547.300
+      Category 3    0.230         1938.414
+      Category 4    0.086          722.647
+      Category 5    0.013          110.798
+    REASON5
+      Category 1    0.027          223.641
+      Category 2    0.077          648.605
+      Category 3    0.242         2040.784
+      Category 4    0.454         3825.220
+      Category 5    0.201         1694.210
+    IGNORE7
+      Category 1    0.267         2094.228
+      Category 2    0.302         2372.101
+      Category 3    0.306         2397.580
+      Category 4    0.108          850.700
+      Category 5    0.016          128.214
+    SMACK7
+      Category 1    0.518         4107.085
+      Category 2    0.406         3216.156
+      Category 3    0.069          545.659
+      Category 4    0.007           54.926
+      Category 5    0.000            3.765
+    SHOUT7
+      Category 1    0.025          200.843
+      Category 2    0.235         1871.180
+      Category 3    0.389         3092.608
+      Category 4    0.306         2435.093
+      Category 5    0.045          355.602
+    BEDROOM7
+      Category 1    0.124          989.192
+      Category 2    0.299         2375.111
+      Category 3    0.405         3220.379
+      Category 4    0.160         1276.265
+      Category 5    0.012           93.961
+    TREATS7
+      Category 1    0.088          697.990
+      Category 2    0.289         2290.252
+      Category 3    0.461         3656.246
+      Category 4    0.154         1220.365
+      Category 5    0.009           72.387
+    TELLOFF7
+      Category 1    0.005           43.594
+      Category 2    0.126          998.191
+      Category 3    0.361         2867.734
+      Category 4    0.422         3347.448
+      Category 5    0.086          681.963
+    BRIBE7
+      Category 1    0.446         3536.809
+      Category 2    0.302         2400.876
+      Category 3    0.192         1520.924
+      Category 4    0.054          428.903
+      Category 5    0.006           50.450
+    REASON7
+      Category 1    0.032          250.136
+      Category 2    0.093          738.647
+      Category 3    0.292         2309.637
+      Category 4    0.448         3549.951
+      Category 5    0.135         1072.601
+    BEDROOM1
+      Category 1    0.142         1094.922
+      Category 2    0.446         3424.983
+      Category 3    0.320         2459.284
+      Category 4    0.084          649.333
+      Category 5    0.007           56.278
+    TREATS11
+      Category 1    0.118          904.557
+      Category 2    0.446         3430.062
+      Category 3    0.353         2719.294
+      Category 4    0.078          596.732
+      Category 5    0.006           46.488
+    REASON11
+      Category 1    0.055          418.712
+      Category 2    0.197         1498.230
+      Category 3    0.359         2721.016
+      Category 4    0.298         2264.481
+      Category 5    0.091          687.099
+    PWHERE14
+      Category 1    0.005           35.870
+      Category 2    0.019          141.616
+      Category 3    0.125          912.941
+      Category 4    0.851         6230.328
+    PWHO14
+      Category 1    0.004           27.144
+      Category 2    0.022          158.423
+      Category 3    0.162         1182.636
+      Category 4    0.813         5952.552
+    PWHAT14
+      Category 1    0.013           96.702
+      Category 2    0.061          449.972
+      Category 3    0.300         2196.470
+      Category 4    0.625         4577.612
+    CMWHERE1
+      Category 1    0.010           83.103
+      Category 2    0.069          549.420
+      Category 3    0.284         2257.598
+      Category 4    0.636         5052.016
+    CMWHO14
+      Category 1    0.014          108.043
+      Category 2    0.091          724.629
+      Category 3    0.334         2652.237
+      Category 4    0.561         4453.173
+    CMWHAT14
+      Category 1    0.028          219.740
+      Category 2    0.125          990.416
+      Category 3    0.378         3005.464
+      Category 4    0.469         3726.800
+    PWHERE17
+      Category 1    0.003           21.761
+      Category 2    0.030          197.212
+      Category 3    0.235         1551.159
+      Category 4    0.732         4838.898
+    CMWHERE1
+      Category 1    0.006           34.112
+      Category 2    0.064          375.320
+      Category 3    0.315         1847.424
+      Category 4    0.615         3605.638
+    PTBACK17
+      Category 1    0.080          527.360
+      Category 2    0.235         1549.511
+      Category 3    0.350         2310.509
+      Category 4    0.336         2216.726
+    CMTBACK1
+      Category 1    0.184          992.380
+      Category 2    0.301         1623.530
+      Category 3    0.281         1519.195
+      Category 4    0.235         1266.883
+
+
+
+THE MODEL ESTIMATION TERMINATED NORMALLY
+
+     THE MODEL CONTAINS A NON-ZERO CORRELATION BETWEEN DEPENDENT VARIABLES.
+     SUCH CORRELATIONS ARE IGNORED IN THE COMPUTATION OF THE FACTOR SCORES.
+
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                      199
+
+Chi-Square Test of Model Fit
+
+          Value                          15023.135*
+          Degrees of Freedom                   565
+          P-Value                           0.0000
+
+*   The chi-square value for MLM, MLMV, MLR, ULSMV, WLSM and WLSMV cannot be used
+    for chi-square difference testing in the regular way.  MLM, MLR and WLSM
+    chi-square difference testing is described on the Mplus website.  MLMV, WLSMV,
+    and ULSMV difference testing is done using the DIFFTEST option.
+
+RMSEA (Root Mean Square Error Of Approximation)
+
+          Estimate                           0.049
+          90 Percent C.I.                    0.048  0.050
+          Probability RMSEA <= .05           0.980
+
+CFI/TLI
+
+          CFI                                0.848
+          TLI                                0.831
+
+Chi-Square Test of Model Fit for the Baseline Model
+
+          Value                          95820.798
+          Degrees of Freedom                   630
+          P-Value                           0.0000
+
+SRMR (Standardized Root Mean Square Residual)
+
+          Value                              0.068
+
+Optimum Function Value for Weighted Least-Squares Estimator
+
+          Value                     0.11683257D+01
+
+
+
+MODEL RESULTS
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ H3       BY
+    IGNORE3            0.508      0.018     27.922      0.000
+    SMACK3             0.748      0.027     27.422      0.000
+    SHOUT3             0.927      0.026     36.201      0.000
+    BEDROOM3           0.707      0.023     31.235      0.000
+    TREATS3            0.643      0.022     29.730      0.000
+    TELLOFF3           0.949      0.032     29.795      0.000
+    BRIBE3             0.457      0.018     25.117      0.000
+
+ H5       BY
+    IGNORE5            0.494      0.014     34.287      0.000
+    SMACK5             0.762      0.020     38.011      0.000
+    SHOUT5             0.886      0.020     43.861      0.000
+    BEDROOM5           0.835      0.018     46.868      0.000
+    TREATS5            0.705      0.017     42.175      0.000
+    TELLOFF5           0.900      0.023     39.419      0.000
+    BRIBE5             0.448      0.014     32.982      0.000
+    REASON5            0.471      0.016     28.704      0.000
+
+ H7       BY
+    IGNORE7            0.526      0.016     33.478      0.000
+    SMACK7             0.810      0.022     36.658      0.000
+    SHOUT7             0.954      0.021     44.694      0.000
+    BEDROOM7           0.922      0.018     51.228      0.000
+    TREATS7            0.837      0.019     43.455      0.000
+    TELLOFF7           0.957      0.020     48.493      0.000
+    BRIBE7             0.449      0.015     30.463      0.000
+    REASON7            0.615      0.016     38.231      0.000
+
+ H11      BY
+    BEDROOM11          1.554      0.046     33.704      0.000
+    TREATS11           1.551      0.048     32.256      0.000
+    REASON11           0.997      0.027     37.342      0.000
+
+ MON14    BY
+    PWHERE14           1.132      0.106     10.635      0.000
+    PWHO14             1.111      0.094     11.800      0.000
+    PWHAT14            0.947      0.068     14.029      0.000
+    CMWHERE14          0.694      0.037     18.693      0.000
+    CMWHO14            0.553      0.033     16.677      0.000
+    CMWHAT14           0.607      0.031     19.444      0.000
+
+ MON17_K  BY
+    PWHERE17           1.214      0.121     10.024      0.000
+    CMWHERE17          0.634      0.041     15.273      0.000
+
+ CURFEW17 BY
+    PTBACK17           0.950      0.119      8.005      0.000
+    CMTBACK17          0.847      0.092      9.219      0.000
+
+ MON17_K  WITH
+    CURFEW17           0.278      0.046      6.002      0.000
+    H3                -0.236      0.026     -9.212      0.000
+    H5                -0.229      0.025     -9.069      0.000
+    H7                -0.253      0.023    -11.105      0.000
+    H11               -0.273      0.025    -10.753      0.000
+    MON14              0.865      0.041     20.935      0.000
+
+ H5       WITH
+    H3                 0.832      0.012     71.005      0.000
+
+ H7       WITH
+    H3                 0.702      0.011     61.429      0.000
+    H5                 0.958      0.010     98.313      0.000
+
+ H11      WITH
+    H3                 0.480      0.015     32.168      0.000
+    H5                 0.617      0.013     49.218      0.000
+    H7                 0.726      0.012     59.053      0.000
+
+ MON14    WITH
+    H3                -0.214      0.022     -9.876      0.000
+    H5                -0.217      0.020    -10.863      0.000
+    H7                -0.228      0.018    -12.832      0.000
+    H11               -0.251      0.025    -10.057      0.000
+
+ CURFEW17 WITH
+    H3                -0.029      0.024     -1.193      0.233
+    H5                 0.005      0.021      0.249      0.803
+    H7                 0.031      0.021      1.452      0.147
+    H11                0.106      0.023      4.691      0.000
+    MON14              0.317      0.028     11.152      0.000
+
+ PWHO14   WITH
+    PWHAT14            0.439      0.039     11.149      0.000
+    PWHERE14           0.500      0.045     11.226      0.000
+
+ CMWHO14  WITH
+    CMWHAT14           0.616      0.014     45.336      0.000
+    CMWHERE14          0.579      0.016     36.493      0.000
+
+ PWHERE14 WITH
+    PWHAT14            0.518      0.038     13.673      0.000
+
+ CMWHERE1 WITH
+    CMWHAT14           0.601      0.015     39.577      0.000
+
+ PWHERE17 WITH
+    PTBACK17           0.205      0.059      3.491      0.000
+
+ CMWHERE1 WITH
+    CMTBACK17          0.196      0.039      5.080      0.000
+
+ Means
+    H3                 0.000      0.000    999.000    999.000
+    H5                 0.000      0.000    999.000    999.000
+    H7                 0.000      0.000    999.000    999.000
+    H11                0.000      0.000    999.000    999.000
+    MON14              0.000      0.000    999.000    999.000
+    MON17_K            0.000      0.000    999.000    999.000
+    CURFEW17           0.000      0.000    999.000    999.000
+
+ Thresholds
+    IGNORE3$1         -0.872      0.026    -33.510      0.000
+    IGNORE3$2          0.208      0.026      8.153      0.000
+    IGNORE3$3          0.368      0.025     14.519      0.000
+    IGNORE3$4          1.360      0.028     48.892      0.000
+    SMACK3$1          -0.533      0.028    -18.737      0.000
+    SMACK3$2           1.346      0.034     39.333      0.000
+    SMACK3$3           1.672      0.040     41.704      0.000
+    SMACK3$4           2.975      0.067     44.300      0.000
+    SHOUT3$1          -2.603      0.048    -53.919      0.000
+    SHOUT3$2          -0.509      0.030    -17.003      0.000
+    SHOUT3$3          -0.241      0.029     -8.414      0.000
+    SHOUT3$4           1.276      0.034     37.094      0.000
+    BEDROOM3$1        -0.886      0.028    -31.173      0.000
+    BEDROOM3$2         0.034      0.030      1.122      0.262
+    BEDROOM3$3         0.411      0.030     13.512      0.000
+    BEDROOM3$4         1.773      0.044     40.254      0.000
+    TREATS3$1         -1.277      0.028    -45.471      0.000
+    TREATS3$2          0.012      0.026      0.460      0.645
+    TREATS3$3          0.403      0.029     13.924      0.000
+    TREATS3$4          1.882      0.041     45.996      0.000
+    TELLOFF3$1        -3.516      0.094    -37.591      0.000
+    TELLOFF3$2        -1.537      0.048    -31.785      0.000
+    TELLOFF3$3        -1.295      0.043    -30.129      0.000
+    TELLOFF3$4         0.417      0.030     13.846      0.000
+    BRIBE3$1          -0.608      0.024    -25.524      0.000
+    BRIBE3$2           0.310      0.024     13.020      0.000
+    BRIBE3$3           0.571      0.024     23.708      0.000
+    BRIBE3$4           1.596      0.040     39.949      0.000
+    IGNORE5$1         -0.916      0.028    -32.579      0.000
+    IGNORE5$2          0.005      0.021      0.217      0.828
+    IGNORE5$3          1.010      0.025     40.708      0.000
+    IGNORE5$4          2.135      0.050     42.994      0.000
+    SMACK5$1          -0.148      0.027     -5.556      0.000
+    SMACK5$2           1.556      0.031     50.162      0.000
+    SMACK5$3           2.791      0.057     49.016      0.000
+    SMACK5$4           3.865      0.167     23.081      0.000
+    SHOUT5$1          -2.577      0.052    -49.421      0.000
+    SHOUT5$2          -0.747      0.035    -21.137      0.000
+    SHOUT5$3           0.482      0.026     18.538      0.000
+    SHOUT5$4           2.213      0.043     51.396      0.000
+    BEDROOM5$1        -1.605      0.030    -53.439      0.000
+    BEDROOM5$2        -0.435      0.028    -15.521      0.000
+    BEDROOM5$3         0.907      0.025     36.573      0.000
+    BEDROOM5$4         2.629      0.050     52.600      0.000
+    TREATS5$1         -1.610      0.031    -51.642      0.000
+    TREATS5$2         -0.432      0.025    -17.325      0.000
+    TREATS5$3          1.031      0.025     42.032      0.000
+    TREATS5$4          2.767      0.063     43.942      0.000
+    TELLOFF5$1        -3.513      0.082    -42.931      0.000
+    TELLOFF5$2        -1.627      0.049    -33.272      0.000
+    TELLOFF5$3        -0.286      0.027    -10.410      0.000
+    TELLOFF5$4         1.607      0.032     50.658      0.000
+    BRIBE5$1          -0.364      0.022    -16.436      0.000
+    BRIBE5$2           0.487      0.023     21.340      0.000
+    BRIBE5$3           1.412      0.027     52.889      0.000
+    BRIBE5$4           2.435      0.048     50.423      0.000
+    REASON5$1         -2.138      0.094    -22.870      0.000
+    REASON5$2         -1.395      0.041    -33.682      0.000
+    REASON5$3         -0.440      0.024    -18.106      0.000
+    REASON5$4          0.927      0.024     37.960      0.000
+    IGNORE7$1         -0.702      0.021    -33.299      0.000
+    IGNORE7$2          0.198      0.021      9.381      0.000
+    IGNORE7$3          1.301      0.027     47.651      0.000
+    IGNORE7$4          2.413      0.058     41.940      0.000
+    SMACK7$1           0.058      0.024      2.386      0.017
+    SMACK7$2           1.842      0.038     48.817      0.000
+    SMACK7$3           3.136      0.073     43.009      0.000
+    SMACK7$4           4.249      0.163     26.002      0.000
+    SHOUT7$1          -2.703      0.049    -55.365      0.000
+    SHOUT7$2          -0.887      0.029    -31.028      0.000
+    SHOUT7$3           0.530      0.024     22.295      0.000
+    SHOUT7$4           2.347      0.045     51.974      0.000
+    BEDROOM7$1        -1.569      0.029    -53.235      0.000
+    BEDROOM7$2        -0.264      0.026    -10.018      0.000
+    BEDROOM7$3         1.286      0.028     45.987      0.000
+    BEDROOM7$4         3.078      0.060     51.308      0.000
+    TREATS7$1         -1.765      0.030    -59.435      0.000
+    TREATS7$2         -0.410      0.022    -18.379      0.000
+    TREATS7$3          1.282      0.030     42.184      0.000
+    TREATS7$4          3.079      0.060     51.595      0.000
+    TELLOFF7$1        -3.520      0.070    -50.011      0.000
+    TELLOFF7$2        -1.551      0.037    -41.914      0.000
+    TELLOFF7$3        -0.026      0.025     -1.034      0.301
+    TELLOFF7$4         1.892      0.032     58.568      0.000
+    BRIBE7$1          -0.150      0.020     -7.364      0.000
+    BRIBE7$2           0.733      0.021     34.176      0.000
+    BRIBE7$3           1.701      0.025     68.111      0.000
+    BRIBE7$4           2.732      0.058     46.800      0.000
+    REASON7$1         -2.181      0.040    -54.398      0.000
+    REASON7$2         -1.351      0.031    -43.676      0.000
+    REASON7$3         -0.248      0.023    -10.816      0.000
+    REASON7$4          1.293      0.023     55.254      0.000
+    BEDROOM1$1        -1.976      0.060    -33.028      0.000
+    BEDROOM1$2         0.412      0.036     11.586      0.000
+    BEDROOM1$3         2.457      0.061     40.497      0.000
+    BEDROOM1$4         4.510      0.107     42.061      0.000
+    TREATS11$1        -2.192      0.054    -40.948      0.000
+    TREATS11$2         0.293      0.032      9.126      0.000
+    TREATS11$3         2.550      0.066     38.804      0.000
+    TREATS11$4         4.640      0.152     30.521      0.000
+    REASON11$1        -2.254      0.049    -45.852      0.000
+    REASON11$2        -0.941      0.032    -29.578      0.000
+    REASON11$3         0.398      0.028     14.041      0.000
+    REASON11$4         1.888      0.045     41.749      0.000
+    PWHERE14$1        -3.901      0.207    -18.812      0.000
+    PWHERE14$2        -2.980      0.152    -19.557      0.000
+    PWHERE14$3        -1.572      0.096    -16.332      0.000
+    PWHO14$1          -4.001      0.195    -20.464      0.000
+    PWHO14$2          -2.921      0.134    -21.821      0.000
+    PWHO14$3          -1.330      0.068    -19.535      0.000
+    PWHAT14$1         -3.060      0.105    -29.271      0.000
+    PWHAT14$2         -1.986      0.073    -27.089      0.000
+    PWHAT14$3         -0.440      0.037    -12.012      0.000
+    CMWHERE1$1        -2.811      0.081    -34.503      0.000
+    CMWHERE1$2        -1.713      0.042    -40.549      0.000
+    CMWHERE1$3        -0.424      0.026    -16.264      0.000
+    CMWHO14$1         -2.523      0.064    -39.691      0.000
+    CMWHO14$2         -1.433      0.032    -44.457      0.000
+    CMWHO14$3         -0.175      0.021     -8.477      0.000
+    CMWHAT14$1        -2.242      0.052    -43.417      0.000
+    CMWHAT14$2        -1.201      0.031    -38.774      0.000
+    CMWHAT14$3         0.090      0.023      3.870      0.000
+    PWHERE17$1        -4.273      0.278    -15.360      0.000
+    PWHERE17$2        -2.888      0.177    -16.327      0.000
+    PWHERE17$3        -0.974      0.073    -13.262      0.000
+    CMWHERE1$1        -2.986      0.085    -35.060      0.000
+    CMWHERE1$2        -1.748      0.049    -35.732      0.000
+    CMWHERE1$3        -0.346      0.031    -11.134      0.000
+    PTBACK17$1        -1.939      0.115    -16.835      0.000
+    PTBACK17$2        -0.666      0.048    -13.830      0.000
+    PTBACK17$3         0.585      0.048     12.256      0.000
+    CMTBACK1$1        -1.181      0.066    -18.020      0.000
+    CMTBACK1$2        -0.052      0.034     -1.527      0.127
+    CMTBACK1$3         0.949      0.054     17.418      0.000
+
+ Variances
+    H3                 1.000      0.000    999.000    999.000
+    H5                 1.000      0.000    999.000    999.000
+    H7                 1.000      0.000    999.000    999.000
+    H11                1.000      0.000    999.000    999.000
+    MON14              1.000      0.000    999.000    999.000
+    MON17_K            1.000      0.000    999.000    999.000
+    CURFEW17           1.000      0.000    999.000    999.000
+
+
+QUALITY OF NUMERICAL RESULTS
+
+     Condition Number for the Information Matrix              0.378E-03
+       (ratio of smallest to largest eigenvalue)
+
+
+STANDARDIZED MODEL RESULTS
+
+
+STDYX Standardization
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ H3       BY
+    IGNORE3            0.453      0.013     35.117      0.000
+    SMACK3             0.599      0.014     42.765      0.000
+    SHOUT3             0.680      0.010     67.313      0.000
+    BEDROOM3           0.577      0.012     46.842      0.000
+    TREATS3            0.541      0.013     42.003      0.000
+    TELLOFF3           0.688      0.012     56.633      0.000
+    BRIBE3             0.416      0.014     30.370      0.000
+
+ H5       BY
+    IGNORE5            0.443      0.010     42.643      0.000
+    SMACK5             0.606      0.010     60.094      0.000
+    SHOUT5             0.663      0.008     78.277      0.000
+    BEDROOM5           0.641      0.008     79.575      0.000
+    TREATS5            0.576      0.009     63.150      0.000
+    TELLOFF5           0.669      0.009     71.357      0.000
+    BRIBE5             0.409      0.010     39.596      0.000
+    REASON5            0.426      0.012     35.076      0.000
+
+ H7       BY
+    IGNORE7            0.466      0.011     42.740      0.000
+    SMACK7             0.630      0.010     60.725      0.000
+    SHOUT7             0.690      0.008     85.360      0.000
+    BEDROOM7           0.678      0.007     94.737      0.000
+    TREATS7            0.642      0.009     73.928      0.000
+    TELLOFF7           0.691      0.007     92.924      0.000
+    BRIBE7             0.410      0.011     36.607      0.000
+    REASON7            0.524      0.010     52.687      0.000
+
+ H11      BY
+    BEDROOM11          0.841      0.007    115.086      0.000
+    TREATS11           0.840      0.008    109.871      0.000
+    REASON11           0.706      0.009     74.451      0.000
+
+ MON14    BY
+    PWHERE14           0.749      0.031     24.253      0.000
+    PWHO14             0.743      0.028     26.378      0.000
+    PWHAT14            0.688      0.026     26.619      0.000
+    CMWHERE14          0.570      0.021     27.698      0.000
+    CMWHO14            0.484      0.022     21.774      0.000
+    CMWHAT14           0.519      0.020     26.609      0.000
+
+ MON17_K  BY
+    PWHERE17           0.772      0.031     24.795      0.000
+    CMWHERE17          0.535      0.025     21.403      0.000
+
+ CURFEW17 BY
+    PTBACK17           0.689      0.045     15.224      0.000
+    CMTBACK17          0.646      0.041     15.836      0.000
+
+ MON17_K  WITH
+    CURFEW17           0.278      0.046      6.002      0.000
+    H3                -0.236      0.026     -9.212      0.000
+    H5                -0.229      0.025     -9.069      0.000
+    H7                -0.253      0.023    -11.105      0.000
+    H11               -0.273      0.025    -10.753      0.000
+    MON14              0.865      0.041     20.935      0.000
+
+ H5       WITH
+    H3                 0.832      0.012     71.005      0.000
+
+ H7       WITH
+    H3                 0.702      0.011     61.429      0.000
+    H5                 0.958      0.010     98.313      0.000
+
+ H11      WITH
+    H3                 0.480      0.015     32.168      0.000
+    H5                 0.617      0.013     49.218      0.000
+    H7                 0.726      0.012     59.053      0.000
+
+ MON14    WITH
+    H3                -0.214      0.022     -9.876      0.000
+    H5                -0.217      0.020    -10.863      0.000
+    H7                -0.228      0.018    -12.832      0.000
+    H11               -0.251      0.025    -10.057      0.000
+
+ CURFEW17 WITH
+    H3                -0.029      0.024     -1.193      0.233
+    H5                 0.005      0.021      0.249      0.803
+    H7                 0.031      0.021      1.452      0.147
+    H11                0.106      0.023      4.691      0.000
+    MON14              0.317      0.028     11.152      0.000
+
+ PWHO14   WITH
+    PWHAT14            0.439      0.039     11.149      0.000
+    PWHERE14           0.500      0.045     11.226      0.000
+
+ CMWHO14  WITH
+    CMWHAT14           0.616      0.014     45.336      0.000
+    CMWHERE14          0.579      0.016     36.493      0.000
+
+ PWHERE14 WITH
+    PWHAT14            0.518      0.038     13.673      0.000
+
+ CMWHERE1 WITH
+    CMWHAT14           0.601      0.015     39.577      0.000
+
+ PWHERE17 WITH
+    PTBACK17           0.205      0.059      3.491      0.000
+
+ CMWHERE1 WITH
+    CMTBACK17          0.196      0.039      5.080      0.000
+
+ Means
+    H3                 0.000      0.000    999.000    999.000
+    H5                 0.000      0.000    999.000    999.000
+    H7                 0.000      0.000    999.000    999.000
+    H11                0.000      0.000    999.000    999.000
+    MON14              0.000      0.000    999.000    999.000
+    MON17_K            0.000      0.000    999.000    999.000
+    CURFEW17           0.000      0.000    999.000    999.000
+
+ Thresholds
+    IGNORE3$1         -0.777      0.024    -31.997      0.000
+    IGNORE3$2          0.186      0.023      8.227      0.000
+    IGNORE3$3          0.328      0.022     14.667      0.000
+    IGNORE3$4          1.213      0.025     48.359      0.000
+    SMACK3$1          -0.427      0.023    -18.447      0.000
+    SMACK3$2           1.078      0.023     47.311      0.000
+    SMACK3$3           1.339      0.027     49.754      0.000
+    SMACK3$4           2.382      0.046     51.667      0.000
+    SHOUT3$1          -1.909      0.031    -60.876      0.000
+    SHOUT3$2          -0.374      0.022    -17.272      0.000
+    SHOUT3$3          -0.177      0.021     -8.475      0.000
+    SHOUT3$4           0.936      0.027     34.906      0.000
+    BEDROOM3$1        -0.723      0.024    -29.782      0.000
+    BEDROOM3$2         0.027      0.024      1.123      0.261
+    BEDROOM3$3         0.336      0.025     13.444      0.000
+    BEDROOM3$4         1.448      0.037     39.091      0.000
+    TREATS3$1         -1.074      0.026    -40.747      0.000
+    TREATS3$2          0.010      0.022      0.461      0.645
+    TREATS3$3          0.339      0.024     14.181      0.000
+    TREATS3$4          1.583      0.035     45.169      0.000
+    TELLOFF3$1        -2.550      0.063    -40.785      0.000
+    TELLOFF3$2        -1.115      0.037    -30.345      0.000
+    TELLOFF3$3        -0.939      0.032    -28.920      0.000
+    TELLOFF3$4         0.302      0.022     14.023      0.000
+    BRIBE3$1          -0.553      0.022    -25.106      0.000
+    BRIBE3$2           0.282      0.022     13.083      0.000
+    BRIBE3$3           0.520      0.022     23.694      0.000
+    BRIBE3$4           1.451      0.037     39.488      0.000
+    IGNORE5$1         -0.822      0.026    -31.444      0.000
+    IGNORE5$2          0.004      0.019      0.218      0.828
+    IGNORE5$3          0.905      0.022     41.696      0.000
+    IGNORE5$4          1.915      0.043     45.042      0.000
+    SMACK5$1          -0.117      0.021     -5.534      0.000
+    SMACK5$2           1.237      0.023     54.837      0.000
+    SMACK5$3           2.220      0.041     53.730      0.000
+    SMACK5$4           3.074      0.132     23.281      0.000
+    SHOUT5$1          -1.929      0.040    -48.770      0.000
+    SHOUT5$2          -0.559      0.027    -20.691      0.000
+    SHOUT5$3           0.361      0.019     18.946      0.000
+    SHOUT5$4           1.657      0.031     54.109      0.000
+    BEDROOM5$1        -1.232      0.024    -52.046      0.000
+    BEDROOM5$2        -0.334      0.021    -15.615      0.000
+    BEDROOM5$3         0.696      0.020     34.460      0.000
+    BEDROOM5$4         2.018      0.040     50.917      0.000
+    TREATS5$1         -1.316      0.026    -50.154      0.000
+    TREATS5$2         -0.353      0.021    -17.219      0.000
+    TREATS5$3          0.842      0.019     43.447      0.000
+    TREATS5$4          2.261      0.051     44.125      0.000
+    TELLOFF5$1        -2.611      0.059    -44.306      0.000
+    TELLOFF5$2        -1.209      0.040    -30.013      0.000
+    TELLOFF5$3        -0.213      0.021    -10.149      0.000
+    TELLOFF5$4         1.195      0.020     59.334      0.000
+    BRIBE5$1          -0.332      0.020    -16.231      0.000
+    BRIBE5$2           0.444      0.020     21.723      0.000
+    BRIBE5$3           1.289      0.024     53.454      0.000
+    BRIBE5$4           2.222      0.043     51.346      0.000
+    REASON5$1         -1.934      0.089    -21.731      0.000
+    REASON5$2         -1.262      0.040    -31.896      0.000
+    REASON5$3         -0.398      0.022    -17.856      0.000
+    REASON5$4          0.838      0.021     39.125      0.000
+    IGNORE7$1         -0.622      0.019    -32.785      0.000
+    IGNORE7$2          0.175      0.019      9.385      0.000
+    IGNORE7$3          1.151      0.024     48.168      0.000
+    IGNORE7$4          2.136      0.053     40.067      0.000
+    SMACK7$1           0.045      0.019      2.395      0.017
+    SMACK7$2           1.431      0.026     56.009      0.000
+    SMACK7$3           2.437      0.052     47.243      0.000
+    SMACK7$4           3.301      0.128     25.840      0.000
+    SHOUT7$1          -1.956      0.034    -57.751      0.000
+    SHOUT7$2          -0.642      0.022    -29.582      0.000
+    SHOUT7$3           0.383      0.017     22.655      0.000
+    SHOUT7$4           1.699      0.033     51.863      0.000
+    BEDROOM7$1        -1.154      0.022    -52.572      0.000
+    BEDROOM7$2        -0.194      0.019    -10.116      0.000
+    BEDROOM7$3         0.945      0.021     44.253      0.000
+    BEDROOM7$4         2.263      0.046     48.761      0.000
+    TREATS7$1         -1.353      0.024    -55.607      0.000
+    TREATS7$2         -0.315      0.017    -18.357      0.000
+    TREATS7$3          0.983      0.021     45.990      0.000
+    TREATS7$4          2.361      0.047     50.348      0.000
+    TELLOFF7$1        -2.543      0.049    -51.738      0.000
+    TELLOFF7$2        -1.121      0.029    -39.280      0.000
+    TELLOFF7$3        -0.019      0.018     -1.033      0.301
+    TELLOFF7$4         1.367      0.021     64.072      0.000
+    BRIBE7$1          -0.137      0.019     -7.314      0.000
+    BRIBE7$2           0.668      0.019     34.923      0.000
+    BRIBE7$3           1.551      0.021     72.752      0.000
+    BRIBE7$4           2.492      0.053     46.826      0.000
+    REASON7$1         -1.858      0.037    -50.506      0.000
+    REASON7$2         -1.151      0.029    -40.297      0.000
+    REASON7$3         -0.211      0.020    -10.680      0.000
+    REASON7$4          1.101      0.019     57.544      0.000
+    BEDROOM1$1        -1.069      0.026    -41.028      0.000
+    BEDROOM1$2         0.223      0.019     11.481      0.000
+    BEDROOM1$3         1.330      0.025     53.865      0.000
+    BEDROOM1$4         2.441      0.056     43.846      0.000
+    TREATS11$1        -1.187      0.023    -52.358      0.000
+    TREATS11$2         0.159      0.017      9.331      0.000
+    TREATS11$3         1.381      0.026     53.112      0.000
+    TREATS11$4         2.514      0.086     29.090      0.000
+    REASON11$1        -1.597      0.034    -47.182      0.000
+    REASON11$2        -0.666      0.022    -30.308      0.000
+    REASON11$3         0.282      0.020     14.178      0.000
+    REASON11$4         1.337      0.030     44.253      0.000
+    PWHERE14$1        -2.583      0.069    -37.630      0.000
+    PWHERE14$2        -1.973      0.038    -52.484      0.000
+    PWHERE14$3        -1.041      0.026    -40.483      0.000
+    PWHO14$1          -2.676      0.080    -33.269      0.000
+    PWHO14$2          -1.954      0.039    -50.376      0.000
+    PWHO14$3          -0.890      0.023    -38.703      0.000
+    PWHAT14$1         -2.221      0.065    -34.341      0.000
+    PWHAT14$2         -1.442      0.032    -44.792      0.000
+    PWHAT14$3         -0.319      0.024    -13.513      0.000
+    CMWHERE1$1        -2.309      0.054    -42.568      0.000
+    CMWHERE1$2        -1.407      0.025    -56.001      0.000
+    CMWHERE1$3        -0.348      0.020    -17.448      0.000
+    CMWHO14$1         -2.208      0.049    -45.056      0.000
+    CMWHO14$2         -1.254      0.025    -50.303      0.000
+    CMWHO14$3         -0.154      0.018     -8.638      0.000
+    CMWHAT14$1        -1.916      0.035    -54.275      0.000
+    CMWHAT14$2        -1.026      0.022    -45.701      0.000
+    CMWHAT14$3         0.077      0.020      3.877      0.000
+    PWHERE17$1        -2.717      0.088    -30.796      0.000
+    PWHERE17$2        -1.837      0.037    -50.036      0.000
+    PWHERE17$3        -0.619      0.027    -23.352      0.000
+    CMWHERE1$1        -2.523      0.059    -42.892      0.000
+    CMWHERE1$2        -1.477      0.039    -38.132      0.000
+    CMWHERE1$3        -0.293      0.027    -10.866      0.000
+    PTBACK17$1        -1.406      0.036    -38.788      0.000
+    PTBACK17$2        -0.483      0.025    -19.267      0.000
+    PTBACK17$3         0.424      0.023     18.326      0.000
+    CMTBACK1$1        -0.901      0.032    -27.947      0.000
+    CMTBACK1$2        -0.039      0.026     -1.535      0.125
+    CMTBACK1$3         0.724      0.030     23.960      0.000
+
+ Variances
+    H3                 1.000      0.000    999.000    999.000
+    H5                 1.000      0.000    999.000    999.000
+    H7                 1.000      0.000    999.000    999.000
+    H11                1.000      0.000    999.000    999.000
+    MON14              1.000      0.000    999.000    999.000
+    MON17_K            1.000      0.000    999.000    999.000
+    CURFEW17           1.000      0.000    999.000    999.000
+
+
+R-SQUARE
+
+    Observed                                        Two-Tailed     Scale
+    Variable        Estimate       S.E.  Est./S.E.    P-Value     Factors
+
+    IGNORE3            0.205      0.012     17.559      0.000      0.892
+    SMACK3             0.359      0.017     21.383      0.000      0.801
+    SHOUT3             0.462      0.014     33.657      0.000      0.733
+    BEDROOM3           0.333      0.014     23.421      0.000      0.817
+    TREATS3            0.292      0.014     21.002      0.000      0.841
+    TELLOFF3           0.474      0.017     28.316      0.000      0.725
+    BRIBE3             0.173      0.011     15.185      0.000      0.909
+    IGNORE5            0.196      0.009     21.322      0.000      0.897
+    SMACK5             0.367      0.012     30.047      0.000      0.795
+    SHOUT5             0.440      0.011     39.139      0.000      0.749
+    BEDROOM5           0.411      0.010     39.787      0.000      0.767
+    TREATS5            0.332      0.011     31.575      0.000      0.817
+    TELLOFF5           0.448      0.013     35.678      0.000      0.743
+    BRIBE5             0.167      0.008     19.798      0.000      0.913
+    REASON5            0.182      0.010     17.538      0.000      0.905
+    IGNORE7            0.217      0.010     21.370      0.000      0.885
+    SMACK7             0.396      0.013     30.362      0.000      0.777
+    SHOUT7             0.476      0.011     42.680      0.000      0.724
+    BEDROOM7           0.459      0.010     47.369      0.000      0.735
+    TREATS7            0.412      0.011     36.964      0.000      0.767
+    TELLOFF7           0.478      0.010     46.462      0.000      0.722
+    BRIBE7             0.168      0.009     18.303      0.000      0.912
+    REASON7            0.274      0.010     26.343      0.000      0.852
+    BEDROOM1           0.707      0.012     57.543      0.000      0.541
+    TREATS11           0.706      0.013     54.935      0.000      0.542
+    REASON11           0.498      0.013     37.225      0.000      0.708
+    PWHERE14           0.562      0.046     12.127      0.000      0.662
+    PWHO14             0.553      0.042     13.189      0.000      0.669
+    PWHAT14            0.473      0.036     13.309      0.000      0.726
+    CMWHERE1           0.325      0.023     13.849      0.000      0.822
+    CMWHO14            0.234      0.022     10.887      0.000      0.875
+    CMWHAT14           0.269      0.020     13.304      0.000      0.855
+    PWHERE17           0.596      0.048     12.398      0.000      0.636
+    CMWHERE1           0.286      0.027     10.702      0.000      0.845
+    PTBACK17           0.474      0.062      7.612      0.000      0.725
+    CMTBACK1           0.418      0.053      7.918      0.000      0.763
+
+
+MODEL MODIFICATION INDICES
+
+NOTE:  Modification indices for direct effects of observed dependent variables
+regressed on covariates and residual covariances among observed dependent
+variables may not be included.  To include these, request MODINDICES (ALL).
+
+Minimum M.I. value for printing the modification index    10.000
+
+                                   M.I.     E.P.C.  Std E.P.C.  StdYX E.P.C.
+
+BY Statements
+
+H3       BY SHOUT5                29.021     0.275      0.275        0.206
+H3       BY BEDROOM5              19.600    -0.218     -0.218       -0.168
+H3       BY BRIBE5                16.668     0.179      0.179        0.163
+H3       BY REASON5               37.194    -0.268     -0.268       -0.243
+H3       BY SMACK7               157.051     0.480      0.480        0.373
+H3       BY SHOUT7                46.004     0.260      0.260        0.188
+H3       BY BEDROOM7              61.165    -0.286     -0.286       -0.211
+H3       BY TREATS7               22.818    -0.169     -0.169       -0.130
+H3       BY TELLOFF7              20.022    -0.181     -0.181       -0.131
+H3       BY BRIBE7                38.581     0.196      0.196        0.179
+H3       BY REASON7               53.076    -0.235     -0.235       -0.200
+H3       BY BEDROOM1              10.741    -0.142     -0.142       -0.077
+H3       BY TREATS11              10.507    -0.144     -0.144       -0.078
+H3       BY REASON11              38.323     0.165      0.165        0.117
+H3       BY PWHAT14               21.786    -0.087     -0.087       -0.063
+H3       BY CMWHO14               11.471     0.044      0.044        0.038
+H3       BY PWHERE17              24.207    -0.193     -0.193       -0.123
+H3       BY CMWHERE1              24.275     0.101      0.101        0.085
+H3       BY PTBACK17              17.931    -0.086     -0.086       -0.062
+H3       BY CMTBACK1              17.892     0.076      0.076        0.058
+H5       BY SMACK3                66.348     0.470      0.470        0.377
+H5       BY SHOUT3                18.755    -0.269     -0.269       -0.197
+H5       BY BEDROOM3              11.143     0.178      0.178        0.145
+H5       BY TELLOFF3              54.741    -0.487     -0.487       -0.353
+H5       BY SMACK7               265.250     1.584      1.584        1.231
+H5       BY SHOUT7                65.468     0.777      0.777        0.562
+H5       BY BEDROOM7             103.602    -0.904     -0.904       -0.664
+H5       BY TREATS7               46.012    -0.586     -0.586       -0.449
+H5       BY TELLOFF7              12.839    -0.357     -0.357       -0.258
+H5       BY BRIBE7                56.261     0.601      0.601        0.548
+H5       BY REASON7               69.960    -0.662     -0.662       -0.564
+H5       BY BEDROOM1              22.417    -0.236     -0.236       -0.128
+H5       BY TREATS11              25.861    -0.262     -0.262       -0.142
+H5       BY REASON11              74.836     0.248      0.248        0.176
+H5       BY PWHAT14               20.569    -0.074     -0.074       -0.054
+H5       BY CMWHO14               13.552     0.042      0.042        0.037
+H5       BY PWHERE17              25.498    -0.172     -0.172       -0.109
+H5       BY CMWHERE1              25.566     0.090      0.090        0.076
+H5       BY PTBACK17              16.843    -0.074     -0.074       -0.053
+H5       BY CMTBACK1              16.802     0.066      0.066        0.050
+H7       BY SMACK3                49.338     0.286      0.286        0.229
+H7       BY SHOUT3                24.510    -0.217     -0.217       -0.159
+H7       BY BEDROOM3              20.016     0.168      0.168        0.137
+H7       BY TELLOFF3              49.561    -0.328     -0.328       -0.238
+H7       BY SHOUT5                73.191    -0.836     -0.836       -0.626
+H7       BY BEDROOM5              71.443     0.750      0.750        0.575
+H7       BY TREATS5               13.322     0.315      0.315        0.258
+H7       BY TELLOFF5              15.863    -0.398     -0.398       -0.296
+H7       BY BRIBE5                24.606    -0.402     -0.402       -0.367
+H7       BY REASON5               40.909     0.510      0.510        0.462
+H7       BY BEDROOM1              26.075    -0.317     -0.317       -0.172
+H7       BY TREATS11              33.451    -0.373     -0.373       -0.202
+H7       BY REASON11              88.570     0.331      0.331        0.235
+H7       BY PWHAT14               19.633    -0.074     -0.074       -0.053
+H7       BY CMWHO14               14.079     0.044      0.044        0.038
+H7       BY PWHERE17              26.134    -0.176     -0.176       -0.112
+H7       BY CMWHERE1              26.206     0.092      0.092        0.078
+H7       BY PTBACK17              15.911    -0.072     -0.072       -0.052
+H7       BY CMTBACK1              15.869     0.065      0.065        0.049
+H11      BY SHOUT3                29.968    -0.168     -0.168       -0.123
+H11      BY BEDROOM3              43.267     0.169      0.169        0.138
+H11      BY TREATS3               11.824     0.084      0.084        0.071
+H11      BY TELLOFF3              16.963    -0.136     -0.136       -0.098
+H11      BY SMACK5                22.245    -0.146     -0.146       -0.116
+H11      BY SHOUT5                77.078    -0.301     -0.301       -0.225
+H11      BY BEDROOM5             101.777     0.284      0.284        0.218
+H11      BY TREATS5               19.047     0.118      0.118        0.097
+H11      BY TELLOFF5              15.362    -0.127     -0.127       -0.094
+H11      BY BRIBE5                24.469    -0.133     -0.133       -0.121
+H11      BY REASON5               20.973     0.118      0.118        0.107
+H11      BY SMACK7               138.673    -0.460     -0.460       -0.357
+H11      BY SHOUT7                61.534    -0.295     -0.295       -0.214
+H11      BY BEDROOM7              98.647     0.329      0.329        0.242
+H11      BY TREATS7               47.250     0.222      0.222        0.170
+H11      BY BRIBE7                35.667    -0.191     -0.191       -0.174
+H11      BY REASON7               41.491     0.191      0.191        0.163
+H11      BY PWHAT14               17.385    -0.087     -0.087       -0.063
+H11      BY CMWHO14               13.251     0.054      0.054        0.047
+H11      BY PWHERE17              26.652    -0.221     -0.221       -0.140
+H11      BY CMWHERE1              26.744     0.115      0.115        0.098
+H11      BY PTBACK17              13.627    -0.083     -0.083       -0.060
+H11      BY CMTBACK1              13.584     0.074      0.074        0.057
+MON14    BY IGNORE5               11.071    -0.054     -0.054       -0.048
+MON14    BY IGNORE7               15.188    -0.064     -0.064       -0.057
+MON14    BY PWHERE17              28.084    -2.542     -2.542       -1.616
+MON14    BY CMWHERE1              27.828     1.321      1.321        1.115
+MON14    BY PTBACK17              10.481     0.162      0.162        0.118
+MON14    BY CMTBACK1              10.478    -0.145     -0.145       -0.110
+MON17_K  BY IGNORE5               10.750    -0.059     -0.059       -0.053
+MON17_K  BY IGNORE7               14.544    -0.069     -0.069       -0.061
+MON17_K  BY PTBACK17              11.448     0.166      0.166        0.120
+MON17_K  BY CMTBACK1              11.443    -0.148     -0.148       -0.113
+CURFEW17 BY SHOUT5                13.240    -0.112     -0.112       -0.084
+CURFEW17 BY IGNORE7               12.816    -0.089     -0.089       -0.079
+CURFEW17 BY SHOUT7                19.825    -0.139     -0.139       -0.101
+CURFEW17 BY BEDROOM7              22.015     0.141      0.141        0.104
+CURFEW17 BY TREATS7               23.208     0.133      0.133        0.102
+CURFEW17 BY PWHERE17              11.177    -0.444     -0.444       -0.282
+CURFEW17 BY CMWHERE1              11.168     0.232      0.232        0.196
+
+WITH Statements
+
+SMACK3   WITH IGNORE3             15.634    -0.124     -0.124       -0.124
+BEDROOM3 WITH SMACK3              44.956    -0.263     -0.263       -0.263
+BEDROOM3 WITH SHOUT3              20.583    -0.160     -0.160       -0.160
+TREATS3  WITH SMACK3              21.616    -0.184     -0.184       -0.184
+TREATS3  WITH SHOUT3              17.710    -0.146     -0.146       -0.146
+TREATS3  WITH BEDROOM3            77.776     0.250      0.250        0.250
+TELLOFF3 WITH SHOUT3             109.439     0.365      0.365        0.365
+BRIBE3   WITH IGNORE3             13.240     0.095      0.095        0.095
+BRIBE3   WITH SMACK3              21.850    -0.162     -0.162       -0.162
+BRIBE3   WITH BEDROOM3            11.630    -0.117     -0.117       -0.117
+IGNORE5  WITH IGNORE3            349.901     0.369      0.369        0.369
+IGNORE5  WITH SMACK3              31.039    -0.177     -0.177       -0.177
+IGNORE5  WITH SHOUT3              10.371    -0.090     -0.090       -0.090
+SMACK5   WITH IGNORE3             49.480    -0.214     -0.214       -0.214
+SMACK5   WITH SMACK3             673.527     0.610      0.610        0.610
+SMACK5   WITH BEDROOM3            49.785    -0.225     -0.225       -0.225
+SMACK5   WITH TREATS3             40.866    -0.185     -0.185       -0.185
+SMACK5   WITH TELLOFF3            22.407    -0.196     -0.196       -0.196
+SMACK5   WITH BRIBE3              35.597    -0.166     -0.166       -0.166
+SMACK5   WITH IGNORE5             37.963    -0.194     -0.194       -0.194
+SHOUT5   WITH SHOUT3             220.031     0.400      0.400        0.400
+SHOUT5   WITH BEDROOM3            40.795    -0.204     -0.204       -0.204
+SHOUT5   WITH TREATS3             40.748    -0.205     -0.205       -0.205
+BEDROOM5 WITH SMACK3              39.841    -0.207     -0.207       -0.207
+BEDROOM5 WITH SHOUT3              78.350    -0.291     -0.291       -0.291
+BEDROOM5 WITH BEDROOM3           208.660     0.364      0.364        0.364
+BEDROOM5 WITH TELLOFF3            27.386    -0.186     -0.186       -0.186
+BEDROOM5 WITH BRIBE3              76.880    -0.243     -0.243       -0.243
+BEDROOM5 WITH SMACK5              57.943    -0.241     -0.241       -0.241
+BEDROOM5 WITH SHOUT5              32.733    -0.188     -0.188       -0.188
+TREATS5  WITH SMACK3              28.429    -0.173     -0.173       -0.173
+TREATS5  WITH SHOUT3              39.927    -0.202     -0.202       -0.202
+TREATS5  WITH TREATS3            128.896     0.293      0.293        0.293
+TREATS5  WITH TELLOFF3            19.101    -0.154     -0.154       -0.154
+TREATS5  WITH BRIBE3              19.124    -0.118     -0.118       -0.118
+TREATS5  WITH SMACK5              68.747    -0.245     -0.245       -0.245
+TREATS5  WITH SHOUT5              39.449    -0.215     -0.215       -0.215
+TREATS5  WITH BEDROOM5           249.389     0.354      0.354        0.354
+TELLOFF5 WITH SMACK3              12.284    -0.141     -0.141       -0.141
+TELLOFF5 WITH TREATS3             13.577    -0.116     -0.116       -0.116
+TELLOFF5 WITH TELLOFF3            40.461     0.212      0.212        0.212
+TELLOFF5 WITH SMACK5              17.916    -0.172     -0.172       -0.172
+TELLOFF5 WITH SHOUT5             175.448     0.358      0.358        0.358
+BRIBE5   WITH SMACK3              22.644    -0.136     -0.136       -0.136
+BRIBE5   WITH BEDROOM3            36.002    -0.168     -0.168       -0.168
+BRIBE5   WITH TREATS3             10.353    -0.082     -0.082       -0.082
+BRIBE5   WITH BRIBE3             727.850     0.474      0.474        0.474
+BRIBE5   WITH SMACK5              14.695    -0.112     -0.112       -0.112
+BRIBE5   WITH BEDROOM5            49.316    -0.224     -0.224       -0.224
+REASON5  WITH SMACK3              71.889    -0.233     -0.233       -0.233
+REASON5  WITH SHOUT3              18.078    -0.121     -0.121       -0.121
+REASON5  WITH SMACK5              57.692    -0.252     -0.252       -0.252
+REASON5  WITH TELLOFF5            46.310     0.261      0.261        0.261
+REASON5  WITH BRIBE5              19.469     0.133      0.133        0.133
+IGNORE7  WITH IGNORE3            235.843     0.321      0.321        0.321
+IGNORE7  WITH SMACK3              17.906    -0.111     -0.111       -0.111
+IGNORE7  WITH SHOUT3              15.327    -0.111     -0.111       -0.111
+IGNORE7  WITH IGNORE5            693.613     0.443      0.443        0.443
+IGNORE7  WITH SMACK5              47.748    -0.195     -0.195       -0.195
+IGNORE7  WITH SHOUT5              23.193    -0.137     -0.137       -0.137
+IGNORE7  WITH BEDROOM5            11.458    -0.090     -0.090       -0.090
+IGNORE7  WITH TELLOFF5            12.396    -0.103     -0.103       -0.103
+SMACK7   WITH IGNORE3             29.580    -0.157     -0.157       -0.157
+SMACK7   WITH SMACK3             571.027     0.562      0.562        0.562
+SMACK7   WITH BEDROOM3            18.039    -0.142     -0.142       -0.142
+SMACK7   WITH TREATS3             21.509    -0.153     -0.153       -0.153
+SMACK7   WITH TELLOFF3            28.637    -0.195     -0.195       -0.195
+SMACK7   WITH BRIBE3              11.583    -0.108     -0.108       -0.108
+SMACK7   WITH IGNORE5             66.779    -0.241     -0.241       -0.241
+SMACK7   WITH SMACK5            2166.594     0.846      0.846        0.846
+SMACK7   WITH BEDROOM5            61.099    -0.257     -0.257       -0.257
+SMACK7   WITH TREATS5             63.551    -0.259     -0.259       -0.259
+SMACK7   WITH TELLOFF5            32.447    -0.228     -0.228       -0.228
+SMACK7   WITH BRIBE5              27.258    -0.145     -0.145       -0.145
+SMACK7   WITH REASON5             81.624    -0.265     -0.265       -0.265
+SMACK7   WITH IGNORE7             22.650    -0.159     -0.159       -0.159
+SHOUT7   WITH SHOUT3             173.965     0.379      0.379        0.379
+SHOUT7   WITH BEDROOM3            13.855    -0.114     -0.114       -0.114
+SHOUT7   WITH TREATS3             14.790    -0.124     -0.124       -0.124
+SHOUT7   WITH IGNORE5             29.020    -0.160     -0.160       -0.160
+SHOUT7   WITH SHOUT5             288.571     0.405      0.405        0.405
+SHOUT7   WITH BEDROOM5            81.170    -0.283     -0.283       -0.283
+SHOUT7   WITH TREATS5             53.065    -0.220     -0.220       -0.220
+BEDROOM7 WITH SMACK3              14.619    -0.124     -0.124       -0.124
+BEDROOM7 WITH SHOUT3              49.959    -0.229     -0.229       -0.229
+BEDROOM7 WITH BEDROOM3            93.455     0.265      0.265        0.265
+BEDROOM7 WITH TELLOFF3            21.674    -0.156     -0.156       -0.156
+BEDROOM7 WITH BRIBE3              46.876    -0.190     -0.190       -0.190
+BEDROOM7 WITH IGNORE5             27.952    -0.143     -0.143       -0.143
+BEDROOM7 WITH SMACK5              84.202    -0.289     -0.289       -0.289
+BEDROOM7 WITH SHOUT5             108.689    -0.360     -0.360       -0.360
+BEDROOM7 WITH BEDROOM5           374.102     0.422      0.422        0.422
+BEDROOM7 WITH TELLOFF5            60.754    -0.245     -0.245       -0.245
+BEDROOM7 WITH BRIBE5              74.091    -0.241     -0.241       -0.241
+BEDROOM7 WITH REASON5             33.422    -0.155     -0.155       -0.155
+BEDROOM7 WITH SMACK7              45.270    -0.233     -0.233       -0.233
+BEDROOM7 WITH SHOUT7              37.329    -0.196     -0.196       -0.196
+TREATS7  WITH SMACK3              18.367    -0.126     -0.126       -0.126
+TREATS7  WITH SHOUT3              43.009    -0.212     -0.212       -0.212
+TREATS7  WITH BEDROOM3            10.520     0.096      0.096        0.096
+TREATS7  WITH TREATS3            118.987     0.270      0.270        0.270
+TREATS7  WITH TELLOFF3            10.676    -0.116     -0.116       -0.116
+TREATS7  WITH BRIBE3              14.187    -0.103     -0.103       -0.103
+TREATS7  WITH IGNORE5             12.060    -0.089     -0.089       -0.089
+TREATS7  WITH SMACK5              92.154    -0.307     -0.307       -0.307
+TREATS7  WITH SHOUT5             108.519    -0.337     -0.337       -0.337
+TREATS7  WITH TREATS5            232.051     0.337      0.337        0.337
+TREATS7  WITH TELLOFF5            44.013    -0.221     -0.221       -0.221
+TREATS7  WITH BRIBE5              35.086    -0.155     -0.155       -0.155
+TREATS7  WITH REASON5             12.405    -0.101     -0.101       -0.101
+TREATS7  WITH SMACK7              68.152    -0.298     -0.298       -0.298
+TREATS7  WITH SHOUT7              72.833    -0.267     -0.267       -0.267
+TREATS7  WITH BEDROOM7           302.532     0.391      0.391        0.391
+TELLOFF7 WITH TELLOFF3            24.004     0.184      0.184        0.184
+TELLOFF7 WITH IGNORE5             24.252    -0.132     -0.132       -0.132
+TELLOFF7 WITH SMACK5              61.627    -0.279     -0.279       -0.279
+TELLOFF7 WITH BEDROOM5            32.097    -0.169     -0.169       -0.169
+TELLOFF7 WITH TREATS5             27.470    -0.148     -0.148       -0.148
+TELLOFF7 WITH TELLOFF5            56.301     0.224      0.224        0.224
+TELLOFF7 WITH BRIBE5              24.851    -0.135     -0.135       -0.135
+TELLOFF7 WITH SMACK7              50.030    -0.273     -0.273       -0.273
+TELLOFF7 WITH SHOUT7             187.334     0.360      0.360        0.360
+BRIBE7   WITH SMACK3              10.730    -0.087     -0.087       -0.087
+BRIBE7   WITH BEDROOM3            12.232    -0.097     -0.097       -0.097
+BRIBE7   WITH BRIBE3             463.740     0.417      0.417        0.417
+BRIBE7   WITH SMACK5              37.221    -0.168     -0.168       -0.168
+BRIBE7   WITH BEDROOM5            71.324    -0.229     -0.229       -0.229
+BRIBE7   WITH TREATS5             13.098    -0.088     -0.088       -0.088
+BRIBE7   WITH BRIBE5            1095.200     0.528      0.528        0.528
+BRIBE7   WITH IGNORE7             17.799     0.100      0.100        0.100
+BRIBE7   WITH SMACK7              23.267    -0.136     -0.136       -0.136
+BRIBE7   WITH BEDROOM7            51.959    -0.186     -0.186       -0.186
+REASON7  WITH SMACK3              69.470    -0.248     -0.248       -0.248
+REASON7  WITH SHOUT3              18.384    -0.125     -0.125       -0.125
+REASON7  WITH SMACK5             109.477    -0.319     -0.319       -0.319
+REASON7  WITH SHOUT5              27.581    -0.151     -0.151       -0.151
+REASON7  WITH BEDROOM5            39.196    -0.175     -0.175       -0.175
+REASON7  WITH TREATS5             25.253    -0.129     -0.129       -0.129
+REASON7  WITH REASON5            505.736     0.433      0.433        0.433
+REASON7  WITH SMACK7             100.573    -0.340     -0.340       -0.340
+REASON7  WITH BEDROOM7            11.150    -0.089     -0.089       -0.089
+REASON7  WITH TELLOFF7           156.550     0.300      0.300        0.300
+REASON7  WITH BRIBE7              27.750     0.131      0.131        0.131
+BEDROOM1 WITH BEDROOM3            22.332     0.208      0.208        0.208
+BEDROOM1 WITH SHOUT5              21.710    -0.227     -0.227       -0.227
+BEDROOM1 WITH BEDROOM5            67.062     0.314      0.314        0.314
+BEDROOM1 WITH TELLOFF5            10.985    -0.152     -0.152       -0.152
+BEDROOM1 WITH BRIBE5              20.751    -0.183     -0.183       -0.183
+BEDROOM1 WITH REASON5             16.731    -0.155     -0.155       -0.155
+BEDROOM1 WITH SHOUT7              16.924    -0.189     -0.189       -0.189
+BEDROOM1 WITH BEDROOM7            94.942     0.364      0.364        0.364
+BEDROOM1 WITH TELLOFF7            16.430    -0.187     -0.187       -0.187
+BEDROOM1 WITH BRIBE7              21.691    -0.189     -0.189       -0.189
+BEDROOM1 WITH REASON7             31.986    -0.217     -0.217       -0.217
+TREATS11 WITH SHOUT3              12.050    -0.194     -0.194       -0.194
+TREATS11 WITH BEDROOM3            13.073     0.156      0.156        0.156
+TREATS11 WITH TREATS3             17.105     0.176      0.176        0.176
+TREATS11 WITH SMACK5              16.055    -0.182     -0.182       -0.182
+TREATS11 WITH SHOUT5              21.479    -0.241     -0.241       -0.241
+TREATS11 WITH BEDROOM5            26.698     0.201      0.201        0.201
+TREATS11 WITH TREATS5             32.490     0.212      0.212        0.212
+TREATS11 WITH SMACK7              22.598    -0.238     -0.238       -0.238
+TREATS11 WITH SHOUT7              40.332    -0.297     -0.297       -0.297
+TREATS11 WITH BEDROOM7            17.048     0.159      0.159        0.159
+TREATS11 WITH TREATS7             52.958     0.271      0.271        0.271
+TREATS11 WITH TELLOFF7            18.657    -0.202     -0.202       -0.202
+TREATS11 WITH BRIBE7              20.408    -0.175     -0.175       -0.175
+TREATS11 WITH REASON7             15.496    -0.150     -0.150       -0.150
+TREATS11 WITH BEDROOM1            96.900     0.608      0.608        0.608
+REASON11 WITH SMACK3              13.687    -0.130     -0.130       -0.130
+REASON11 WITH SMACK5              45.162    -0.229     -0.229       -0.229
+REASON11 WITH REASON5            152.118     0.347      0.347        0.347
+REASON11 WITH SMACK7              59.217    -0.280     -0.280       -0.280
+REASON11 WITH TELLOFF7            13.861     0.121      0.121        0.121
+REASON11 WITH REASON7            338.461     0.416      0.416        0.416
+REASON11 WITH BEDROOM1            48.014    -0.334     -0.334       -0.334
+REASON11 WITH TREATS11            23.576    -0.224     -0.224       -0.224
+PWHAT14  WITH IGNORE7             10.687    -0.115     -0.115       -0.115
+CMWHERE1 WITH PWHERE14            10.264    -0.252     -0.252       -0.252
+CMWHERE1 WITH PWHAT14             27.402    -0.279     -0.279       -0.279
+CMWHERE1 WITH CMWHERE1            27.030     0.220      0.220        0.220
+CMWHERE1 WITH CMWHO14             42.027     0.255      0.255        0.255
+CMWHERE1 WITH CMWHAT14            44.737     0.247      0.247        0.247
+PTBACK17 WITH SHOUT5              10.846    -0.137     -0.137       -0.137
+CMTBACK1 WITH CMWHO14             10.011     0.134      0.134        0.134
+
+
+TECHNICAL 1 OUTPUT
+
+
+     PARAMETER SPECIFICATION
+
+
+           TAU
+              IGNORE3$      IGNORE3$      IGNORE3$      IGNORE3$      SMACK3$1
+              ________      ________      ________      ________      ________
+                  1             2             3             4             5
+
+
+           TAU
+              SMACK3$2      SMACK3$3      SMACK3$4      SHOUT3$1      SHOUT3$2
+              ________      ________      ________      ________      ________
+                  6             7             8             9            10
+
+
+           TAU
+              SHOUT3$3      SHOUT3$4      BEDROOM3      BEDROOM3      BEDROOM3
+              ________      ________      ________      ________      ________
+                 11            12            13            14            15
+
+
+           TAU
+              BEDROOM3      TREATS3$      TREATS3$      TREATS3$      TREATS3$
+              ________      ________      ________      ________      ________
+                 16            17            18            19            20
+
+
+           TAU
+              TELLOFF3      TELLOFF3      TELLOFF3      TELLOFF3      BRIBE3$1
+              ________      ________      ________      ________      ________
+                 21            22            23            24            25
+
+
+           TAU
+              BRIBE3$2      BRIBE3$3      BRIBE3$4      IGNORE5$      IGNORE5$
+              ________      ________      ________      ________      ________
+                 26            27            28            29            30
+
+
+           TAU
+              IGNORE5$      IGNORE5$      SMACK5$1      SMACK5$2      SMACK5$3
+              ________      ________      ________      ________      ________
+                 31            32            33            34            35
+
+
+           TAU
+              SMACK5$4      SHOUT5$1      SHOUT5$2      SHOUT5$3      SHOUT5$4
+              ________      ________      ________      ________      ________
+                 36            37            38            39            40
+
+
+           TAU
+              BEDROOM5      BEDROOM5      BEDROOM5      BEDROOM5      TREATS5$
+              ________      ________      ________      ________      ________
+                 41            42            43            44            45
+
+
+           TAU
+              TREATS5$      TREATS5$      TREATS5$      TELLOFF5      TELLOFF5
+              ________      ________      ________      ________      ________
+                 46            47            48            49            50
+
+
+           TAU
+              TELLOFF5      TELLOFF5      BRIBE5$1      BRIBE5$2      BRIBE5$3
+              ________      ________      ________      ________      ________
+                 51            52            53            54            55
+
+
+           TAU
+              BRIBE5$4      REASON5$      REASON5$      REASON5$      REASON5$
+              ________      ________      ________      ________      ________
+                 56            57            58            59            60
+
+
+           TAU
+              IGNORE7$      IGNORE7$      IGNORE7$      IGNORE7$      SMACK7$1
+              ________      ________      ________      ________      ________
+                 61            62            63            64            65
+
+
+           TAU
+              SMACK7$2      SMACK7$3      SMACK7$4      SHOUT7$1      SHOUT7$2
+              ________      ________      ________      ________      ________
+                 66            67            68            69            70
+
+
+           TAU
+              SHOUT7$3      SHOUT7$4      BEDROOM7      BEDROOM7      BEDROOM7
+              ________      ________      ________      ________      ________
+                 71            72            73            74            75
+
+
+           TAU
+              BEDROOM7      TREATS7$      TREATS7$      TREATS7$      TREATS7$
+              ________      ________      ________      ________      ________
+                 76            77            78            79            80
+
+
+           TAU
+              TELLOFF7      TELLOFF7      TELLOFF7      TELLOFF7      BRIBE7$1
+              ________      ________      ________      ________      ________
+                 81            82            83            84            85
+
+
+           TAU
+              BRIBE7$2      BRIBE7$3      BRIBE7$4      REASON7$      REASON7$
+              ________      ________      ________      ________      ________
+                 86            87            88            89            90
+
+
+           TAU
+              REASON7$      REASON7$      BEDROOM1      BEDROOM1      BEDROOM1
+              ________      ________      ________      ________      ________
+                 91            92            93            94            95
+
+
+           TAU
+              BEDROOM1      TREATS11      TREATS11      TREATS11      TREATS11
+              ________      ________      ________      ________      ________
+                 96            97            98            99           100
+
+
+           TAU
+              REASON11      REASON11      REASON11      REASON11      PWHERE14
+              ________      ________      ________      ________      ________
+                101           102           103           104           105
+
+
+           TAU
+              PWHERE14      PWHERE14      PWHO14$1      PWHO14$2      PWHO14$3
+              ________      ________      ________      ________      ________
+                106           107           108           109           110
+
+
+           TAU
+              PWHAT14$      PWHAT14$      PWHAT14$      CMWHERE1      CMWHERE1
+              ________      ________      ________      ________      ________
+                111           112           113           114           115
+
+
+           TAU
+              CMWHERE1      CMWHO14$      CMWHO14$      CMWHO14$      CMWHAT14
+              ________      ________      ________      ________      ________
+                116           117           118           119           120
+
+
+           TAU
+              CMWHAT14      CMWHAT14      PWHERE17      PWHERE17      PWHERE17
+              ________      ________      ________      ________      ________
+                121           122           123           124           125
+
+
+           TAU
+              CMWHERE1      CMWHERE1      CMWHERE1      PTBACK17      PTBACK17
+              ________      ________      ________      ________      ________
+                126           127           128           129           130
+
+
+           TAU
+              PTBACK17      CMTBACK1      CMTBACK1      CMTBACK1
+              ________      ________      ________      ________
+                131           132           133           134
+
+
+           NU
+              IGNORE3       SMACK3        SHOUT3        BEDROOM3      TREATS3
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              TELLOFF3      BRIBE3        IGNORE5       SMACK5        SHOUT5
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              BEDROOM5      TREATS5       TELLOFF5      BRIBE5        REASON5
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              IGNORE7       SMACK7        SHOUT7        BEDROOM7      TREATS7
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              TELLOFF7      BRIBE7        REASON7       BEDROOM1      TREATS11
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              REASON11      PWHERE14      PWHO14        PWHAT14       CMWHERE1
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              CMWHO14       CMWHAT14      PWHERE17      CMWHERE1      PTBACK17
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              CMTBACK1
+              ________
+                  0
+
+
+           LAMBDA
+              H3            H5            H7            H11           MON14
+              ________      ________      ________      ________      ________
+ IGNORE3          135             0             0             0             0
+ SMACK3           136             0             0             0             0
+ SHOUT3           137             0             0             0             0
+ BEDROOM3         138             0             0             0             0
+ TREATS3          139             0             0             0             0
+ TELLOFF3         140             0             0             0             0
+ BRIBE3           141             0             0             0             0
+ IGNORE5            0           142             0             0             0
+ SMACK5             0           143             0             0             0
+ SHOUT5             0           144             0             0             0
+ BEDROOM5           0           145             0             0             0
+ TREATS5            0           146             0             0             0
+ TELLOFF5           0           147             0             0             0
+ BRIBE5             0           148             0             0             0
+ REASON5            0           149             0             0             0
+ IGNORE7            0             0           150             0             0
+ SMACK7             0             0           151             0             0
+ SHOUT7             0             0           152             0             0
+ BEDROOM7           0             0           153             0             0
+ TREATS7            0             0           154             0             0
+ TELLOFF7           0             0           155             0             0
+ BRIBE7             0             0           156             0             0
+ REASON7            0             0           157             0             0
+ BEDROOM1           0             0             0           158             0
+ TREATS11           0             0             0           159             0
+ REASON11           0             0             0           160             0
+ PWHERE14           0             0             0             0           161
+ PWHO14             0             0             0             0           162
+ PWHAT14            0             0             0             0           163
+ CMWHERE1           0             0             0             0           164
+ CMWHO14            0             0             0             0           165
+ CMWHAT14           0             0             0             0           166
+ PWHERE17           0             0             0             0             0
+ CMWHERE1           0             0             0             0             0
+ PTBACK17           0             0             0             0             0
+ CMTBACK1           0             0             0             0             0
+
+
+           LAMBDA
+              MON17_K       CURFEW17
+              ________      ________
+ IGNORE3            0             0
+ SMACK3             0             0
+ SHOUT3             0             0
+ BEDROOM3           0             0
+ TREATS3            0             0
+ TELLOFF3           0             0
+ BRIBE3             0             0
+ IGNORE5            0             0
+ SMACK5             0             0
+ SHOUT5             0             0
+ BEDROOM5           0             0
+ TREATS5            0             0
+ TELLOFF5           0             0
+ BRIBE5             0             0
+ REASON5            0             0
+ IGNORE7            0             0
+ SMACK7             0             0
+ SHOUT7             0             0
+ BEDROOM7           0             0
+ TREATS7            0             0
+ TELLOFF7           0             0
+ BRIBE7             0             0
+ REASON7            0             0
+ BEDROOM1           0             0
+ TREATS11           0             0
+ REASON11           0             0
+ PWHERE14           0             0
+ PWHO14             0             0
+ PWHAT14            0             0
+ CMWHERE1           0             0
+ CMWHO14            0             0
+ CMWHAT14           0             0
+ PWHERE17         167             0
+ CMWHERE1         168             0
+ PTBACK17           0           169
+ CMTBACK1           0           170
+
+
+           THETA
+              IGNORE3       SMACK3        SHOUT3        BEDROOM3      TREATS3
+              ________      ________      ________      ________      ________
+ IGNORE3            0
+ SMACK3             0             0
+ SHOUT3             0             0             0
+ BEDROOM3           0             0             0             0
+ TREATS3            0             0             0             0             0
+ TELLOFF3           0             0             0             0             0
+ BRIBE3             0             0             0             0             0
+ IGNORE5            0             0             0             0             0
+ SMACK5             0             0             0             0             0
+ SHOUT5             0             0             0             0             0
+ BEDROOM5           0             0             0             0             0
+ TREATS5            0             0             0             0             0
+ TELLOFF5           0             0             0             0             0
+ BRIBE5             0             0             0             0             0
+ REASON5            0             0             0             0             0
+ IGNORE7            0             0             0             0             0
+ SMACK7             0             0             0             0             0
+ SHOUT7             0             0             0             0             0
+ BEDROOM7           0             0             0             0             0
+ TREATS7            0             0             0             0             0
+ TELLOFF7           0             0             0             0             0
+ BRIBE7             0             0             0             0             0
+ REASON7            0             0             0             0             0
+ BEDROOM1           0             0             0             0             0
+ TREATS11           0             0             0             0             0
+ REASON11           0             0             0             0             0
+ PWHERE14           0             0             0             0             0
+ PWHO14             0             0             0             0             0
+ PWHAT14            0             0             0             0             0
+ CMWHERE1           0             0             0             0             0
+ CMWHO14            0             0             0             0             0
+ CMWHAT14           0             0             0             0             0
+ PWHERE17           0             0             0             0             0
+ CMWHERE1           0             0             0             0             0
+ PTBACK17           0             0             0             0             0
+ CMTBACK1           0             0             0             0             0
+
+
+           THETA
+              TELLOFF3      BRIBE3        IGNORE5       SMACK5        SHOUT5
+              ________      ________      ________      ________      ________
+ TELLOFF3           0
+ BRIBE3             0             0
+ IGNORE5            0             0             0
+ SMACK5             0             0             0             0
+ SHOUT5             0             0             0             0             0
+ BEDROOM5           0             0             0             0             0
+ TREATS5            0             0             0             0             0
+ TELLOFF5           0             0             0             0             0
+ BRIBE5             0             0             0             0             0
+ REASON5            0             0             0             0             0
+ IGNORE7            0             0             0             0             0
+ SMACK7             0             0             0             0             0
+ SHOUT7             0             0             0             0             0
+ BEDROOM7           0             0             0             0             0
+ TREATS7            0             0             0             0             0
+ TELLOFF7           0             0             0             0             0
+ BRIBE7             0             0             0             0             0
+ REASON7            0             0             0             0             0
+ BEDROOM1           0             0             0             0             0
+ TREATS11           0             0             0             0             0
+ REASON11           0             0             0             0             0
+ PWHERE14           0             0             0             0             0
+ PWHO14             0             0             0             0             0
+ PWHAT14            0             0             0             0             0
+ CMWHERE1           0             0             0             0             0
+ CMWHO14            0             0             0             0             0
+ CMWHAT14           0             0             0             0             0
+ PWHERE17           0             0             0             0             0
+ CMWHERE1           0             0             0             0             0
+ PTBACK17           0             0             0             0             0
+ CMTBACK1           0             0             0             0             0
+
+
+           THETA
+              BEDROOM5      TREATS5       TELLOFF5      BRIBE5        REASON5
+              ________      ________      ________      ________      ________
+ BEDROOM5           0
+ TREATS5            0             0
+ TELLOFF5           0             0             0
+ BRIBE5             0             0             0             0
+ REASON5            0             0             0             0             0
+ IGNORE7            0             0             0             0             0
+ SMACK7             0             0             0             0             0
+ SHOUT7             0             0             0             0             0
+ BEDROOM7           0             0             0             0             0
+ TREATS7            0             0             0             0             0
+ TELLOFF7           0             0             0             0             0
+ BRIBE7             0             0             0             0             0
+ REASON7            0             0             0             0             0
+ BEDROOM1           0             0             0             0             0
+ TREATS11           0             0             0             0             0
+ REASON11           0             0             0             0             0
+ PWHERE14           0             0             0             0             0
+ PWHO14             0             0             0             0             0
+ PWHAT14            0             0             0             0             0
+ CMWHERE1           0             0             0             0             0
+ CMWHO14            0             0             0             0             0
+ CMWHAT14           0             0             0             0             0
+ PWHERE17           0             0             0             0             0
+ CMWHERE1           0             0             0             0             0
+ PTBACK17           0             0             0             0             0
+ CMTBACK1           0             0             0             0             0
+
+
+           THETA
+              IGNORE7       SMACK7        SHOUT7        BEDROOM7      TREATS7
+              ________      ________      ________      ________      ________
+ IGNORE7            0
+ SMACK7             0             0
+ SHOUT7             0             0             0
+ BEDROOM7           0             0             0             0
+ TREATS7            0             0             0             0             0
+ TELLOFF7           0             0             0             0             0
+ BRIBE7             0             0             0             0             0
+ REASON7            0             0             0             0             0
+ BEDROOM1           0             0             0             0             0
+ TREATS11           0             0             0             0             0
+ REASON11           0             0             0             0             0
+ PWHERE14           0             0             0             0             0
+ PWHO14             0             0             0             0             0
+ PWHAT14            0             0             0             0             0
+ CMWHERE1           0             0             0             0             0
+ CMWHO14            0             0             0             0             0
+ CMWHAT14           0             0             0             0             0
+ PWHERE17           0             0             0             0             0
+ CMWHERE1           0             0             0             0             0
+ PTBACK17           0             0             0             0             0
+ CMTBACK1           0             0             0             0             0
+
+
+           THETA
+              TELLOFF7      BRIBE7        REASON7       BEDROOM1      TREATS11
+              ________      ________      ________      ________      ________
+ TELLOFF7           0
+ BRIBE7             0             0
+ REASON7            0             0             0
+ BEDROOM1           0             0             0             0
+ TREATS11           0             0             0             0             0
+ REASON11           0             0             0             0             0
+ PWHERE14           0             0             0             0             0
+ PWHO14             0             0             0             0             0
+ PWHAT14            0             0             0             0             0
+ CMWHERE1           0             0             0             0             0
+ CMWHO14            0             0             0             0             0
+ CMWHAT14           0             0             0             0             0
+ PWHERE17           0             0             0             0             0
+ CMWHERE1           0             0             0             0             0
+ PTBACK17           0             0             0             0             0
+ CMTBACK1           0             0             0             0             0
+
+
+           THETA
+              REASON11      PWHERE14      PWHO14        PWHAT14       CMWHERE1
+              ________      ________      ________      ________      ________
+ REASON11           0
+ PWHERE14           0             0
+ PWHO14             0           171             0
+ PWHAT14            0           172           173             0
+ CMWHERE1           0             0             0             0             0
+ CMWHO14            0             0             0             0           174
+ CMWHAT14           0             0             0             0           175
+ PWHERE17           0             0             0             0             0
+ CMWHERE1           0             0             0             0             0
+ PTBACK17           0             0             0             0             0
+ CMTBACK1           0             0             0             0             0
+
+
+           THETA
+              CMWHO14       CMWHAT14      PWHERE17      CMWHERE1      PTBACK17
+              ________      ________      ________      ________      ________
+ CMWHO14            0
+ CMWHAT14         176             0
+ PWHERE17           0             0             0
+ CMWHERE1           0             0             0             0
+ PTBACK17           0             0           177             0             0
+ CMTBACK1           0             0             0           178             0
+
+
+           THETA
+              CMTBACK1
+              ________
+ CMTBACK1           0
+
+
+           ALPHA
+              H3            H5            H7            H11           MON14
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           ALPHA
+              MON17_K       CURFEW17
+              ________      ________
+                  0             0
+
+
+           BETA
+              H3            H5            H7            H11           MON14
+              ________      ________      ________      ________      ________
+ H3                 0             0             0             0             0
+ H5                 0             0             0             0             0
+ H7                 0             0             0             0             0
+ H11                0             0             0             0             0
+ MON14              0             0             0             0             0
+ MON17_K            0             0             0             0             0
+ CURFEW17           0             0             0             0             0
+
+
+           BETA
+              MON17_K       CURFEW17
+              ________      ________
+ H3                 0             0
+ H5                 0             0
+ H7                 0             0
+ H11                0             0
+ MON14              0             0
+ MON17_K            0             0
+ CURFEW17           0             0
+
+
+           PSI
+              H3            H5            H7            H11           MON14
+              ________      ________      ________      ________      ________
+ H3                 0
+ H5               179             0
+ H7               180           181             0
+ H11              182           183           184             0
+ MON14            185           186           187           188             0
+ MON17_K          189           190           191           192           193
+ CURFEW17         194           195           196           197           198
+
+
+           PSI
+              MON17_K       CURFEW17
+              ________      ________
+ MON17_K            0
+ CURFEW17         199             0
+
+
+     STARTING VALUES
+
+
+           TAU
+              IGNORE3$      IGNORE3$      IGNORE3$      IGNORE3$      SMACK3$1
+              ________      ________      ________      ________      ________
+               -0.777         0.186         0.328         1.213        -0.427
+
+
+           TAU
+              SMACK3$2      SMACK3$3      SMACK3$4      SHOUT3$1      SHOUT3$2
+              ________      ________      ________      ________      ________
+                1.078         1.339         2.382        -1.909        -0.374
+
+
+           TAU
+              SHOUT3$3      SHOUT3$4      BEDROOM3      BEDROOM3      BEDROOM3
+              ________      ________      ________      ________      ________
+               -0.177         0.936        -0.723         0.027         0.336
+
+
+           TAU
+              BEDROOM3      TREATS3$      TREATS3$      TREATS3$      TREATS3$
+              ________      ________      ________      ________      ________
+                1.448        -1.074         0.010         0.339         1.583
+
+
+           TAU
+              TELLOFF3      TELLOFF3      TELLOFF3      TELLOFF3      BRIBE3$1
+              ________      ________      ________      ________      ________
+               -2.551        -1.115        -0.940         0.302        -0.553
+
+
+           TAU
+              BRIBE3$2      BRIBE3$3      BRIBE3$4      IGNORE5$      IGNORE5$
+              ________      ________      ________      ________      ________
+                0.282         0.520         1.451        -0.822         0.004
+
+
+           TAU
+              IGNORE5$      IGNORE5$      SMACK5$1      SMACK5$2      SMACK5$3
+              ________      ________      ________      ________      ________
+                0.905         1.915        -0.117         1.237         2.220
+
+
+           TAU
+              SMACK5$4      SHOUT5$1      SHOUT5$2      SHOUT5$3      SHOUT5$4
+              ________      ________      ________      ________      ________
+                3.077        -1.930        -0.559         0.361         1.657
+
+
+           TAU
+              BEDROOM5      BEDROOM5      BEDROOM5      BEDROOM5      TREATS5$
+              ________      ________      ________      ________      ________
+               -1.232        -0.334         0.697         2.018        -1.316
+
+
+           TAU
+              TREATS5$      TREATS5$      TREATS5$      TELLOFF5      TELLOFF5
+              ________      ________      ________      ________      ________
+               -0.353         0.842         2.261        -2.610        -1.209
+
+
+           TAU
+              TELLOFF5      TELLOFF5      BRIBE5$1      BRIBE5$2      BRIBE5$3
+              ________      ________      ________      ________      ________
+               -0.213         1.195        -0.332         0.444         1.289
+
+
+           TAU
+              BRIBE5$4      REASON5$      REASON5$      REASON5$      REASON5$
+              ________      ________      ________      ________      ________
+                2.222        -1.935        -1.262        -0.398         0.838
+
+
+           TAU
+              IGNORE7$      IGNORE7$      IGNORE7$      IGNORE7$      SMACK7$1
+              ________      ________      ________      ________      ________
+               -0.622         0.175         1.151         2.136         0.045
+
+
+           TAU
+              SMACK7$2      SMACK7$3      SMACK7$4      SHOUT7$1      SHOUT7$2
+              ________      ________      ________      ________      ________
+                1.431         2.437         3.305        -1.956        -0.642
+
+
+           TAU
+              SHOUT7$3      SHOUT7$4      BEDROOM7      BEDROOM7      BEDROOM7
+              ________      ________      ________      ________      ________
+                0.383         1.699        -1.154        -0.194         0.945
+
+
+           TAU
+              BEDROOM7      TREATS7$      TREATS7$      TREATS7$      TREATS7$
+              ________      ________      ________      ________      ________
+                2.263        -1.354        -0.315         0.983         2.361
+
+
+           TAU
+              TELLOFF7      TELLOFF7      TELLOFF7      TELLOFF7      BRIBE7$1
+              ________      ________      ________      ________      ________
+               -2.543        -1.121        -0.019         1.366        -0.137
+
+
+           TAU
+              BRIBE7$2      BRIBE7$3      BRIBE7$4      REASON7$      REASON7$
+              ________      ________      ________      ________      ________
+                0.668         1.552         2.492        -1.858        -1.151
+
+
+           TAU
+              REASON7$      REASON7$      BEDROOM1      BEDROOM1      BEDROOM1
+              ________      ________      ________      ________      ________
+               -0.211         1.101        -1.069         0.223         1.330
+
+
+           TAU
+              BEDROOM1      TREATS11      TREATS11      TREATS11      TREATS11
+              ________      ________      ________      ________      ________
+                2.441        -1.187         0.159         1.381         2.510
+
+
+           TAU
+              REASON11      REASON11      REASON11      REASON11      PWHERE14
+              ________      ________      ________      ________      ________
+               -1.597        -0.666         0.282         1.337        -2.583
+
+
+           TAU
+              PWHERE14      PWHERE14      PWHO14$1      PWHO14$2      PWHO14$3
+              ________      ________      ________      ________      ________
+               -1.973        -1.041        -2.678        -1.954        -0.889
+
+
+           TAU
+              PWHAT14$      PWHAT14$      PWHAT14$      CMWHERE1      CMWHERE1
+              ________      ________      ________      ________      ________
+               -2.220        -1.442        -0.319        -2.309        -1.407
+
+
+           TAU
+              CMWHERE1      CMWHO14$      CMWHO14$      CMWHO14$      CMWHAT14
+              ________      ________      ________      ________      ________
+               -0.348        -2.208        -1.254        -0.153        -1.916
+
+
+           TAU
+              CMWHAT14      CMWHAT14      PWHERE17      PWHERE17      PWHERE17
+              ________      ________      ________      ________      ________
+               -1.026         0.077        -2.717        -1.837        -0.619
+
+
+           TAU
+              CMWHERE1      CMWHERE1      CMWHERE1      PTBACK17      PTBACK17
+              ________      ________      ________      ________      ________
+               -2.523        -1.477        -0.292        -1.406        -0.483
+
+
+           TAU
+              PTBACK17      CMTBACK1      CMTBACK1      CMTBACK1
+              ________      ________      ________      ________
+                0.424        -0.901        -0.039         0.724
+
+
+           NU
+              IGNORE3       SMACK3        SHOUT3        BEDROOM3      TREATS3
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              TELLOFF3      BRIBE3        IGNORE5       SMACK5        SHOUT5
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              BEDROOM5      TREATS5       TELLOFF5      BRIBE5        REASON5
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              IGNORE7       SMACK7        SHOUT7        BEDROOM7      TREATS7
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              TELLOFF7      BRIBE7        REASON7       BEDROOM1      TREATS11
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              REASON11      PWHERE14      PWHO14        PWHAT14       CMWHERE1
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              CMWHO14       CMWHAT14      PWHERE17      CMWHERE1      PTBACK17
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              CMTBACK1
+              ________
+                0.000
+
+
+           LAMBDA
+              H3            H5            H7            H11           MON14
+              ________      ________      ________      ________      ________
+ IGNORE3        0.468         0.000         0.000         0.000         0.000
+ SMACK3         0.441         0.000         0.000         0.000         0.000
+ SHOUT3         0.689         0.000         0.000         0.000         0.000
+ BEDROOM3       0.536         0.000         0.000         0.000         0.000
+ TREATS3        0.576         0.000         0.000         0.000         0.000
+ TELLOFF3       0.737         0.000         0.000         0.000         0.000
+ BRIBE3         0.414         0.000         0.000         0.000         0.000
+ IGNORE5        0.000         0.442         0.000         0.000         0.000
+ SMACK5         0.000         0.438         0.000         0.000         0.000
+ SHOUT5         0.000         0.641         0.000         0.000         0.000
+ BEDROOM5       0.000         0.580         0.000         0.000         0.000
+ TREATS5        0.000         0.582         0.000         0.000         0.000
+ TELLOFF5       0.000         0.747         0.000         0.000         0.000
+ BRIBE5         0.000         0.397         0.000         0.000         0.000
+ REASON5        0.000         0.497         0.000         0.000         0.000
+ IGNORE7        0.000         0.000         0.471         0.000         0.000
+ SMACK7         0.000         0.000         0.446         0.000         0.000
+ SHOUT7         0.000         0.000         0.650         0.000         0.000
+ BEDROOM7       0.000         0.000         0.651         0.000         0.000
+ TREATS7        0.000         0.000         0.652         0.000         0.000
+ TELLOFF7       0.000         0.000         0.738         0.000         0.000
+ BRIBE7         0.000         0.000         0.402         0.000         0.000
+ REASON7        0.000         0.000         0.549         0.000         0.000
+ BEDROOM1       0.000         0.000         0.000         0.835         0.000
+ TREATS11       0.000         0.000         0.000         0.884         0.000
+ REASON11       0.000         0.000         0.000         0.611         0.000
+ PWHERE14       0.000         0.000         0.000         0.000         0.932
+ PWHO14         0.000         0.000         0.000         0.000         0.881
+ PWHAT14        0.000         0.000         0.000         0.000         0.859
+ CMWHERE1       0.000         0.000         0.000         0.000         0.510
+ CMWHO14        0.000         0.000         0.000         0.000         0.483
+ CMWHAT14       0.000         0.000         0.000         0.000         0.499
+ PWHERE17       0.000         0.000         0.000         0.000         0.000
+ CMWHERE1       0.000         0.000         0.000         0.000         0.000
+ PTBACK17       0.000         0.000         0.000         0.000         0.000
+ CMTBACK1       0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              MON17_K       CURFEW17
+              ________      ________
+ IGNORE3        0.000         0.000
+ SMACK3         0.000         0.000
+ SHOUT3         0.000         0.000
+ BEDROOM3       0.000         0.000
+ TREATS3        0.000         0.000
+ TELLOFF3       0.000         0.000
+ BRIBE3         0.000         0.000
+ IGNORE5        0.000         0.000
+ SMACK5         0.000         0.000
+ SHOUT5         0.000         0.000
+ BEDROOM5       0.000         0.000
+ TREATS5        0.000         0.000
+ TELLOFF5       0.000         0.000
+ BRIBE5         0.000         0.000
+ REASON5        0.000         0.000
+ IGNORE7        0.000         0.000
+ SMACK7         0.000         0.000
+ SHOUT7         0.000         0.000
+ BEDROOM7       0.000         0.000
+ TREATS7        0.000         0.000
+ TELLOFF7       0.000         0.000
+ BRIBE7         0.000         0.000
+ REASON7        0.000         0.000
+ BEDROOM1       0.000         0.000
+ TREATS11       0.000         0.000
+ REASON11       0.000         0.000
+ PWHERE14       0.000         0.000
+ PWHO14         0.000         0.000
+ PWHAT14        0.000         0.000
+ CMWHERE1       0.000         0.000
+ CMWHO14        0.000         0.000
+ CMWHAT14       0.000         0.000
+ PWHERE17       1.000         0.000
+ CMWHERE1       0.413         0.000
+ PTBACK17       0.000         1.000
+ CMTBACK1       0.000         0.445
+
+
+           THETA
+              IGNORE3       SMACK3        SHOUT3        BEDROOM3      TREATS3
+              ________      ________      ________      ________      ________
+ IGNORE3        1.000
+ SMACK3         0.000         1.000
+ SHOUT3         0.000         0.000         1.000
+ BEDROOM3       0.000         0.000         0.000         1.000
+ TREATS3        0.000         0.000         0.000         0.000         1.000
+ TELLOFF3       0.000         0.000         0.000         0.000         0.000
+ BRIBE3         0.000         0.000         0.000         0.000         0.000
+ IGNORE5        0.000         0.000         0.000         0.000         0.000
+ SMACK5         0.000         0.000         0.000         0.000         0.000
+ SHOUT5         0.000         0.000         0.000         0.000         0.000
+ BEDROOM5       0.000         0.000         0.000         0.000         0.000
+ TREATS5        0.000         0.000         0.000         0.000         0.000
+ TELLOFF5       0.000         0.000         0.000         0.000         0.000
+ BRIBE5         0.000         0.000         0.000         0.000         0.000
+ REASON5        0.000         0.000         0.000         0.000         0.000
+ IGNORE7        0.000         0.000         0.000         0.000         0.000
+ SMACK7         0.000         0.000         0.000         0.000         0.000
+ SHOUT7         0.000         0.000         0.000         0.000         0.000
+ BEDROOM7       0.000         0.000         0.000         0.000         0.000
+ TREATS7        0.000         0.000         0.000         0.000         0.000
+ TELLOFF7       0.000         0.000         0.000         0.000         0.000
+ BRIBE7         0.000         0.000         0.000         0.000         0.000
+ REASON7        0.000         0.000         0.000         0.000         0.000
+ BEDROOM1       0.000         0.000         0.000         0.000         0.000
+ TREATS11       0.000         0.000         0.000         0.000         0.000
+ REASON11       0.000         0.000         0.000         0.000         0.000
+ PWHERE14       0.000         0.000         0.000         0.000         0.000
+ PWHO14         0.000         0.000         0.000         0.000         0.000
+ PWHAT14        0.000         0.000         0.000         0.000         0.000
+ CMWHERE1       0.000         0.000         0.000         0.000         0.000
+ CMWHO14        0.000         0.000         0.000         0.000         0.000
+ CMWHAT14       0.000         0.000         0.000         0.000         0.000
+ PWHERE17       0.000         0.000         0.000         0.000         0.000
+ CMWHERE1       0.000         0.000         0.000         0.000         0.000
+ PTBACK17       0.000         0.000         0.000         0.000         0.000
+ CMTBACK1       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              TELLOFF3      BRIBE3        IGNORE5       SMACK5        SHOUT5
+              ________      ________      ________      ________      ________
+ TELLOFF3       1.000
+ BRIBE3         0.000         1.000
+ IGNORE5        0.000         0.000         1.000
+ SMACK5         0.000         0.000         0.000         1.000
+ SHOUT5         0.000         0.000         0.000         0.000         1.000
+ BEDROOM5       0.000         0.000         0.000         0.000         0.000
+ TREATS5        0.000         0.000         0.000         0.000         0.000
+ TELLOFF5       0.000         0.000         0.000         0.000         0.000
+ BRIBE5         0.000         0.000         0.000         0.000         0.000
+ REASON5        0.000         0.000         0.000         0.000         0.000
+ IGNORE7        0.000         0.000         0.000         0.000         0.000
+ SMACK7         0.000         0.000         0.000         0.000         0.000
+ SHOUT7         0.000         0.000         0.000         0.000         0.000
+ BEDROOM7       0.000         0.000         0.000         0.000         0.000
+ TREATS7        0.000         0.000         0.000         0.000         0.000
+ TELLOFF7       0.000         0.000         0.000         0.000         0.000
+ BRIBE7         0.000         0.000         0.000         0.000         0.000
+ REASON7        0.000         0.000         0.000         0.000         0.000
+ BEDROOM1       0.000         0.000         0.000         0.000         0.000
+ TREATS11       0.000         0.000         0.000         0.000         0.000
+ REASON11       0.000         0.000         0.000         0.000         0.000
+ PWHERE14       0.000         0.000         0.000         0.000         0.000
+ PWHO14         0.000         0.000         0.000         0.000         0.000
+ PWHAT14        0.000         0.000         0.000         0.000         0.000
+ CMWHERE1       0.000         0.000         0.000         0.000         0.000
+ CMWHO14        0.000         0.000         0.000         0.000         0.000
+ CMWHAT14       0.000         0.000         0.000         0.000         0.000
+ PWHERE17       0.000         0.000         0.000         0.000         0.000
+ CMWHERE1       0.000         0.000         0.000         0.000         0.000
+ PTBACK17       0.000         0.000         0.000         0.000         0.000
+ CMTBACK1       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              BEDROOM5      TREATS5       TELLOFF5      BRIBE5        REASON5
+              ________      ________      ________      ________      ________
+ BEDROOM5       1.000
+ TREATS5        0.000         1.000
+ TELLOFF5       0.000         0.000         1.000
+ BRIBE5         0.000         0.000         0.000         1.000
+ REASON5        0.000         0.000         0.000         0.000         1.000
+ IGNORE7        0.000         0.000         0.000         0.000         0.000
+ SMACK7         0.000         0.000         0.000         0.000         0.000
+ SHOUT7         0.000         0.000         0.000         0.000         0.000
+ BEDROOM7       0.000         0.000         0.000         0.000         0.000
+ TREATS7        0.000         0.000         0.000         0.000         0.000
+ TELLOFF7       0.000         0.000         0.000         0.000         0.000
+ BRIBE7         0.000         0.000         0.000         0.000         0.000
+ REASON7        0.000         0.000         0.000         0.000         0.000
+ BEDROOM1       0.000         0.000         0.000         0.000         0.000
+ TREATS11       0.000         0.000         0.000         0.000         0.000
+ REASON11       0.000         0.000         0.000         0.000         0.000
+ PWHERE14       0.000         0.000         0.000         0.000         0.000
+ PWHO14         0.000         0.000         0.000         0.000         0.000
+ PWHAT14        0.000         0.000         0.000         0.000         0.000
+ CMWHERE1       0.000         0.000         0.000         0.000         0.000
+ CMWHO14        0.000         0.000         0.000         0.000         0.000
+ CMWHAT14       0.000         0.000         0.000         0.000         0.000
+ PWHERE17       0.000         0.000         0.000         0.000         0.000
+ CMWHERE1       0.000         0.000         0.000         0.000         0.000
+ PTBACK17       0.000         0.000         0.000         0.000         0.000
+ CMTBACK1       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              IGNORE7       SMACK7        SHOUT7        BEDROOM7      TREATS7
+              ________      ________      ________      ________      ________
+ IGNORE7        1.000
+ SMACK7         0.000         1.000
+ SHOUT7         0.000         0.000         1.000
+ BEDROOM7       0.000         0.000         0.000         1.000
+ TREATS7        0.000         0.000         0.000         0.000         1.000
+ TELLOFF7       0.000         0.000         0.000         0.000         0.000
+ BRIBE7         0.000         0.000         0.000         0.000         0.000
+ REASON7        0.000         0.000         0.000         0.000         0.000
+ BEDROOM1       0.000         0.000         0.000         0.000         0.000
+ TREATS11       0.000         0.000         0.000         0.000         0.000
+ REASON11       0.000         0.000         0.000         0.000         0.000
+ PWHERE14       0.000         0.000         0.000         0.000         0.000
+ PWHO14         0.000         0.000         0.000         0.000         0.000
+ PWHAT14        0.000         0.000         0.000         0.000         0.000
+ CMWHERE1       0.000         0.000         0.000         0.000         0.000
+ CMWHO14        0.000         0.000         0.000         0.000         0.000
+ CMWHAT14       0.000         0.000         0.000         0.000         0.000
+ PWHERE17       0.000         0.000         0.000         0.000         0.000
+ CMWHERE1       0.000         0.000         0.000         0.000         0.000
+ PTBACK17       0.000         0.000         0.000         0.000         0.000
+ CMTBACK1       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              TELLOFF7      BRIBE7        REASON7       BEDROOM1      TREATS11
+              ________      ________      ________      ________      ________
+ TELLOFF7       1.000
+ BRIBE7         0.000         1.000
+ REASON7        0.000         0.000         1.000
+ BEDROOM1       0.000         0.000         0.000         1.000
+ TREATS11       0.000         0.000         0.000         0.000         1.000
+ REASON11       0.000         0.000         0.000         0.000         0.000
+ PWHERE14       0.000         0.000         0.000         0.000         0.000
+ PWHO14         0.000         0.000         0.000         0.000         0.000
+ PWHAT14        0.000         0.000         0.000         0.000         0.000
+ CMWHERE1       0.000         0.000         0.000         0.000         0.000
+ CMWHO14        0.000         0.000         0.000         0.000         0.000
+ CMWHAT14       0.000         0.000         0.000         0.000         0.000
+ PWHERE17       0.000         0.000         0.000         0.000         0.000
+ CMWHERE1       0.000         0.000         0.000         0.000         0.000
+ PTBACK17       0.000         0.000         0.000         0.000         0.000
+ CMTBACK1       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              REASON11      PWHERE14      PWHO14        PWHAT14       CMWHERE1
+              ________      ________      ________      ________      ________
+ REASON11       1.000
+ PWHERE14       0.000         1.000
+ PWHO14         0.000         0.000         1.000
+ PWHAT14        0.000         0.000         0.000         1.000
+ CMWHERE1       0.000         0.000         0.000         0.000         1.000
+ CMWHO14        0.000         0.000         0.000         0.000         0.000
+ CMWHAT14       0.000         0.000         0.000         0.000         0.000
+ PWHERE17       0.000         0.000         0.000         0.000         0.000
+ CMWHERE1       0.000         0.000         0.000         0.000         0.000
+ PTBACK17       0.000         0.000         0.000         0.000         0.000
+ CMTBACK1       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              CMWHO14       CMWHAT14      PWHERE17      CMWHERE1      PTBACK17
+              ________      ________      ________      ________      ________
+ CMWHO14        1.000
+ CMWHAT14       0.000         1.000
+ PWHERE17       0.000         0.000         1.000
+ CMWHERE1       0.000         0.000         0.000         1.000
+ PTBACK17       0.000         0.000         0.000         0.000         1.000
+ CMTBACK1       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              CMTBACK1
+              ________
+ CMTBACK1       1.000
+
+
+           ALPHA
+              H3            H5            H7            H11           MON14
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           ALPHA
+              MON17_K       CURFEW17
+              ________      ________
+                0.000         0.000
+
+
+           BETA
+              H3            H5            H7            H11           MON14
+              ________      ________      ________      ________      ________
+ H3             0.000         0.000         0.000         0.000         0.000
+ H5             0.000         0.000         0.000         0.000         0.000
+ H7             0.000         0.000         0.000         0.000         0.000
+ H11            0.000         0.000         0.000         0.000         0.000
+ MON14          0.000         0.000         0.000         0.000         0.000
+ MON17_K        0.000         0.000         0.000         0.000         0.000
+ CURFEW17       0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              MON17_K       CURFEW17
+              ________      ________
+ H3             0.000         0.000
+ H5             0.000         0.000
+ H7             0.000         0.000
+ H11            0.000         0.000
+ MON14          0.000         0.000
+ MON17_K        0.000         0.000
+ CURFEW17       0.000         0.000
+
+
+           PSI
+              H3            H5            H7            H11           MON14
+              ________      ________      ________      ________      ________
+ H3             1.000
+ H5             0.000         1.000
+ H7             0.000         0.000         1.000
+ H11            0.000         0.000         0.000         1.000
+ MON14          0.000         0.000         0.000         0.000         1.000
+ MON17_K        0.000         0.000         0.000         0.000         0.000
+ CURFEW17       0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              MON17_K       CURFEW17
+              ________      ________
+ MON17_K        1.000
+ CURFEW17       0.000         1.000
+
+
+SAMPLE STATISTICS FOR ESTIMATED FACTOR SCORES
+
+
+     SAMPLE STATISTICS
+
+
+           Means
+              H3            H3_SE         H5            H5_SE         H7
+              ________      ________      ________      ________      ________
+               -0.009         0.504        -0.007         0.382        -0.007
+
+
+           Means
+              H7_SE         H11           H11_SE        MON14         MON14_SE
+              ________      ________      ________      ________      ________
+                0.387        -0.013         0.484         0.005         0.601
+
+
+           Means
+              MON17_K       MON17_K_      CURFEW17      CURFEW17
+              ________      ________      ________      ________
+               -0.010         0.661         0.008         0.753
+
+
+           Covariances
+              H3            H3_SE         H5            H5_SE         H7
+              ________      ________      ________      ________      ________
+ H3             0.701
+ H3_SE         -0.005         0.016
+ H5             0.681        -0.007         0.796
+ H5_SE         -0.006         0.013        -0.007         0.016
+ H7             0.617        -0.007         0.779        -0.007         0.795
+ H7_SE         -0.007         0.011        -0.008         0.015        -0.008
+ H11            0.432        -0.004         0.556        -0.005         0.624
+ H11_SE        -0.012         0.007        -0.014         0.009        -0.015
+ MON14         -0.196         0.008        -0.208         0.006        -0.218
+ MON14_SE      -0.022         0.003        -0.023         0.003        -0.024
+ MON17_K       -0.208         0.007        -0.221         0.005        -0.234
+ MON17_K_      -0.018         0.003        -0.019         0.003        -0.020
+ CURFEW17      -0.025         0.006        -0.002         0.005         0.014
+ CURFEW17      -0.002         0.004        -0.001         0.004         0.000
+
+
+           Covariances
+              H7_SE         H11           H11_SE        MON14         MON14_SE
+              ________      ________      ________      ________      ________
+ H7_SE          0.015
+ H11           -0.005         0.726
+ H11_SE         0.011        -0.012         0.022
+ MON14          0.005        -0.229         0.004         0.680
+ MON14_SE       0.003        -0.023         0.006         0.068         0.019
+ MON17_K        0.005        -0.243         0.005         0.613         0.063
+ MON17_K_       0.003        -0.018         0.005         0.052         0.015
+ CURFEW17       0.004         0.059         0.002         0.245         0.024
+ CURFEW17       0.004         0.004         0.005         0.000         0.007
+
+
+           Covariances
+              MON17_K       MON17_K_      CURFEW17      CURFEW17
+              ________      ________      ________      ________
+ MON17_K        0.581
+ MON17_K_       0.051         0.013
+ CURFEW17       0.220         0.020         0.401
+ CURFEW17       0.001         0.009         0.007         0.015
+
+
+           Correlations
+              H3            H3_SE         H5            H5_SE         H7
+              ________      ________      ________      ________      ________
+ H3             1.000
+ H3_SE         -0.051         1.000
+ H5             0.912        -0.063         1.000
+ H5_SE         -0.061         0.800        -0.067         1.000
+ H7             0.827        -0.063         0.979        -0.065         1.000
+ H7_SE         -0.067         0.688        -0.073         0.975        -0.071
+ H11            0.606        -0.040         0.731        -0.045         0.821
+ H11_SE        -0.096         0.393        -0.108         0.503        -0.110
+ MON14         -0.284         0.074        -0.283         0.055        -0.297
+ MON14_SE      -0.195         0.177        -0.192         0.182        -0.197
+ MON17_K       -0.326         0.076        -0.325         0.058        -0.344
+ MON17_K_      -0.193         0.221        -0.190         0.224        -0.194
+ CURFEW17      -0.048         0.078        -0.004         0.061         0.025
+ CURFEW17      -0.022         0.251        -0.011         0.252         0.001
+
+
+           Correlations
+              H7_SE         H11           H11_SE        MON14         MON14_SE
+              ________      ________      ________      ________      ________
+ H7_SE          1.000
+ H11           -0.051         1.000
+ H11_SE         0.588        -0.098         1.000
+ MON14          0.048        -0.326         0.036         1.000
+ MON14_SE       0.197        -0.197         0.293         0.604         1.000
+ MON17_K        0.052        -0.374         0.044         0.976         0.600
+ MON17_K_       0.235        -0.191         0.309         0.563         0.947
+ CURFEW17       0.053         0.109         0.022         0.469         0.282
+ CURFEW17       0.253         0.039         0.275         0.001         0.411
+
+
+           Correlations
+              MON17_K       MON17_K_      CURFEW17      CURFEW17
+              ________      ________      ________      ________
+ MON17_K        1.000
+ MON17_K_       0.587         1.000
+ CURFEW17       0.457         0.274         1.000
+ CURFEW17       0.012         0.608         0.088         1.000
+
+
+SAVEDATA INFORMATION
+
+
+  Save file
+    Parenting_FS_all.dat
+
+  Order and format of variables
+
+    IGNORE3        F10.3
+    SMACK3         F10.3
+    SHOUT3         F10.3
+    BEDROOM3       F10.3
+    TREATS3        F10.3
+    TELLOFF3       F10.3
+    BRIBE3         F10.3
+    IGNORE5        F10.3
+    SMACK5         F10.3
+    SHOUT5         F10.3
+    BEDROOM5       F10.3
+    TREATS5        F10.3
+    TELLOFF5       F10.3
+    BRIBE5         F10.3
+    REASON5        F10.3
+    IGNORE7        F10.3
+    SMACK7         F10.3
+    SHOUT7         F10.3
+    BEDROOM7       F10.3
+    TREATS7        F10.3
+    TELLOFF7       F10.3
+    BRIBE7         F10.3
+    REASON7        F10.3
+    BEDROOM1       F10.3
+    TREATS11       F10.3
+    REASON11       F10.3
+    PWHERE14       F10.3
+    PWHO14         F10.3
+    PWHAT14        F10.3
+    CMWHERE1       F10.3
+    CMWHO14        F10.3
+    CMWHAT14       F10.3
+    PWHERE17       F10.3
+    CMWHERE1       F10.3
+    PTBACK17       F10.3
+    CMTBACK1       F10.3
+    H3             F10.3
+    H3_SE          F10.3
+    H5             F10.3
+    H5_SE          F10.3
+    H7             F10.3
+    H7_SE          F10.3
+    H11            F10.3
+    H11_SE         F10.3
+    MON14          F10.3
+    MON14_SE       F10.3
+    MON17_K        F10.3
+    MON17_K_SE     F10.3
+    CURFEW17       F10.3
+    CURFEW17_SE    F10.3
+    GOVWT1         F10.3
+    MCSID          I6
+    PTTYPE2        I4
+    SPTN00         I4
+
+  Save file format
+    51F10.3 I6 2I4
+
+  Save file record length    10000
+
+  Save missing symbol        *
+
+
+DIAGRAM INFORMATION
+
+  Use View Diagram under the Diagram menu in the Mplus Editor to view the diagram.
+  If running Mplus from the Mplus Diagrammer, the diagram opens automatically.
+
+  Diagram output
+    c:\users\siyan\onedrive - the pennsylvania state university\dissertation_working\data\mplus\growth_mixture_models\co
+
+     Beginning Time:  23:20:54
+        Ending Time:  23:21:04
+       Elapsed Time:  00:00:10
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2022 Muthen & Muthen

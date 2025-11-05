@@ -1,0 +1,193 @@
+TITLE: One-class growth mixture on continuous wave factor scores
+       with complex survey features and covariates (non-composite parenting).
+
+DATA:
+  FILE = sc_wave_fscores_complete.dat;
+
+VARIABLE: 
+      NAMES = 
+		SC3THAC SC3TCOM SC3OBEY SC3DIST SC3TEMP SC3REST SC3FIDG 
+		SC5THAC SC5TCOM SC5OBEY SC5DIST SC5TEMP SC5REST SC5FIDG 
+		SC7THAC SC7TCOM SC7OBEY SC7DIST SC7TEMP SC7REST SC7FIDG 
+		SC11THAC SC11TCOM SC11OBEY SC11DIST SC11TEMP SC11REST SC11FIDG 
+		SC14THAC SC14TCOM SC14OBEY SC14DIST SC14TEMP SC14REST SC14FIDG 
+		SC17THAC SC17TCOM SC17OBEY SC17DIST SC17TEMP SC17REST SC17FIDG 
+		IGNORE3 SMACK3 SHOUT3 BEDROOM3 TREATS3 TELLOFF3 BRIBE3
+		IGNORE5 SMACK5 SHOUT5 BEDROOM5 TREATS5 TELLOFF5 BRIBE5 REASON5 
+		RINDOOR5 DINNER5 CLOSE5 READ5 STORY5 MUSIC5 PAINT5 ACTIVE5 GAMES5 PARK5 
+		IGNORE7 SMACK7 SHOUT7 BEDROOM7 TREATS7 TELLOFF7 BRIBE7 REASON7 
+		RINDOOR7 DINNER7 CLOSE7 READ7 STORY7 MUSIC7 PAINT7 ACTIVE7 GAMES7 PARK7 TVRULES7
+		BEDROOM11 TREATS11 REASON11 CLOSE11 ACTIVE11 GAMES11 
+		PWHERE14 PWHO14 PWHAT14 CMWHERE14 CMWHO14 CMWHAT14 
+		CMWHERE17 CMTBACK17 PWHERE17 PTBACK17 LIVEWP17 
+		PEDU BPEDU SEX RACE BRACE BMARRIED INCOMEC INCOMEL INCOMEF LBW 
+		NAMHAPNA NAMUNFAA NAMBRUSA NAMFEEDA NAMINJUA NAMBATHA NAMWARYA 
+		NAMBSHYA NAMFRETA NAMSLEEA NAMMILKA NAMSLTIA NAMNAPSA NAMSOFOA 
+		INFTEMPR INFTEMP DFPW DUPD DUPW HFAE COGA SCOGA AGE3
+		AGE5 AGE7 AGE11 AGE14 AGE17 
+		SC_3 SC_3_SE SC_5 SC_5_SE SC_7 SC_7_SE SC_11 SC_11_SE 
+		SC_14 SC_14_SE SC_17 SC_17_SE 
+		GOVWT1 MCSID PTTYPE2 SPTN00;
+
+      USEVARIABLES =
+		SC_3 SC_5 SC_7 SC_11 SC_14 SC_17
+        scoga lbw inftemp hfae bmarried brace sex bpedu incomef
+		ignore3 smack3 shout3 bedroom3 treats3 telloff3 bribe3
+	    ignore5 smack5 shout5 bedroom5 treats5 telloff5 bribe5 reason5
+	    ignore7 smack7 shout7 bedroom7 treats7 telloff7 bribe7 reason7
+	    bedroom11 treats11 reason11
+        cmwhere14 cmwho14 cmwhat14
+        cmwhere17 cmtback17;
+
+  IDVARIABLE = mcsid;
+  MISSING = *;
+
+  ! ---- Complex survey design retained in mixture ----
+  STRATIFICATION = pttype2;
+  CLUSTER       = sptn00;
+  WEIGHT        = govwt1;
+  SUBPOPULATION = (govwt1 > 0);
+
+  ! ---- Two latent classes ----
+  CLASSES = c(1);
+
+ANALYSIS:
+  TYPE = COMPLEX MIXTURE;   ! mixture + survey adjustments are allowed
+  ESTIMATOR = MLR;          ! robust ML for continuous outcomes in mixtures
+  PROCESSORS = 12;
+  STARTS = 500 100;
+  STITERATIONS = 10;
+  STSEED = 20251021;     ! sets the global seed for random starts
+
+
+MODEL:
+  %OVERALL%
+
+  ! ===== Latent growth factors over wave factor scores =====
+  ! Non-linear slope via free time scores; time centered at age 3 (0 -> 1)
+  i s | SC_3@0 SC_5* SC_7* SC_11* SC_14* SC_17@1;
+
+  ! Residual variances of the six repeated measures (equal across classes by placing here)
+  SC_3*; SC_5*; SC_7*; SC_11*; SC_14*; SC_17*;
+
+  ! Growth variances and covariance (equal across classes here for stability)
+  i*;
+  s*;
+  i WITH s;
+
+    ! Time-varying parenting on wave outcomes (fixed to 0 here)
+	SC_3  ON ignore3@0
+             smack3@0
+             shout3@0
+             bedroom3@0
+             treats3@0
+             telloff3@0
+             bribe3@0;
+
+    SC_5  ON ignore5@0
+             smack5@0
+             shout5@0
+             bedroom5@0
+             treats5@0
+             telloff5@0
+             bribe5@0
+             reason5@0;
+
+    SC_7  ON ignore7@0
+             smack7@0
+             shout7@0
+             bedroom7@0
+             treats7@0
+             telloff7@0
+             bribe7@0
+             reason7@0;
+
+    SC_11 ON bedroom11@0
+             treats11@0
+             reason11@0;
+
+    SC_14 ON cmwhere14@0
+             cmwho14@0
+             cmwhat14@0;
+
+    SC_17 ON cmwhere17@0
+             cmtback17@0;
+
+    ! Time-invariant covariates on growth factors (fixed to 0 here)
+    i ON scoga@0 lbw@0 inftemp@0 hfae@0 bmarried@0 brace@0 sex@0 bpedu@0 incomef@0;
+    s ON scoga@0 lbw@0 inftemp@0 hfae@0 bmarried@0 brace@0 sex@0 bpedu@0 incomef@0;
+
+
+
+    ! ===== Class-specific growth means =====
+    %c#1%
+      [i] (mi1);
+      [s] (ms1);
+
+  	! class-specific time-varying parenting effects
+! class-specific time-varying parenting effects
+    SC_3  ON ignore3  (sc3_ign_c1)
+             smack3   (sc3_smk_c1)
+             shout3   (sc3_sht_c1)
+             bedroom3 (sc3_bed_c1)
+             treats3  (sc3_trt_c1)
+             telloff3 (sc3_tel_c1)
+             bribe3   (sc3_brb_c1);
+
+    SC_5  ON ignore5  (sc5_ign_c1)
+             smack5   (sc5_smk_c1)
+             shout5   (sc5_sht_c1)
+             bedroom5 (sc5_bed_c1)
+             treats5  (sc5_trt_c1)
+             telloff5 (sc5_tel_c1)
+             bribe5   (sc5_brb_c1)
+             reason5  (sc5_rsn_c1);
+
+    SC_7  ON ignore7  (sc7_ign_c1)
+             smack7   (sc7_smk_c1)
+             shout7   (sc7_sht_c1)
+             bedroom7 (sc7_bed_c1)
+             treats7  (sc7_trt_c1)
+             telloff7 (sc7_tel_c1)
+             bribe7   (sc7_brb_c1)
+             reason7  (sc7_rsn_c1);
+
+    SC_11 ON bedroom11(sc11_bed_c1)
+             treats11 (sc11_trt_c1)
+             reason11 (sc11_rsn_c1);
+
+    SC_14 ON cmwhere14(sc14_whr_c1)
+             cmwho14  (sc14_who_c1)
+             cmwhat14 (sc14_wht_c1);
+
+    SC_17 ON cmwhere17(sc17_whr_c1)
+             cmtback17(sc17_tbk_c1);
+
+    i ON scoga   (i_scoga_c1);
+    i ON lbw     (i_lbw_c1);
+    i ON inftemp (i_inftemp_c1);
+    i ON hfae    (i_hfae_c1);
+    i ON bmarried(i_bmar_c1);
+    i ON brace   (i_brace_c1);
+    i ON sex     (i_sex_c1);
+    i ON bpedu   (i_bpedu_c1);
+    i ON incomef (i_inc_c1);
+
+    s ON scoga   (s_scoga_c1);
+    s ON lbw     (s_lbw_c1);
+    s ON inftemp (s_inftemp_c1);
+    s ON hfae    (s_hfae_c1);
+    s ON bmarried(s_bmar_c1);
+    s ON brace   (s_brace_c1);
+    s ON sex     (s_sex_c1);
+    s ON bpedu   (s_bpedu_c1);
+    s ON incomef (s_inc_c1);
+
+
+
+OUTPUT:
+  TECH1 TECH4 TECH8 TECH11 TECH14 STANDARDIZED;
+
+SAVEDATA:
+  FILE = sc_gmm3_fscores_cprobs.dat;
+  SAVE = CPROB;     ! most-likely class and posterior probabilities

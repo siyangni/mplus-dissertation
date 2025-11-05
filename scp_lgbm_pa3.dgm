@@ -1,0 +1,1689 @@
+VERSION 1.1.0
+INPUT
+TITLE:
+ Second-order LGBM with categorical indicators and covariates (pa3 not composite)
+DATA:
+  FILE = recoded_only_sc_pa_cov.dat;
+VARIABLE:
+  Names are
+     pttype2 nh2 bovwt1 covwt1 dovwt1 eovwt1 fovwt1 govwt1 sptn00 sc3thac
+     sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg sc5thac sc5tcom sc5obey
+     sc5dist sc5temp sc5rest sc5fidg sc5lyin sc7thac sc7tcom sc7obey sc7dist
+     sc7temp sc7rest sc7fidg sc7lyin sc11thac sc11tcom sc11obey sc11dist
+     sc11temp sc11rest sc11fidg sc11lyin sc14thac sc14tcom sc14obey sc14dist
+     sc14temp sc14rest sc14fidg sc14lyin sc17thac sc17tcom sc17obey sc17dist
+     sc17temp sc17rest sc17fidg sc17lyin ignore3 smack3 shout3 bedroom3
+     treats3 telloff3 bribe3 ignore5 smack5 shout5 bedroom5 treats5 telloff5
+     bribe5 reason5 rindoor5 dinner5 close5 read5 story5 music5 paint5
+     active5 games5 park5 ignore7 smack7 shout7 bedroom7 treats7 telloff7
+     bribe7 reason7 rindoor7 dinner7 close7 read7 story7 music7 paint7
+     active7 games7 park7 tvrules7 bedroom11 treats11 reason11 close11
+     active11 games11 pwhere14 pwho14 pwhat14 cmwhere14 cmwho14 cmwhat14
+     cmwhere17 cmtback17 pwhere17 ptback17 livewp17 pedu bpedu sex race
+     brace bmarried incomec incomel incomef lbw namhapna0 namunfaa0 nambrusa0
+     namfeeda0 naminjua0 nambatha0 namwarya0 nambshya0 namfreta0 namsleea0
+     nammilka0 namsltia0 namnapsa0 namsofoa0 inftempr inftemp dfpw dupd
+     dupw hfae coga scoga age3 age5 age7 age11 age14 age17 mcsid;
+  USEVARIABLES =
+      sc3thac sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg
+      sc5thac sc5tcom sc5obey sc5dist sc5temp sc5rest sc5fidg
+      sc7thac sc7tcom sc7obey sc7dist sc7temp sc7rest sc7fidg
+      sc11thac sc11tcom sc11obey sc11dist sc11temp sc11rest sc11fidg
+      sc14thac sc14tcom sc14obey sc14dist sc14temp sc14rest sc14fidg
+      sc17thac sc17tcom sc17obey sc17dist sc17temp sc17rest sc17fidg
+   scoga lbw inftemp hfae bmarried brace sex bpedu incomef
+      ignore3 smack3 shout3 bedroom3 treats3 telloff3 bribe3
+      pa5 pa7 pa11 pm14 pm17;
+  CATEGORICAL =
+    sc3thac sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg
+    sc5thac sc5tcom sc5obey sc5dist sc5temp sc5rest sc5fidg
+    sc7thac sc7tcom sc7obey sc7dist sc7temp sc7rest sc7fidg
+    sc11thac sc11tcom sc11obey sc11dist sc11temp sc11rest sc11fidg
+    sc14thac sc14tcom sc14obey sc14dist sc14temp sc14rest sc14fidg
+    sc17thac sc17tcom sc17obey sc17dist sc17temp sc17rest sc17fidg;
+  MISSING ARE ALL (-9999);
+  IDVARIABLE IS mcsid;
+    STRATIFICATION = pttype2;
+    CLUSTER       = sptn00;
+    WEIGHT        = govwt1;
+    SUBPOPULATION = (govwt1 > 0);
+DEFINE:
+ pa5  = MEAN(ignore5 smack5 shout5 bedroom5 treats5 telloff5 bribe5 reason5);
+ pa7  = MEAN(ignore7 smack7 shout7 bedroom7 treats7 telloff7 bribe7 reason7);
+ pa11 = MEAN(bedroom11 treats11 reason11);
+ pm14 = MEAN(pwhere14 pwho14 pwhat14 cmwhere14 cmwho14 cmwhat14);
+ pm17 = MEAN(cmwhere17 cmtback17 pwhere17 ptback17);
+ANALYSIS:
+  TYPE = COMPLEX;
+  ESTIMATOR = WLSMV;
+  PARAMETERIZATION = DELTA;
+OUTPUT:
+ STANDARDIZED MODINDICES(10) TECH1 TECH4;
+MODEL:
+  SC_3  BY sc3thac@1
+            sc3tcom (l2)
+   sc3obey (l3)
+   sc3dist (l4)
+   sc3temp (l5)
+   sc3rest (l6)
+   sc3fidg (l7);
+  SC_5  BY sc5thac@1
+            sc5tcom (l2)
+   sc5obey (l3)
+   sc5dist (l4)
+   sc5temp (l5)
+   sc5rest (l6)
+   sc5fidg (l7);
+  SC_7  BY sc7thac@1
+            sc7tcom (l2)
+   sc7obey (l3)
+   sc7dist (l4)
+   sc7temp (l5)
+   sc7rest (l6)
+   sc7fidg (l7);
+  SC_11 BY sc11thac@1
+            sc11tcom (l2)
+   sc11obey (l3)
+   sc11dist (l4)
+   sc11temp (l5)
+   sc11rest (l6)
+   sc11fidg (l7);
+  SC_14 BY sc14thac@1
+            sc14tcom (l2)
+   sc14obey (l3)
+   sc14dist (l4)
+   sc14temp (l5)
+   sc14rest (l6)
+   sc14fidg (l7);
+  SC_17 BY sc17thac@1
+            sc17tcom (l2)
+   sc17obey (l3)
+   sc17dist (l4)
+   sc17temp (l5)
+   sc17rest (l6)
+   sc17fidg (l7);
+  SC_3*; SC_5*; SC_7*; SC_11*; SC_14*; SC_17*;
+  [SC_3-SC_17@0];
+  [sc3thac$1] (t_thac1);  [sc5thac$1] (t_thac1);  [sc7thac$1] (t_thac1);
+[sc11thac$1] (t_thac1);  [sc14thac$1] (t_thac1);  [sc17thac$1] (t_thac1);
+  [sc3thac$2] (t_thac2);  [sc5thac$2] (t_thac2);  [sc7thac$2] (t_thac2);
+[sc11thac$2] (t_thac2);  [sc14thac$2] (t_thac2);  [sc17thac$2] (t_thac2);
+  [sc3tcom$1](t_tcom1);  [sc5tcom$1](t_tcom1);  [sc7tcom$1](t_tcom1);
+[sc11tcom$1](t_tcom1);  [sc14tcom$1](t_tcom1);  [sc17tcom$1](t_tcom1);
+  [sc3tcom$2](t_tcom2);  [sc5tcom$2](t_tcom2);  [sc7tcom$2](t_tcom2);
+[sc11tcom$2](t_tcom2);  [sc14tcom$2](t_tcom2);  [sc17tcom$2](t_tcom2);
+  [sc3obey$1](t_obey1);  [sc5obey$1](t_obey1);  [sc7obey$1](t_obey1);
+[sc11obey$1](t_obey1);  [sc14obey$1](t_obey1);  [sc17obey$1](t_obey1);
+  [sc3obey$2](t_obey2);  [sc5obey$2](t_obey2);  [sc7obey$2](t_obey2);
+[sc11obey$2](t_obey2);  [sc14obey$2](t_obey2);  [sc17obey$2](t_obey2);
+  [sc3dist$1](t_dist1);  [sc5dist$1](t_dist1);  [sc7dist$1](t_dist1);
+[sc11dist$1](t_dist1);  [sc14dist$1](t_dist1);  [sc17dist$1](t_dist1);
+  [sc3dist$2](t_dist2);  [sc5dist$2](t_dist2);  [sc7dist$2](t_dist2);
+[sc11dist$2](t_dist2);  [sc14dist$2](t_dist2);  [sc17dist$2](t_dist2);
+  [sc3temp$1](t_temp1);  [sc5temp$1](t_temp1);  [sc7temp$1](t_temp1);
+[sc11temp$1](t_temp1);  [sc14temp$1](t_temp1);  [sc17temp$1](t_temp1);
+  [sc3temp$2](t_temp2);  [sc5temp$2](t_temp2);  [sc7temp$2](t_temp2);
+[sc11temp$2](t_temp2);  [sc14temp$2](t_temp2);  [sc17temp$2](t_temp2);
+  [sc3rest$1](t_rest1);  [sc5rest$1](t_rest1);  [sc7rest$1](t_rest1);
+[sc11rest$1](t_rest1);  [sc14rest$1](t_rest1);  [sc17rest$1](t_rest1);
+  [sc3rest$2](t_rest2);  [sc5rest$2](t_rest2);  [sc7rest$2](t_rest2);
+[sc11rest$2](t_rest2);  [sc14rest$2](t_rest2);  [sc17rest$2](t_rest2);
+  [sc3fidg$1](t_fidg1);  [sc5fidg$1](t_fidg1);  [sc7fidg$1](t_fidg1);
+[sc11fidg$1](t_fidg1);  [sc14fidg$1](t_fidg1);  [sc17fidg$1](t_fidg1);
+  [sc3fidg$2](t_fidg2);  [sc5fidg$2](t_fidg2);  [sc7fidg$2](t_fidg2);
+[sc11fidg$2](t_fidg2);  [sc14fidg$2](t_fidg2);  [sc17fidg$2](t_fidg2);
+  sc3thac WITH sc5thac;  sc5thac WITH sc7thac;  sc7thac WITH sc11thac;
+sc11thac WITH sc14thac; sc14thac WITH sc17thac;
+  sc3tcom WITH sc5tcom;  sc5tcom WITH sc7tcom;  sc7tcom WITH sc11tcom;
+sc11tcom WITH sc14tcom; sc14tcom WITH sc17tcom;
+  sc3obey WITH sc5obey;  sc5obey WITH sc7obey;  sc7obey WITH sc11obey;
+sc11obey WITH sc14obey; sc14obey WITH sc17obey;
+  sc3dist WITH sc5dist;  sc5dist WITH sc7dist;  sc7dist WITH sc11dist;
+sc11dist WITH sc14dist; sc14dist WITH sc17dist;
+  sc3temp WITH sc5temp;  sc5temp WITH sc7temp;  sc7temp WITH sc11temp;
+sc11temp WITH sc14temp; sc14temp WITH sc17temp;
+  sc3rest WITH sc5rest;  sc5rest WITH sc7rest;  sc7rest WITH sc11rest;
+sc11rest WITH sc14rest; sc14rest WITH sc17rest;
+  sc3fidg WITH sc5fidg;  sc5fidg WITH sc7fidg;  sc7fidg WITH sc11fidg;
+sc11fidg WITH sc14fidg; sc14fidg WITH sc17fidg;
+  { sc3thac-sc3fidg@1  sc5thac-sc5fidg  sc7thac-sc7fidg
+sc11thac-sc11fidg  sc14thac-sc14fidg  sc17thac-sc17fidg };
+  i s | SC_3@0 SC_5* SC_7* SC_11* SC_14* SC_17@1;
+  [i@0 s];
+  i* s*;
+  i WITH s;
+SC_3  ON ignore3 smack3 shout3
+bedroom3 treats3 telloff3 bribe3;
+SC_5  ON pa5;
+SC_7  ON pa7;
+SC_11 ON pa11;
+SC_14 ON pm14;
+SC_17 ON pm17;
+i s ON scoga lbw inftemp hfae bmarried brace sex bpedu incomef;
+INPUT_END
+2
+2
+2
+2
+WLSMV
+1
+GENERAL
+0
+42
+8
+21
+sc3thac sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg sc5thac sc5tcom sc5obey sc5dist sc5temp sc5rest sc5fidg sc7thac sc7tcom sc7obey sc7dist sc7temp sc7rest sc7fidg sc11thac sc11tcom sc11obey sc11dist sc11temp sc11rest sc11fidg sc14thac sc14tcom sc14obey sc14dist sc14temp sc14rest sc14fidg sc17thac sc17tcom sc17obey sc17dist sc17temp sc17rest sc17fidg sc_3 sc_5 sc_7 sc_11 sc_14 sc_17 i s scoga lbw inftemp hfae bmarried brace sex bpedu incomef ignore3 smack3 shout3 bedroom3 treats3 telloff3 bribe3 pa5 pa7 pa11 pm14 pm17
+3
+-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 2 2 2 2 2 2 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+1
+i s
+sc_3 sc_5 sc_7 sc_11 sc_14 sc_17
+6
+sc_3
+sc3thac sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg
+sc_5
+sc5thac sc5tcom sc5obey sc5dist sc5temp sc5rest sc5fidg
+sc_7
+sc7thac sc7tcom sc7obey sc7dist sc7temp sc7rest sc7fidg
+sc_11
+sc11thac sc11tcom sc11obey sc11dist sc11temp sc11rest sc11fidg
+sc_14
+sc14thac sc14tcom sc14obey sc14dist sc14temp sc14rest sc14fidg
+sc_17
+sc17thac sc17tcom sc17obey sc17dist sc17temp sc17rest sc17fidg
+1 1 sc_3 sc3thac    1.000    0.000
+1 1 sc_3 sc3tcom    1.894    0.179
+91 1 sc_3 sc3tcom l2
+1 1 sc_3 sc3obey    1.279    0.135
+91 1 sc_3 sc3obey l3
+1 1 sc_3 sc3dist    2.328    0.223
+91 1 sc_3 sc3dist l4
+1 1 sc_3 sc3temp    0.941    0.119
+91 1 sc_3 sc3temp l5
+1 1 sc_3 sc3rest    2.341    0.242
+91 1 sc_3 sc3rest l6
+1 1 sc_3 sc3fidg    2.090    0.214
+91 1 sc_3 sc3fidg l7
+1 1 sc_5 sc5thac    1.000    0.000
+1 1 sc_5 sc5tcom    1.894    0.179
+91 1 sc_5 sc5tcom l2
+1 1 sc_5 sc5obey    1.279    0.135
+91 1 sc_5 sc5obey l3
+1 1 sc_5 sc5dist    2.328    0.223
+91 1 sc_5 sc5dist l4
+1 1 sc_5 sc5temp    0.941    0.119
+91 1 sc_5 sc5temp l5
+1 1 sc_5 sc5rest    2.341    0.242
+91 1 sc_5 sc5rest l6
+1 1 sc_5 sc5fidg    2.090    0.214
+91 1 sc_5 sc5fidg l7
+1 1 sc_7 sc7thac    1.000    0.000
+1 1 sc_7 sc7tcom    1.894    0.179
+91 1 sc_7 sc7tcom l2
+1 1 sc_7 sc7obey    1.279    0.135
+91 1 sc_7 sc7obey l3
+1 1 sc_7 sc7dist    2.328    0.223
+91 1 sc_7 sc7dist l4
+1 1 sc_7 sc7temp    0.941    0.119
+91 1 sc_7 sc7temp l5
+1 1 sc_7 sc7rest    2.341    0.242
+91 1 sc_7 sc7rest l6
+1 1 sc_7 sc7fidg    2.090    0.214
+91 1 sc_7 sc7fidg l7
+1 1 sc_11 sc11thac    1.000    0.000
+1 1 sc_11 sc11tcom    1.894    0.179
+91 1 sc_11 sc11tcom l2
+1 1 sc_11 sc11obey    1.279    0.135
+91 1 sc_11 sc11obey l3
+1 1 sc_11 sc11dist    2.328    0.223
+91 1 sc_11 sc11dist l4
+1 1 sc_11 sc11temp    0.941    0.119
+91 1 sc_11 sc11temp l5
+1 1 sc_11 sc11rest    2.341    0.242
+91 1 sc_11 sc11rest l6
+1 1 sc_11 sc11fidg    2.090    0.214
+91 1 sc_11 sc11fidg l7
+1 1 sc_14 sc14thac    1.000    0.000
+1 1 sc_14 sc14tcom    1.894    0.179
+91 1 sc_14 sc14tcom l2
+1 1 sc_14 sc14obey    1.279    0.135
+91 1 sc_14 sc14obey l3
+1 1 sc_14 sc14dist    2.328    0.223
+91 1 sc_14 sc14dist l4
+1 1 sc_14 sc14temp    0.941    0.119
+91 1 sc_14 sc14temp l5
+1 1 sc_14 sc14rest    2.341    0.242
+91 1 sc_14 sc14rest l6
+1 1 sc_14 sc14fidg    2.090    0.214
+91 1 sc_14 sc14fidg l7
+1 1 sc_17 sc17thac    1.000    0.000
+1 1 sc_17 sc17tcom    1.894    0.179
+91 1 sc_17 sc17tcom l2
+1 1 sc_17 sc17obey    1.279    0.135
+91 1 sc_17 sc17obey l3
+1 1 sc_17 sc17dist    2.328    0.223
+91 1 sc_17 sc17dist l4
+1 1 sc_17 sc17temp    0.941    0.119
+91 1 sc_17 sc17temp l5
+1 1 sc_17 sc17rest    2.341    0.242
+91 1 sc_17 sc17rest l6
+1 1 sc_17 sc17fidg    2.090    0.214
+91 1 sc_17 sc17fidg l7
+1 1 i sc_3    1.000    0.000
+1 1 i sc_5    1.000    0.000
+1 1 i sc_7    1.000    0.000
+1 1 i sc_11    1.000    0.000
+1 1 i sc_14    1.000    0.000
+1 1 i sc_17    1.000    0.000
+1 1 s sc_3    0.000    0.000
+1 1 s sc_5    0.088    0.041
+1 1 s sc_7    0.245    0.044
+1 1 s sc_11    0.470    0.053
+1 1 s sc_14    0.752    0.068
+1 1 s sc_17    1.000    0.000
+1 1 ignore3 sc_3   -0.006    0.007
+1 1 smack3 sc_3   -0.032    0.013
+1 1 shout3 sc_3   -0.040    0.011
+1 1 bedroom3 sc_3   -0.015    0.007
+1 1 treats3 sc_3   -0.010    0.007
+1 1 telloff3 sc_3   -0.048    0.014
+1 1 bribe3 sc_3   -0.032    0.009
+1 1 pa5 sc_5   -0.122    0.022
+1 1 pa7 sc_7   -0.196    0.029
+1 1 pa11 sc_11   -0.169    0.020
+1 1 pm14 sc_14    0.155    0.029
+1 1 pm17 sc_17   -0.022    0.020
+1 1 scoga i    0.052    0.009
+1 1 lbw i   -0.040    0.029
+1 1 inftemp i    0.025    0.008
+1 1 hfae i   -0.015    0.078
+1 1 bmarried i    0.050    0.015
+1 1 brace i   -0.012    0.023
+1 1 sex i    0.055    0.014
+1 1 bpedu i    0.109    0.021
+1 1 incomef i    0.016    0.006
+1 1 scoga s    0.011    0.012
+1 1 lbw s    0.028    0.047
+1 1 inftemp s   -0.012    0.012
+1 1 hfae s   -0.050    0.105
+1 1 bmarried s   -0.038    0.023
+1 1 brace s    0.034    0.039
+1 1 sex s    0.008    0.022
+1 1 bpedu s   -0.029    0.028
+1 1 incomef s    0.011    0.011
+2 1 sc3thac sc5thac    0.097    0.015
+2 1 sc5thac sc7thac    0.059    0.013
+2 1 sc7thac sc11thac    0.054    0.012
+2 1 sc11thac sc14thac    0.051    0.012
+2 1 sc14thac sc17thac    0.093    0.027
+2 1 sc3tcom sc5tcom    0.113    0.017
+2 1 sc5tcom sc7tcom    0.068    0.010
+2 1 sc7tcom sc11tcom    0.089    0.014
+2 1 sc11tcom sc14tcom    0.104    0.019
+2 1 sc14tcom sc17tcom    0.139    0.032
+2 1 sc3obey sc5obey    0.193    0.023
+2 1 sc5obey sc7obey    0.152    0.029
+2 1 sc7obey sc11obey    0.141    0.031
+2 1 sc11obey sc14obey    0.266    0.055
+2 1 sc14obey sc17obey    0.510    0.123
+2 1 sc3dist sc5dist    0.105    0.015
+2 1 sc5dist sc7dist    0.087    0.014
+2 1 sc7dist sc11dist    0.112    0.017
+2 1 sc11dist sc14dist    0.127    0.025
+2 1 sc14dist sc17dist    0.189    0.045
+2 1 sc3temp sc5temp    0.296    0.036
+2 1 sc5temp sc7temp    0.240    0.046
+2 1 sc7temp sc11temp    0.192    0.037
+2 1 sc11temp sc14temp    0.232    0.050
+2 1 sc14temp sc17temp    0.266    0.067
+2 1 sc3rest sc5rest    0.161    0.018
+2 1 sc5rest sc7rest    0.132    0.018
+2 1 sc7rest sc11rest    0.146    0.022
+2 1 sc11rest sc14rest    0.167    0.032
+2 1 sc14rest sc17rest    0.294    0.066
+2 1 sc3fidg sc5fidg    0.183    0.020
+2 1 sc5fidg sc7fidg    0.181    0.024
+2 1 sc7fidg sc11fidg    0.163    0.026
+2 1 sc11fidg sc14fidg    0.158    0.035
+2 1 sc14fidg sc17fidg    0.141    0.042
+2 1 i s   -0.019    0.007
+4 1 sc_3    0.053    0.011
+4 1 sc_5    0.011    0.003
+4 1 sc_7    0.019    0.004
+4 1 sc_11    0.020    0.004
+4 1 sc_14    0.033    0.008
+4 1 sc_17    0.037    0.012
+4 1 i    0.053    0.010
+4 1 s    0.088    0.022
+2 1 scoga lbw  999.000  999.000
+2 1 scoga inftemp  999.000  999.000
+2 1 scoga hfae  999.000  999.000
+2 1 scoga bmarried  999.000  999.000
+2 1 scoga brace  999.000  999.000
+2 1 scoga sex  999.000  999.000
+2 1 scoga bpedu  999.000  999.000
+2 1 scoga incomef  999.000  999.000
+2 1 scoga ignore3  999.000  999.000
+2 1 scoga smack3  999.000  999.000
+2 1 scoga shout3  999.000  999.000
+2 1 scoga bedroom3  999.000  999.000
+2 1 scoga treats3  999.000  999.000
+2 1 scoga telloff3  999.000  999.000
+2 1 scoga bribe3  999.000  999.000
+2 1 scoga pa5  999.000  999.000
+2 1 scoga pa7  999.000  999.000
+2 1 scoga pa11  999.000  999.000
+2 1 scoga pm14  999.000  999.000
+2 1 scoga pm17  999.000  999.000
+2 1 lbw inftemp  999.000  999.000
+2 1 lbw hfae  999.000  999.000
+2 1 lbw bmarried  999.000  999.000
+2 1 lbw brace  999.000  999.000
+2 1 lbw sex  999.000  999.000
+2 1 lbw bpedu  999.000  999.000
+2 1 lbw incomef  999.000  999.000
+2 1 lbw ignore3  999.000  999.000
+2 1 lbw smack3  999.000  999.000
+2 1 lbw shout3  999.000  999.000
+2 1 lbw bedroom3  999.000  999.000
+2 1 lbw treats3  999.000  999.000
+2 1 lbw telloff3  999.000  999.000
+2 1 lbw bribe3  999.000  999.000
+2 1 lbw pa5  999.000  999.000
+2 1 lbw pa7  999.000  999.000
+2 1 lbw pa11  999.000  999.000
+2 1 lbw pm14  999.000  999.000
+2 1 lbw pm17  999.000  999.000
+2 1 inftemp hfae  999.000  999.000
+2 1 inftemp bmarried  999.000  999.000
+2 1 inftemp brace  999.000  999.000
+2 1 inftemp sex  999.000  999.000
+2 1 inftemp bpedu  999.000  999.000
+2 1 inftemp incomef  999.000  999.000
+2 1 inftemp ignore3  999.000  999.000
+2 1 inftemp smack3  999.000  999.000
+2 1 inftemp shout3  999.000  999.000
+2 1 inftemp bedroom3  999.000  999.000
+2 1 inftemp treats3  999.000  999.000
+2 1 inftemp telloff3  999.000  999.000
+2 1 inftemp bribe3  999.000  999.000
+2 1 inftemp pa5  999.000  999.000
+2 1 inftemp pa7  999.000  999.000
+2 1 inftemp pa11  999.000  999.000
+2 1 inftemp pm14  999.000  999.000
+2 1 inftemp pm17  999.000  999.000
+2 1 hfae bmarried  999.000  999.000
+2 1 hfae brace  999.000  999.000
+2 1 hfae sex  999.000  999.000
+2 1 hfae bpedu  999.000  999.000
+2 1 hfae incomef  999.000  999.000
+2 1 hfae ignore3  999.000  999.000
+2 1 hfae smack3  999.000  999.000
+2 1 hfae shout3  999.000  999.000
+2 1 hfae bedroom3  999.000  999.000
+2 1 hfae treats3  999.000  999.000
+2 1 hfae telloff3  999.000  999.000
+2 1 hfae bribe3  999.000  999.000
+2 1 hfae pa5  999.000  999.000
+2 1 hfae pa7  999.000  999.000
+2 1 hfae pa11  999.000  999.000
+2 1 hfae pm14  999.000  999.000
+2 1 hfae pm17  999.000  999.000
+2 1 bmarried brace  999.000  999.000
+2 1 bmarried sex  999.000  999.000
+2 1 bmarried bpedu  999.000  999.000
+2 1 bmarried incomef  999.000  999.000
+2 1 bmarried ignore3  999.000  999.000
+2 1 bmarried smack3  999.000  999.000
+2 1 bmarried shout3  999.000  999.000
+2 1 bmarried bedroom3  999.000  999.000
+2 1 bmarried treats3  999.000  999.000
+2 1 bmarried telloff3  999.000  999.000
+2 1 bmarried bribe3  999.000  999.000
+2 1 bmarried pa5  999.000  999.000
+2 1 bmarried pa7  999.000  999.000
+2 1 bmarried pa11  999.000  999.000
+2 1 bmarried pm14  999.000  999.000
+2 1 bmarried pm17  999.000  999.000
+2 1 brace sex  999.000  999.000
+2 1 brace bpedu  999.000  999.000
+2 1 brace incomef  999.000  999.000
+2 1 brace ignore3  999.000  999.000
+2 1 brace smack3  999.000  999.000
+2 1 brace shout3  999.000  999.000
+2 1 brace bedroom3  999.000  999.000
+2 1 brace treats3  999.000  999.000
+2 1 brace telloff3  999.000  999.000
+2 1 brace bribe3  999.000  999.000
+2 1 brace pa5  999.000  999.000
+2 1 brace pa7  999.000  999.000
+2 1 brace pa11  999.000  999.000
+2 1 brace pm14  999.000  999.000
+2 1 brace pm17  999.000  999.000
+2 1 sex bpedu  999.000  999.000
+2 1 sex incomef  999.000  999.000
+2 1 sex ignore3  999.000  999.000
+2 1 sex smack3  999.000  999.000
+2 1 sex shout3  999.000  999.000
+2 1 sex bedroom3  999.000  999.000
+2 1 sex treats3  999.000  999.000
+2 1 sex telloff3  999.000  999.000
+2 1 sex bribe3  999.000  999.000
+2 1 sex pa5  999.000  999.000
+2 1 sex pa7  999.000  999.000
+2 1 sex pa11  999.000  999.000
+2 1 sex pm14  999.000  999.000
+2 1 sex pm17  999.000  999.000
+2 1 bpedu incomef  999.000  999.000
+2 1 bpedu ignore3  999.000  999.000
+2 1 bpedu smack3  999.000  999.000
+2 1 bpedu shout3  999.000  999.000
+2 1 bpedu bedroom3  999.000  999.000
+2 1 bpedu treats3  999.000  999.000
+2 1 bpedu telloff3  999.000  999.000
+2 1 bpedu bribe3  999.000  999.000
+2 1 bpedu pa5  999.000  999.000
+2 1 bpedu pa7  999.000  999.000
+2 1 bpedu pa11  999.000  999.000
+2 1 bpedu pm14  999.000  999.000
+2 1 bpedu pm17  999.000  999.000
+2 1 incomef ignore3  999.000  999.000
+2 1 incomef smack3  999.000  999.000
+2 1 incomef shout3  999.000  999.000
+2 1 incomef bedroom3  999.000  999.000
+2 1 incomef treats3  999.000  999.000
+2 1 incomef telloff3  999.000  999.000
+2 1 incomef bribe3  999.000  999.000
+2 1 incomef pa5  999.000  999.000
+2 1 incomef pa7  999.000  999.000
+2 1 incomef pa11  999.000  999.000
+2 1 incomef pm14  999.000  999.000
+2 1 incomef pm17  999.000  999.000
+2 1 ignore3 smack3  999.000  999.000
+2 1 ignore3 shout3  999.000  999.000
+2 1 ignore3 bedroom3  999.000  999.000
+2 1 ignore3 treats3  999.000  999.000
+2 1 ignore3 telloff3  999.000  999.000
+2 1 ignore3 bribe3  999.000  999.000
+2 1 ignore3 pa5  999.000  999.000
+2 1 ignore3 pa7  999.000  999.000
+2 1 ignore3 pa11  999.000  999.000
+2 1 ignore3 pm14  999.000  999.000
+2 1 ignore3 pm17  999.000  999.000
+2 1 smack3 shout3  999.000  999.000
+2 1 smack3 bedroom3  999.000  999.000
+2 1 smack3 treats3  999.000  999.000
+2 1 smack3 telloff3  999.000  999.000
+2 1 smack3 bribe3  999.000  999.000
+2 1 smack3 pa5  999.000  999.000
+2 1 smack3 pa7  999.000  999.000
+2 1 smack3 pa11  999.000  999.000
+2 1 smack3 pm14  999.000  999.000
+2 1 smack3 pm17  999.000  999.000
+2 1 shout3 bedroom3  999.000  999.000
+2 1 shout3 treats3  999.000  999.000
+2 1 shout3 telloff3  999.000  999.000
+2 1 shout3 bribe3  999.000  999.000
+2 1 shout3 pa5  999.000  999.000
+2 1 shout3 pa7  999.000  999.000
+2 1 shout3 pa11  999.000  999.000
+2 1 shout3 pm14  999.000  999.000
+2 1 shout3 pm17  999.000  999.000
+2 1 bedroom3 treats3  999.000  999.000
+2 1 bedroom3 telloff3  999.000  999.000
+2 1 bedroom3 bribe3  999.000  999.000
+2 1 bedroom3 pa5  999.000  999.000
+2 1 bedroom3 pa7  999.000  999.000
+2 1 bedroom3 pa11  999.000  999.000
+2 1 bedroom3 pm14  999.000  999.000
+2 1 bedroom3 pm17  999.000  999.000
+2 1 treats3 telloff3  999.000  999.000
+2 1 treats3 bribe3  999.000  999.000
+2 1 treats3 pa5  999.000  999.000
+2 1 treats3 pa7  999.000  999.000
+2 1 treats3 pa11  999.000  999.000
+2 1 treats3 pm14  999.000  999.000
+2 1 treats3 pm17  999.000  999.000
+2 1 telloff3 bribe3  999.000  999.000
+2 1 telloff3 pa5  999.000  999.000
+2 1 telloff3 pa7  999.000  999.000
+2 1 telloff3 pa11  999.000  999.000
+2 1 telloff3 pm14  999.000  999.000
+2 1 telloff3 pm17  999.000  999.000
+2 1 bribe3 pa5  999.000  999.000
+2 1 bribe3 pa7  999.000  999.000
+2 1 bribe3 pa11  999.000  999.000
+2 1 bribe3 pm14  999.000  999.000
+2 1 bribe3 pm17  999.000  999.000
+2 1 pa5 pa7  999.000  999.000
+2 1 pa5 pa11  999.000  999.000
+2 1 pa5 pm14  999.000  999.000
+2 1 pa5 pm17  999.000  999.000
+2 1 pa7 pa11  999.000  999.000
+2 1 pa7 pm14  999.000  999.000
+2 1 pa7 pm17  999.000  999.000
+2 1 pa11 pm14  999.000  999.000
+2 1 pa11 pm17  999.000  999.000
+2 1 pm14 pm17  999.000  999.000
+11 1 sc_3 sc3thac    0.359    0.033
+11 1 sc_3 sc3tcom    0.659    0.024
+91 1 sc_3 sc3tcom l2
+11 1 sc_3 sc3obey    0.456    0.030
+91 1 sc_3 sc3obey l3
+11 1 sc_3 sc3dist    0.793    0.019
+91 1 sc_3 sc3dist l4
+11 1 sc_3 sc3temp    0.338    0.031
+91 1 sc_3 sc3temp l5
+11 1 sc_3 sc3rest    0.797    0.018
+91 1 sc_3 sc3rest l6
+11 1 sc_3 sc3fidg    0.720    0.021
+91 1 sc_3 sc3fidg l7
+11 1 sc_5 sc5thac    0.546    0.026
+11 1 sc_5 sc5tcom    0.757    0.018
+91 1 sc_5 sc5tcom l2
+11 1 sc_5 sc5obey    0.494    0.026
+91 1 sc_5 sc5obey l3
+11 1 sc_5 sc5dist    0.787    0.016
+91 1 sc_5 sc5dist l4
+11 1 sc_5 sc5temp    0.361    0.030
+91 1 sc_5 sc5temp l5
+11 1 sc_5 sc5rest    0.803    0.016
+91 1 sc_5 sc5rest l6
+11 1 sc_5 sc5fidg    0.719    0.021
+91 1 sc_5 sc5fidg l7
+11 1 sc_7 sc7thac    0.592    0.025
+11 1 sc_7 sc7tcom    0.783    0.013
+91 1 sc_7 sc7tcom l2
+11 1 sc_7 sc7obey    0.533    0.029
+91 1 sc_7 sc7obey l3
+11 1 sc_7 sc7dist    0.835    0.014
+91 1 sc_7 sc7dist l4
+11 1 sc_7 sc7temp    0.415    0.028
+91 1 sc_7 sc7temp l5
+11 1 sc_7 sc7rest    0.799    0.017
+91 1 sc_7 sc7rest l6
+11 1 sc_7 sc7fidg    0.742    0.018
+91 1 sc_7 sc7fidg l7
+11 1 sc_11 sc11thac    0.641    0.018
+11 1 sc_11 sc11tcom    0.798    0.015
+91 1 sc_11 sc11tcom l2
+11 1 sc_11 sc11obey    0.485    0.030
+91 1 sc_11 sc11obey l3
+11 1 sc_11 sc11dist    0.851    0.014
+91 1 sc_11 sc11dist l4
+11 1 sc_11 sc11temp    0.427    0.029
+91 1 sc_11 sc11temp l5
+11 1 sc_11 sc11rest    0.779    0.017
+91 1 sc_11 sc11rest l6
+11 1 sc_11 sc11fidg    0.756    0.020
+91 1 sc_11 sc11fidg l7
+11 1 sc_14 sc14thac    0.589    0.024
+11 1 sc_14 sc14tcom    0.788    0.016
+91 1 sc_14 sc14tcom l2
+11 1 sc_14 sc14obey    0.404    0.032
+91 1 sc_14 sc14obey l3
+11 1 sc_14 sc14dist    0.843    0.014
+91 1 sc_14 sc14dist l4
+11 1 sc_14 sc14temp    0.417    0.029
+91 1 sc_14 sc14temp l5
+11 1 sc_14 sc14rest    0.761    0.021
+91 1 sc_14 sc14rest l6
+11 1 sc_14 sc14fidg    0.823    0.023
+91 1 sc_14 sc14fidg l7
+11 1 sc_17 sc17thac    0.537    0.026
+11 1 sc_17 sc17tcom    0.756    0.020
+91 1 sc_17 sc17tcom l2
+11 1 sc_17 sc17obey    0.400    0.033
+91 1 sc_17 sc17obey l3
+11 1 sc_17 sc17dist    0.837    0.018
+91 1 sc_17 sc17dist l4
+11 1 sc_17 sc17temp    0.488    0.033
+91 1 sc_17 sc17temp l5
+11 1 sc_17 sc17rest    0.787    0.024
+91 1 sc_17 sc17rest l6
+11 1 sc_17 sc17fidg    0.828    0.022
+91 1 sc_17 sc17fidg l7
+11 1 i sc_3    0.689    0.021
+11 1 i sc_5    0.913    0.020
+11 1 i sc_7    0.841    0.034
+11 1 i sc_11    0.788    0.050
+11 1 i sc_14    0.718    0.067
+11 1 i sc_17    0.648    0.079
+11 1 s sc_3    0.000    0.000
+11 1 s sc_5    0.095    0.044
+11 1 s sc_7    0.245    0.042
+11 1 s sc_11    0.439    0.043
+11 1 s sc_14    0.640    0.046
+11 1 s sc_17    0.768    0.044
+11 1 ignore3 sc_3   -0.023    0.027
+11 1 smack3 sc_3   -0.078    0.031
+11 1 shout3 sc_3   -0.121    0.031
+11 1 bedroom3 sc_3   -0.053    0.026
+11 1 treats3 sc_3   -0.032    0.024
+11 1 telloff3 sc_3   -0.111    0.030
+11 1 bribe3 sc_3   -0.115    0.027
+11 1 pa5 sc_5   -0.232    0.032
+11 1 pa7 sc_7   -0.344    0.033
+11 1 pa11 sc_11   -0.386    0.024
+11 1 pm14 sc_14    0.179    0.025
+11 1 pm17 sc_17   -0.031    0.028
+11 1 scoga i    0.181    0.025
+11 1 lbw i   -0.036    0.026
+11 1 inftemp i    0.087    0.027
+11 1 hfae i   -0.004    0.022
+11 1 bmarried i    0.090    0.025
+11 1 brace i   -0.011    0.022
+11 1 sex i    0.110    0.026
+11 1 bpedu i    0.194    0.029
+11 1 incomef i    0.074    0.025
+11 1 scoga s    0.032    0.034
+11 1 lbw s    0.021    0.035
+11 1 inftemp s   -0.036    0.036
+11 1 hfae s   -0.012    0.025
+11 1 bmarried s   -0.058    0.035
+11 1 brace s    0.027    0.032
+11 1 sex s    0.013    0.037
+11 1 bpedu s   -0.044    0.043
+11 1 incomef s    0.041    0.040
+12 1 sc3thac sc5thac    0.245    0.032
+12 1 sc5thac sc7thac    0.345    0.026
+12 1 sc7thac sc11thac    0.349    0.033
+12 1 sc11thac sc14thac    0.282    0.030
+12 1 sc14thac sc17thac    0.321    0.035
+12 1 sc3tcom sc5tcom    0.320    0.041
+12 1 sc5tcom sc7tcom    0.340    0.030
+12 1 sc7tcom sc11tcom    0.435    0.038
+12 1 sc11tcom sc14tcom    0.441    0.040
+12 1 sc14tcom sc17tcom    0.425    0.047
+12 1 sc3obey sc5obey    0.344    0.031
+12 1 sc5obey sc7obey    0.406    0.033
+12 1 sc7obey sc11obey    0.318    0.035
+12 1 sc11obey sc14obey    0.359    0.029
+12 1 sc14obey sc17obey    0.445    0.030
+12 1 sc3dist sc5dist    0.322    0.047
+12 1 sc5dist sc7dist    0.381    0.045
+12 1 sc7dist sc11dist    0.538    0.046
+12 1 sc11dist sc14dist    0.537    0.049
+12 1 sc14dist sc17dist    0.621    0.055
+12 1 sc3temp sc5temp    0.466    0.028
+12 1 sc5temp sc7temp    0.584    0.026
+12 1 sc7temp sc11temp    0.494    0.031
+12 1 sc11temp sc14temp    0.513    0.030
+12 1 sc14temp sc17temp    0.571    0.032
+12 1 sc3rest sc5rest    0.523    0.054
+12 1 sc5rest sc7rest    0.526    0.043
+12 1 sc7rest sc11rest    0.463    0.047
+12 1 sc11rest sc14rest    0.399    0.050
+12 1 sc14rest sc17rest    0.593    0.052
+12 1 sc3fidg sc5fidg    0.451    0.040
+12 1 sc5fidg sc7fidg    0.581    0.037
+12 1 sc7fidg sc11fidg    0.502    0.044
+12 1 sc11fidg sc14fidg    0.544    0.061
+12 1 sc14fidg sc17fidg    0.510    0.093
+12 1 i s   -0.272    0.101
+14 1 sc_3    0.401    0.028
+14 1 sc_5    0.141    0.021
+14 1 sc_7    0.212    0.016
+14 1 sc_11    0.199    0.017
+14 1 sc_14    0.268    0.029
+14 1 sc_17    0.244    0.040
+14 1 i    0.849    0.017
+14 1 s    0.992    0.006
+12 1 scoga lbw  999.000  999.000
+12 1 scoga inftemp  999.000  999.000
+12 1 scoga hfae  999.000  999.000
+12 1 scoga bmarried  999.000  999.000
+12 1 scoga brace  999.000  999.000
+12 1 scoga sex  999.000  999.000
+12 1 scoga bpedu  999.000  999.000
+12 1 scoga incomef  999.000  999.000
+12 1 scoga ignore3  999.000  999.000
+12 1 scoga smack3  999.000  999.000
+12 1 scoga shout3  999.000  999.000
+12 1 scoga bedroom3  999.000  999.000
+12 1 scoga treats3  999.000  999.000
+12 1 scoga telloff3  999.000  999.000
+12 1 scoga bribe3  999.000  999.000
+12 1 scoga pa5  999.000  999.000
+12 1 scoga pa7  999.000  999.000
+12 1 scoga pa11  999.000  999.000
+12 1 scoga pm14  999.000  999.000
+12 1 scoga pm17  999.000  999.000
+12 1 lbw inftemp  999.000  999.000
+12 1 lbw hfae  999.000  999.000
+12 1 lbw bmarried  999.000  999.000
+12 1 lbw brace  999.000  999.000
+12 1 lbw sex  999.000  999.000
+12 1 lbw bpedu  999.000  999.000
+12 1 lbw incomef  999.000  999.000
+12 1 lbw ignore3  999.000  999.000
+12 1 lbw smack3  999.000  999.000
+12 1 lbw shout3  999.000  999.000
+12 1 lbw bedroom3  999.000  999.000
+12 1 lbw treats3  999.000  999.000
+12 1 lbw telloff3  999.000  999.000
+12 1 lbw bribe3  999.000  999.000
+12 1 lbw pa5  999.000  999.000
+12 1 lbw pa7  999.000  999.000
+12 1 lbw pa11  999.000  999.000
+12 1 lbw pm14  999.000  999.000
+12 1 lbw pm17  999.000  999.000
+12 1 inftemp hfae  999.000  999.000
+12 1 inftemp bmarried  999.000  999.000
+12 1 inftemp brace  999.000  999.000
+12 1 inftemp sex  999.000  999.000
+12 1 inftemp bpedu  999.000  999.000
+12 1 inftemp incomef  999.000  999.000
+12 1 inftemp ignore3  999.000  999.000
+12 1 inftemp smack3  999.000  999.000
+12 1 inftemp shout3  999.000  999.000
+12 1 inftemp bedroom3  999.000  999.000
+12 1 inftemp treats3  999.000  999.000
+12 1 inftemp telloff3  999.000  999.000
+12 1 inftemp bribe3  999.000  999.000
+12 1 inftemp pa5  999.000  999.000
+12 1 inftemp pa7  999.000  999.000
+12 1 inftemp pa11  999.000  999.000
+12 1 inftemp pm14  999.000  999.000
+12 1 inftemp pm17  999.000  999.000
+12 1 hfae bmarried  999.000  999.000
+12 1 hfae brace  999.000  999.000
+12 1 hfae sex  999.000  999.000
+12 1 hfae bpedu  999.000  999.000
+12 1 hfae incomef  999.000  999.000
+12 1 hfae ignore3  999.000  999.000
+12 1 hfae smack3  999.000  999.000
+12 1 hfae shout3  999.000  999.000
+12 1 hfae bedroom3  999.000  999.000
+12 1 hfae treats3  999.000  999.000
+12 1 hfae telloff3  999.000  999.000
+12 1 hfae bribe3  999.000  999.000
+12 1 hfae pa5  999.000  999.000
+12 1 hfae pa7  999.000  999.000
+12 1 hfae pa11  999.000  999.000
+12 1 hfae pm14  999.000  999.000
+12 1 hfae pm17  999.000  999.000
+12 1 bmarried brace  999.000  999.000
+12 1 bmarried sex  999.000  999.000
+12 1 bmarried bpedu  999.000  999.000
+12 1 bmarried incomef  999.000  999.000
+12 1 bmarried ignore3  999.000  999.000
+12 1 bmarried smack3  999.000  999.000
+12 1 bmarried shout3  999.000  999.000
+12 1 bmarried bedroom3  999.000  999.000
+12 1 bmarried treats3  999.000  999.000
+12 1 bmarried telloff3  999.000  999.000
+12 1 bmarried bribe3  999.000  999.000
+12 1 bmarried pa5  999.000  999.000
+12 1 bmarried pa7  999.000  999.000
+12 1 bmarried pa11  999.000  999.000
+12 1 bmarried pm14  999.000  999.000
+12 1 bmarried pm17  999.000  999.000
+12 1 brace sex  999.000  999.000
+12 1 brace bpedu  999.000  999.000
+12 1 brace incomef  999.000  999.000
+12 1 brace ignore3  999.000  999.000
+12 1 brace smack3  999.000  999.000
+12 1 brace shout3  999.000  999.000
+12 1 brace bedroom3  999.000  999.000
+12 1 brace treats3  999.000  999.000
+12 1 brace telloff3  999.000  999.000
+12 1 brace bribe3  999.000  999.000
+12 1 brace pa5  999.000  999.000
+12 1 brace pa7  999.000  999.000
+12 1 brace pa11  999.000  999.000
+12 1 brace pm14  999.000  999.000
+12 1 brace pm17  999.000  999.000
+12 1 sex bpedu  999.000  999.000
+12 1 sex incomef  999.000  999.000
+12 1 sex ignore3  999.000  999.000
+12 1 sex smack3  999.000  999.000
+12 1 sex shout3  999.000  999.000
+12 1 sex bedroom3  999.000  999.000
+12 1 sex treats3  999.000  999.000
+12 1 sex telloff3  999.000  999.000
+12 1 sex bribe3  999.000  999.000
+12 1 sex pa5  999.000  999.000
+12 1 sex pa7  999.000  999.000
+12 1 sex pa11  999.000  999.000
+12 1 sex pm14  999.000  999.000
+12 1 sex pm17  999.000  999.000
+12 1 bpedu incomef  999.000  999.000
+12 1 bpedu ignore3  999.000  999.000
+12 1 bpedu smack3  999.000  999.000
+12 1 bpedu shout3  999.000  999.000
+12 1 bpedu bedroom3  999.000  999.000
+12 1 bpedu treats3  999.000  999.000
+12 1 bpedu telloff3  999.000  999.000
+12 1 bpedu bribe3  999.000  999.000
+12 1 bpedu pa5  999.000  999.000
+12 1 bpedu pa7  999.000  999.000
+12 1 bpedu pa11  999.000  999.000
+12 1 bpedu pm14  999.000  999.000
+12 1 bpedu pm17  999.000  999.000
+12 1 incomef ignore3  999.000  999.000
+12 1 incomef smack3  999.000  999.000
+12 1 incomef shout3  999.000  999.000
+12 1 incomef bedroom3  999.000  999.000
+12 1 incomef treats3  999.000  999.000
+12 1 incomef telloff3  999.000  999.000
+12 1 incomef bribe3  999.000  999.000
+12 1 incomef pa5  999.000  999.000
+12 1 incomef pa7  999.000  999.000
+12 1 incomef pa11  999.000  999.000
+12 1 incomef pm14  999.000  999.000
+12 1 incomef pm17  999.000  999.000
+12 1 ignore3 smack3  999.000  999.000
+12 1 ignore3 shout3  999.000  999.000
+12 1 ignore3 bedroom3  999.000  999.000
+12 1 ignore3 treats3  999.000  999.000
+12 1 ignore3 telloff3  999.000  999.000
+12 1 ignore3 bribe3  999.000  999.000
+12 1 ignore3 pa5  999.000  999.000
+12 1 ignore3 pa7  999.000  999.000
+12 1 ignore3 pa11  999.000  999.000
+12 1 ignore3 pm14  999.000  999.000
+12 1 ignore3 pm17  999.000  999.000
+12 1 smack3 shout3  999.000  999.000
+12 1 smack3 bedroom3  999.000  999.000
+12 1 smack3 treats3  999.000  999.000
+12 1 smack3 telloff3  999.000  999.000
+12 1 smack3 bribe3  999.000  999.000
+12 1 smack3 pa5  999.000  999.000
+12 1 smack3 pa7  999.000  999.000
+12 1 smack3 pa11  999.000  999.000
+12 1 smack3 pm14  999.000  999.000
+12 1 smack3 pm17  999.000  999.000
+12 1 shout3 bedroom3  999.000  999.000
+12 1 shout3 treats3  999.000  999.000
+12 1 shout3 telloff3  999.000  999.000
+12 1 shout3 bribe3  999.000  999.000
+12 1 shout3 pa5  999.000  999.000
+12 1 shout3 pa7  999.000  999.000
+12 1 shout3 pa11  999.000  999.000
+12 1 shout3 pm14  999.000  999.000
+12 1 shout3 pm17  999.000  999.000
+12 1 bedroom3 treats3  999.000  999.000
+12 1 bedroom3 telloff3  999.000  999.000
+12 1 bedroom3 bribe3  999.000  999.000
+12 1 bedroom3 pa5  999.000  999.000
+12 1 bedroom3 pa7  999.000  999.000
+12 1 bedroom3 pa11  999.000  999.000
+12 1 bedroom3 pm14  999.000  999.000
+12 1 bedroom3 pm17  999.000  999.000
+12 1 treats3 telloff3  999.000  999.000
+12 1 treats3 bribe3  999.000  999.000
+12 1 treats3 pa5  999.000  999.000
+12 1 treats3 pa7  999.000  999.000
+12 1 treats3 pa11  999.000  999.000
+12 1 treats3 pm14  999.000  999.000
+12 1 treats3 pm17  999.000  999.000
+12 1 telloff3 bribe3  999.000  999.000
+12 1 telloff3 pa5  999.000  999.000
+12 1 telloff3 pa7  999.000  999.000
+12 1 telloff3 pa11  999.000  999.000
+12 1 telloff3 pm14  999.000  999.000
+12 1 telloff3 pm17  999.000  999.000
+12 1 bribe3 pa5  999.000  999.000
+12 1 bribe3 pa7  999.000  999.000
+12 1 bribe3 pa11  999.000  999.000
+12 1 bribe3 pm14  999.000  999.000
+12 1 bribe3 pm17  999.000  999.000
+12 1 pa5 pa7  999.000  999.000
+12 1 pa5 pa11  999.000  999.000
+12 1 pa5 pm14  999.000  999.000
+12 1 pa5 pm17  999.000  999.000
+12 1 pa7 pa11  999.000  999.000
+12 1 pa7 pm14  999.000  999.000
+12 1 pa7 pm17  999.000  999.000
+12 1 pa11 pm14  999.000  999.000
+12 1 pa11 pm17  999.000  999.000
+12 1 pm14 pm17  999.000  999.000
+21 1 sc_3 sc3thac    0.359    0.033
+21 1 sc_3 sc3tcom    0.659    0.024
+91 1 sc_3 sc3tcom l2
+21 1 sc_3 sc3obey    0.456    0.030
+91 1 sc_3 sc3obey l3
+21 1 sc_3 sc3dist    0.793    0.019
+91 1 sc_3 sc3dist l4
+21 1 sc_3 sc3temp    0.338    0.031
+91 1 sc_3 sc3temp l5
+21 1 sc_3 sc3rest    0.797    0.018
+91 1 sc_3 sc3rest l6
+21 1 sc_3 sc3fidg    0.720    0.021
+91 1 sc_3 sc3fidg l7
+21 1 sc_5 sc5thac    0.546    0.026
+21 1 sc_5 sc5tcom    0.757    0.018
+91 1 sc_5 sc5tcom l2
+21 1 sc_5 sc5obey    0.494    0.026
+91 1 sc_5 sc5obey l3
+21 1 sc_5 sc5dist    0.787    0.016
+91 1 sc_5 sc5dist l4
+21 1 sc_5 sc5temp    0.361    0.030
+91 1 sc_5 sc5temp l5
+21 1 sc_5 sc5rest    0.803    0.016
+91 1 sc_5 sc5rest l6
+21 1 sc_5 sc5fidg    0.719    0.021
+91 1 sc_5 sc5fidg l7
+21 1 sc_7 sc7thac    0.592    0.025
+21 1 sc_7 sc7tcom    0.783    0.013
+91 1 sc_7 sc7tcom l2
+21 1 sc_7 sc7obey    0.533    0.029
+91 1 sc_7 sc7obey l3
+21 1 sc_7 sc7dist    0.835    0.014
+91 1 sc_7 sc7dist l4
+21 1 sc_7 sc7temp    0.415    0.028
+91 1 sc_7 sc7temp l5
+21 1 sc_7 sc7rest    0.799    0.017
+91 1 sc_7 sc7rest l6
+21 1 sc_7 sc7fidg    0.742    0.018
+91 1 sc_7 sc7fidg l7
+21 1 sc_11 sc11thac    0.641    0.018
+21 1 sc_11 sc11tcom    0.798    0.015
+91 1 sc_11 sc11tcom l2
+21 1 sc_11 sc11obey    0.485    0.030
+91 1 sc_11 sc11obey l3
+21 1 sc_11 sc11dist    0.851    0.014
+91 1 sc_11 sc11dist l4
+21 1 sc_11 sc11temp    0.427    0.029
+91 1 sc_11 sc11temp l5
+21 1 sc_11 sc11rest    0.779    0.017
+91 1 sc_11 sc11rest l6
+21 1 sc_11 sc11fidg    0.756    0.020
+91 1 sc_11 sc11fidg l7
+21 1 sc_14 sc14thac    0.589    0.024
+21 1 sc_14 sc14tcom    0.788    0.016
+91 1 sc_14 sc14tcom l2
+21 1 sc_14 sc14obey    0.404    0.032
+91 1 sc_14 sc14obey l3
+21 1 sc_14 sc14dist    0.843    0.014
+91 1 sc_14 sc14dist l4
+21 1 sc_14 sc14temp    0.417    0.029
+91 1 sc_14 sc14temp l5
+21 1 sc_14 sc14rest    0.761    0.021
+91 1 sc_14 sc14rest l6
+21 1 sc_14 sc14fidg    0.823    0.023
+91 1 sc_14 sc14fidg l7
+21 1 sc_17 sc17thac    0.537    0.026
+21 1 sc_17 sc17tcom    0.756    0.020
+91 1 sc_17 sc17tcom l2
+21 1 sc_17 sc17obey    0.400    0.033
+91 1 sc_17 sc17obey l3
+21 1 sc_17 sc17dist    0.837    0.018
+91 1 sc_17 sc17dist l4
+21 1 sc_17 sc17temp    0.488    0.033
+91 1 sc_17 sc17temp l5
+21 1 sc_17 sc17rest    0.787    0.024
+91 1 sc_17 sc17rest l6
+21 1 sc_17 sc17fidg    0.828    0.022
+91 1 sc_17 sc17fidg l7
+21 1 i sc_3    0.689    0.021
+21 1 i sc_5    0.913    0.020
+21 1 i sc_7    0.841    0.034
+21 1 i sc_11    0.788    0.050
+21 1 i sc_14    0.718    0.067
+21 1 i sc_17    0.648    0.079
+21 1 s sc_3    0.000    0.000
+21 1 s sc_5    0.095    0.044
+21 1 s sc_7    0.245    0.042
+21 1 s sc_11    0.439    0.043
+21 1 s sc_14    0.640    0.046
+21 1 s sc_17    0.768    0.044
+21 1 ignore3 sc_3   -0.017    0.020
+21 1 smack3 sc_3   -0.088    0.035
+21 1 shout3 sc_3   -0.109    0.028
+21 1 bedroom3 sc_3   -0.041    0.020
+21 1 treats3 sc_3   -0.028    0.021
+21 1 telloff3 sc_3   -0.132    0.035
+21 1 bribe3 sc_3   -0.089    0.021
+21 1 pa5 sc_5   -0.445    0.061
+21 1 pa7 sc_7   -0.656    0.062
+21 1 pa11 sc_11   -0.531    0.033
+21 1 pm14 sc_14    0.443    0.061
+21 1 pm17 sc_17   -0.057    0.052
+21 1 scoga i    0.207    0.029
+21 1 lbw i   -0.161    0.115
+21 1 inftemp i    0.099    0.030
+21 1 hfae i   -0.060    0.313
+21 1 bmarried i    0.199    0.055
+21 1 brace i   -0.046    0.094
+21 1 sex i    0.221    0.051
+21 1 bpedu i    0.435    0.065
+21 1 incomef i    0.065    0.022
+21 1 scoga s    0.037    0.039
+21 1 lbw s    0.093    0.158
+21 1 inftemp s   -0.041    0.041
+21 1 hfae s   -0.168    0.352
+21 1 bmarried s   -0.128    0.077
+21 1 brace s    0.115    0.134
+21 1 sex s    0.025    0.075
+21 1 bpedu s   -0.099    0.097
+21 1 incomef s    0.036    0.035
+22 1 sc3thac sc5thac    0.245    0.032
+22 1 sc5thac sc7thac    0.345    0.026
+22 1 sc7thac sc11thac    0.349    0.033
+22 1 sc11thac sc14thac    0.282    0.030
+22 1 sc14thac sc17thac    0.321    0.035
+22 1 sc3tcom sc5tcom    0.320    0.041
+22 1 sc5tcom sc7tcom    0.340    0.030
+22 1 sc7tcom sc11tcom    0.435    0.038
+22 1 sc11tcom sc14tcom    0.441    0.040
+22 1 sc14tcom sc17tcom    0.425    0.047
+22 1 sc3obey sc5obey    0.344    0.031
+22 1 sc5obey sc7obey    0.406    0.033
+22 1 sc7obey sc11obey    0.318    0.035
+22 1 sc11obey sc14obey    0.359    0.029
+22 1 sc14obey sc17obey    0.445    0.030
+22 1 sc3dist sc5dist    0.322    0.047
+22 1 sc5dist sc7dist    0.381    0.045
+22 1 sc7dist sc11dist    0.538    0.046
+22 1 sc11dist sc14dist    0.537    0.049
+22 1 sc14dist sc17dist    0.621    0.055
+22 1 sc3temp sc5temp    0.466    0.028
+22 1 sc5temp sc7temp    0.584    0.026
+22 1 sc7temp sc11temp    0.494    0.031
+22 1 sc11temp sc14temp    0.513    0.030
+22 1 sc14temp sc17temp    0.571    0.032
+22 1 sc3rest sc5rest    0.523    0.054
+22 1 sc5rest sc7rest    0.526    0.043
+22 1 sc7rest sc11rest    0.463    0.047
+22 1 sc11rest sc14rest    0.399    0.050
+22 1 sc14rest sc17rest    0.593    0.052
+22 1 sc3fidg sc5fidg    0.451    0.040
+22 1 sc5fidg sc7fidg    0.581    0.037
+22 1 sc7fidg sc11fidg    0.502    0.044
+22 1 sc11fidg sc14fidg    0.544    0.061
+22 1 sc14fidg sc17fidg    0.510    0.093
+22 1 i s   -0.272    0.101
+24 1 sc_3    0.401    0.028
+24 1 sc_5    0.141    0.021
+24 1 sc_7    0.212    0.016
+24 1 sc_11    0.199    0.017
+24 1 sc_14    0.268    0.029
+24 1 sc_17    0.244    0.040
+24 1 i    0.849    0.017
+24 1 s    0.992    0.006
+22 1 scoga lbw  999.000  999.000
+22 1 scoga inftemp  999.000  999.000
+22 1 scoga hfae  999.000  999.000
+22 1 scoga bmarried  999.000  999.000
+22 1 scoga brace  999.000  999.000
+22 1 scoga sex  999.000  999.000
+22 1 scoga bpedu  999.000  999.000
+22 1 scoga incomef  999.000  999.000
+22 1 scoga ignore3  999.000  999.000
+22 1 scoga smack3  999.000  999.000
+22 1 scoga shout3  999.000  999.000
+22 1 scoga bedroom3  999.000  999.000
+22 1 scoga treats3  999.000  999.000
+22 1 scoga telloff3  999.000  999.000
+22 1 scoga bribe3  999.000  999.000
+22 1 scoga pa5  999.000  999.000
+22 1 scoga pa7  999.000  999.000
+22 1 scoga pa11  999.000  999.000
+22 1 scoga pm14  999.000  999.000
+22 1 scoga pm17  999.000  999.000
+22 1 lbw inftemp  999.000  999.000
+22 1 lbw hfae  999.000  999.000
+22 1 lbw bmarried  999.000  999.000
+22 1 lbw brace  999.000  999.000
+22 1 lbw sex  999.000  999.000
+22 1 lbw bpedu  999.000  999.000
+22 1 lbw incomef  999.000  999.000
+22 1 lbw ignore3  999.000  999.000
+22 1 lbw smack3  999.000  999.000
+22 1 lbw shout3  999.000  999.000
+22 1 lbw bedroom3  999.000  999.000
+22 1 lbw treats3  999.000  999.000
+22 1 lbw telloff3  999.000  999.000
+22 1 lbw bribe3  999.000  999.000
+22 1 lbw pa5  999.000  999.000
+22 1 lbw pa7  999.000  999.000
+22 1 lbw pa11  999.000  999.000
+22 1 lbw pm14  999.000  999.000
+22 1 lbw pm17  999.000  999.000
+22 1 inftemp hfae  999.000  999.000
+22 1 inftemp bmarried  999.000  999.000
+22 1 inftemp brace  999.000  999.000
+22 1 inftemp sex  999.000  999.000
+22 1 inftemp bpedu  999.000  999.000
+22 1 inftemp incomef  999.000  999.000
+22 1 inftemp ignore3  999.000  999.000
+22 1 inftemp smack3  999.000  999.000
+22 1 inftemp shout3  999.000  999.000
+22 1 inftemp bedroom3  999.000  999.000
+22 1 inftemp treats3  999.000  999.000
+22 1 inftemp telloff3  999.000  999.000
+22 1 inftemp bribe3  999.000  999.000
+22 1 inftemp pa5  999.000  999.000
+22 1 inftemp pa7  999.000  999.000
+22 1 inftemp pa11  999.000  999.000
+22 1 inftemp pm14  999.000  999.000
+22 1 inftemp pm17  999.000  999.000
+22 1 hfae bmarried  999.000  999.000
+22 1 hfae brace  999.000  999.000
+22 1 hfae sex  999.000  999.000
+22 1 hfae bpedu  999.000  999.000
+22 1 hfae incomef  999.000  999.000
+22 1 hfae ignore3  999.000  999.000
+22 1 hfae smack3  999.000  999.000
+22 1 hfae shout3  999.000  999.000
+22 1 hfae bedroom3  999.000  999.000
+22 1 hfae treats3  999.000  999.000
+22 1 hfae telloff3  999.000  999.000
+22 1 hfae bribe3  999.000  999.000
+22 1 hfae pa5  999.000  999.000
+22 1 hfae pa7  999.000  999.000
+22 1 hfae pa11  999.000  999.000
+22 1 hfae pm14  999.000  999.000
+22 1 hfae pm17  999.000  999.000
+22 1 bmarried brace  999.000  999.000
+22 1 bmarried sex  999.000  999.000
+22 1 bmarried bpedu  999.000  999.000
+22 1 bmarried incomef  999.000  999.000
+22 1 bmarried ignore3  999.000  999.000
+22 1 bmarried smack3  999.000  999.000
+22 1 bmarried shout3  999.000  999.000
+22 1 bmarried bedroom3  999.000  999.000
+22 1 bmarried treats3  999.000  999.000
+22 1 bmarried telloff3  999.000  999.000
+22 1 bmarried bribe3  999.000  999.000
+22 1 bmarried pa5  999.000  999.000
+22 1 bmarried pa7  999.000  999.000
+22 1 bmarried pa11  999.000  999.000
+22 1 bmarried pm14  999.000  999.000
+22 1 bmarried pm17  999.000  999.000
+22 1 brace sex  999.000  999.000
+22 1 brace bpedu  999.000  999.000
+22 1 brace incomef  999.000  999.000
+22 1 brace ignore3  999.000  999.000
+22 1 brace smack3  999.000  999.000
+22 1 brace shout3  999.000  999.000
+22 1 brace bedroom3  999.000  999.000
+22 1 brace treats3  999.000  999.000
+22 1 brace telloff3  999.000  999.000
+22 1 brace bribe3  999.000  999.000
+22 1 brace pa5  999.000  999.000
+22 1 brace pa7  999.000  999.000
+22 1 brace pa11  999.000  999.000
+22 1 brace pm14  999.000  999.000
+22 1 brace pm17  999.000  999.000
+22 1 sex bpedu  999.000  999.000
+22 1 sex incomef  999.000  999.000
+22 1 sex ignore3  999.000  999.000
+22 1 sex smack3  999.000  999.000
+22 1 sex shout3  999.000  999.000
+22 1 sex bedroom3  999.000  999.000
+22 1 sex treats3  999.000  999.000
+22 1 sex telloff3  999.000  999.000
+22 1 sex bribe3  999.000  999.000
+22 1 sex pa5  999.000  999.000
+22 1 sex pa7  999.000  999.000
+22 1 sex pa11  999.000  999.000
+22 1 sex pm14  999.000  999.000
+22 1 sex pm17  999.000  999.000
+22 1 bpedu incomef  999.000  999.000
+22 1 bpedu ignore3  999.000  999.000
+22 1 bpedu smack3  999.000  999.000
+22 1 bpedu shout3  999.000  999.000
+22 1 bpedu bedroom3  999.000  999.000
+22 1 bpedu treats3  999.000  999.000
+22 1 bpedu telloff3  999.000  999.000
+22 1 bpedu bribe3  999.000  999.000
+22 1 bpedu pa5  999.000  999.000
+22 1 bpedu pa7  999.000  999.000
+22 1 bpedu pa11  999.000  999.000
+22 1 bpedu pm14  999.000  999.000
+22 1 bpedu pm17  999.000  999.000
+22 1 incomef ignore3  999.000  999.000
+22 1 incomef smack3  999.000  999.000
+22 1 incomef shout3  999.000  999.000
+22 1 incomef bedroom3  999.000  999.000
+22 1 incomef treats3  999.000  999.000
+22 1 incomef telloff3  999.000  999.000
+22 1 incomef bribe3  999.000  999.000
+22 1 incomef pa5  999.000  999.000
+22 1 incomef pa7  999.000  999.000
+22 1 incomef pa11  999.000  999.000
+22 1 incomef pm14  999.000  999.000
+22 1 incomef pm17  999.000  999.000
+22 1 ignore3 smack3  999.000  999.000
+22 1 ignore3 shout3  999.000  999.000
+22 1 ignore3 bedroom3  999.000  999.000
+22 1 ignore3 treats3  999.000  999.000
+22 1 ignore3 telloff3  999.000  999.000
+22 1 ignore3 bribe3  999.000  999.000
+22 1 ignore3 pa5  999.000  999.000
+22 1 ignore3 pa7  999.000  999.000
+22 1 ignore3 pa11  999.000  999.000
+22 1 ignore3 pm14  999.000  999.000
+22 1 ignore3 pm17  999.000  999.000
+22 1 smack3 shout3  999.000  999.000
+22 1 smack3 bedroom3  999.000  999.000
+22 1 smack3 treats3  999.000  999.000
+22 1 smack3 telloff3  999.000  999.000
+22 1 smack3 bribe3  999.000  999.000
+22 1 smack3 pa5  999.000  999.000
+22 1 smack3 pa7  999.000  999.000
+22 1 smack3 pa11  999.000  999.000
+22 1 smack3 pm14  999.000  999.000
+22 1 smack3 pm17  999.000  999.000
+22 1 shout3 bedroom3  999.000  999.000
+22 1 shout3 treats3  999.000  999.000
+22 1 shout3 telloff3  999.000  999.000
+22 1 shout3 bribe3  999.000  999.000
+22 1 shout3 pa5  999.000  999.000
+22 1 shout3 pa7  999.000  999.000
+22 1 shout3 pa11  999.000  999.000
+22 1 shout3 pm14  999.000  999.000
+22 1 shout3 pm17  999.000  999.000
+22 1 bedroom3 treats3  999.000  999.000
+22 1 bedroom3 telloff3  999.000  999.000
+22 1 bedroom3 bribe3  999.000  999.000
+22 1 bedroom3 pa5  999.000  999.000
+22 1 bedroom3 pa7  999.000  999.000
+22 1 bedroom3 pa11  999.000  999.000
+22 1 bedroom3 pm14  999.000  999.000
+22 1 bedroom3 pm17  999.000  999.000
+22 1 treats3 telloff3  999.000  999.000
+22 1 treats3 bribe3  999.000  999.000
+22 1 treats3 pa5  999.000  999.000
+22 1 treats3 pa7  999.000  999.000
+22 1 treats3 pa11  999.000  999.000
+22 1 treats3 pm14  999.000  999.000
+22 1 treats3 pm17  999.000  999.000
+22 1 telloff3 bribe3  999.000  999.000
+22 1 telloff3 pa5  999.000  999.000
+22 1 telloff3 pa7  999.000  999.000
+22 1 telloff3 pa11  999.000  999.000
+22 1 telloff3 pm14  999.000  999.000
+22 1 telloff3 pm17  999.000  999.000
+22 1 bribe3 pa5  999.000  999.000
+22 1 bribe3 pa7  999.000  999.000
+22 1 bribe3 pa11  999.000  999.000
+22 1 bribe3 pm14  999.000  999.000
+22 1 bribe3 pm17  999.000  999.000
+22 1 pa5 pa7  999.000  999.000
+22 1 pa5 pa11  999.000  999.000
+22 1 pa5 pm14  999.000  999.000
+22 1 pa5 pm17  999.000  999.000
+22 1 pa7 pa11  999.000  999.000
+22 1 pa7 pm14  999.000  999.000
+22 1 pa7 pm17  999.000  999.000
+22 1 pa11 pm14  999.000  999.000
+22 1 pa11 pm17  999.000  999.000
+22 1 pm14 pm17  999.000  999.000
+31 1 sc_3 sc3thac    0.364    0.034
+31 1 sc_3 sc3tcom    0.689    0.028
+91 1 sc_3 sc3tcom l2
+31 1 sc_3 sc3obey    0.465    0.032
+91 1 sc_3 sc3obey l3
+31 1 sc_3 sc3dist    0.847    0.025
+91 1 sc_3 sc3dist l4
+31 1 sc_3 sc3temp    0.342    0.032
+91 1 sc_3 sc3temp l5
+31 1 sc_3 sc3rest    0.851    0.024
+91 1 sc_3 sc3rest l6
+31 1 sc_3 sc3fidg    0.760    0.025
+91 1 sc_3 sc3fidg l7
+31 1 sc_5 sc5thac    0.274    0.027
+31 1 sc_5 sc5tcom    0.520    0.027
+91 1 sc_5 sc5tcom l2
+31 1 sc_5 sc5obey    0.351    0.025
+91 1 sc_5 sc5obey l3
+31 1 sc_5 sc5dist    0.639    0.028
+91 1 sc_5 sc5dist l4
+31 1 sc_5 sc5temp    0.258    0.024
+91 1 sc_5 sc5temp l5
+31 1 sc_5 sc5rest    0.643    0.027
+91 1 sc_5 sc5rest l6
+31 1 sc_5 sc5fidg    0.574    0.026
+91 1 sc_5 sc5fidg l7
+31 1 sc_7 sc7thac    0.298    0.030
+31 1 sc_7 sc7tcom    0.565    0.033
+91 1 sc_7 sc7tcom l2
+31 1 sc_7 sc7obey    0.381    0.028
+91 1 sc_7 sc7obey l3
+31 1 sc_7 sc7dist    0.694    0.033
+91 1 sc_7 sc7dist l4
+31 1 sc_7 sc7temp    0.281    0.027
+91 1 sc_7 sc7temp l5
+31 1 sc_7 sc7rest    0.698    0.033
+91 1 sc_7 sc7rest l6
+31 1 sc_7 sc7fidg    0.623    0.032
+91 1 sc_7 sc7fidg l7
+31 1 sc_11 sc11thac    0.318    0.033
+31 1 sc_11 sc11tcom    0.602    0.043
+91 1 sc_11 sc11tcom l2
+31 1 sc_11 sc11obey    0.407    0.032
+91 1 sc_11 sc11obey l3
+31 1 sc_11 sc11dist    0.741    0.050
+91 1 sc_11 sc11dist l4
+31 1 sc_11 sc11temp    0.299    0.030
+91 1 sc_11 sc11temp l5
+31 1 sc_11 sc11rest    0.745    0.047
+91 1 sc_11 sc11rest l6
+31 1 sc_11 sc11fidg    0.665    0.046
+91 1 sc_11 sc11fidg l7
+31 1 sc_14 sc14thac    0.349    0.042
+31 1 sc_14 sc14tcom    0.661    0.064
+91 1 sc_14 sc14tcom l2
+31 1 sc_14 sc14obey    0.446    0.045
+91 1 sc_14 sc14obey l3
+31 1 sc_14 sc14dist    0.813    0.075
+91 1 sc_14 sc14dist l4
+31 1 sc_14 sc14temp    0.328    0.038
+91 1 sc_14 sc14temp l5
+31 1 sc_14 sc14rest    0.817    0.074
+91 1 sc_14 sc14rest l6
+31 1 sc_14 sc14fidg    0.729    0.070
+91 1 sc_14 sc14fidg l7
+31 1 sc_17 sc17thac    0.387    0.054
+31 1 sc_17 sc17tcom    0.732    0.090
+91 1 sc_17 sc17tcom l2
+31 1 sc_17 sc17obey    0.495    0.059
+91 1 sc_17 sc17obey l3
+31 1 sc_17 sc17dist    0.900    0.106
+91 1 sc_17 sc17dist l4
+31 1 sc_17 sc17temp    0.364    0.049
+91 1 sc_17 sc17temp l5
+31 1 sc_17 sc17rest    0.905    0.105
+91 1 sc_17 sc17rest l6
+31 1 sc_17 sc17fidg    0.808    0.098
+91 1 sc_17 sc17fidg l7
+31 1 i sc_3    0.689    0.021
+31 1 i sc_5    0.913    0.020
+31 1 i sc_7    0.841    0.034
+31 1 i sc_11    0.788    0.050
+31 1 i sc_14    0.718    0.067
+31 1 i sc_17    0.648    0.079
+31 1 s sc_3    0.000    0.000
+31 1 s sc_5    0.095    0.044
+31 1 s sc_7    0.245    0.042
+31 1 s sc_11    0.439    0.043
+31 1 s sc_14    0.640    0.046
+31 1 s sc_17    0.768    0.044
+31 1 ignore3 sc_3   -0.017    0.020
+31 1 smack3 sc_3   -0.088    0.035
+31 1 shout3 sc_3   -0.109    0.028
+31 1 bedroom3 sc_3   -0.041    0.020
+31 1 treats3 sc_3   -0.028    0.021
+31 1 telloff3 sc_3   -0.132    0.035
+31 1 bribe3 sc_3   -0.089    0.021
+31 1 pa5 sc_5   -0.445    0.061
+31 1 pa7 sc_7   -0.656    0.062
+31 1 pa11 sc_11   -0.531    0.033
+31 1 pm14 sc_14    0.443    0.061
+31 1 pm17 sc_17   -0.057    0.052
+31 1 scoga i    0.207    0.029
+31 1 lbw i   -0.161    0.115
+31 1 inftemp i    0.099    0.030
+31 1 hfae i   -0.060    0.313
+31 1 bmarried i    0.199    0.055
+31 1 brace i   -0.046    0.094
+31 1 sex i    0.221    0.051
+31 1 bpedu i    0.435    0.065
+31 1 incomef i    0.065    0.022
+31 1 scoga s    0.037    0.039
+31 1 lbw s    0.093    0.158
+31 1 inftemp s   -0.041    0.041
+31 1 hfae s   -0.168    0.352
+31 1 bmarried s   -0.128    0.077
+31 1 brace s    0.115    0.134
+31 1 sex s    0.025    0.075
+31 1 bpedu s   -0.099    0.097
+31 1 incomef s    0.036    0.035
+32 1 sc3thac sc5thac    0.097    0.015
+32 1 sc5thac sc7thac    0.059    0.013
+32 1 sc7thac sc11thac    0.054    0.012
+32 1 sc11thac sc14thac    0.051    0.012
+32 1 sc14thac sc17thac    0.093    0.027
+32 1 sc3tcom sc5tcom    0.113    0.017
+32 1 sc5tcom sc7tcom    0.068    0.010
+32 1 sc7tcom sc11tcom    0.089    0.014
+32 1 sc11tcom sc14tcom    0.104    0.019
+32 1 sc14tcom sc17tcom    0.139    0.032
+32 1 sc3obey sc5obey    0.193    0.023
+32 1 sc5obey sc7obey    0.152    0.029
+32 1 sc7obey sc11obey    0.141    0.031
+32 1 sc11obey sc14obey    0.266    0.055
+32 1 sc14obey sc17obey    0.510    0.123
+32 1 sc3dist sc5dist    0.105    0.015
+32 1 sc5dist sc7dist    0.087    0.014
+32 1 sc7dist sc11dist    0.112    0.017
+32 1 sc11dist sc14dist    0.127    0.025
+32 1 sc14dist sc17dist    0.189    0.045
+32 1 sc3temp sc5temp    0.296    0.036
+32 1 sc5temp sc7temp    0.240    0.046
+32 1 sc7temp sc11temp    0.192    0.037
+32 1 sc11temp sc14temp    0.232    0.050
+32 1 sc14temp sc17temp    0.266    0.067
+32 1 sc3rest sc5rest    0.161    0.018
+32 1 sc5rest sc7rest    0.132    0.018
+32 1 sc7rest sc11rest    0.146    0.022
+32 1 sc11rest sc14rest    0.167    0.032
+32 1 sc14rest sc17rest    0.294    0.066
+32 1 sc3fidg sc5fidg    0.183    0.020
+32 1 sc5fidg sc7fidg    0.181    0.024
+32 1 sc7fidg sc11fidg    0.163    0.026
+32 1 sc11fidg sc14fidg    0.158    0.035
+32 1 sc14fidg sc17fidg    0.141    0.042
+32 1 i s   -0.272    0.101
+34 1 sc_3    0.401    0.028
+34 1 sc_5    0.141    0.021
+34 1 sc_7    0.212    0.016
+34 1 sc_11    0.199    0.017
+34 1 sc_14    0.268    0.029
+34 1 sc_17    0.244    0.040
+34 1 i    0.849    0.017
+34 1 s    0.992    0.006
+32 1 scoga lbw  999.000  999.000
+32 1 scoga inftemp  999.000  999.000
+32 1 scoga hfae  999.000  999.000
+32 1 scoga bmarried  999.000  999.000
+32 1 scoga brace  999.000  999.000
+32 1 scoga sex  999.000  999.000
+32 1 scoga bpedu  999.000  999.000
+32 1 scoga incomef  999.000  999.000
+32 1 scoga ignore3  999.000  999.000
+32 1 scoga smack3  999.000  999.000
+32 1 scoga shout3  999.000  999.000
+32 1 scoga bedroom3  999.000  999.000
+32 1 scoga treats3  999.000  999.000
+32 1 scoga telloff3  999.000  999.000
+32 1 scoga bribe3  999.000  999.000
+32 1 scoga pa5  999.000  999.000
+32 1 scoga pa7  999.000  999.000
+32 1 scoga pa11  999.000  999.000
+32 1 scoga pm14  999.000  999.000
+32 1 scoga pm17  999.000  999.000
+32 1 lbw inftemp  999.000  999.000
+32 1 lbw hfae  999.000  999.000
+32 1 lbw bmarried  999.000  999.000
+32 1 lbw brace  999.000  999.000
+32 1 lbw sex  999.000  999.000
+32 1 lbw bpedu  999.000  999.000
+32 1 lbw incomef  999.000  999.000
+32 1 lbw ignore3  999.000  999.000
+32 1 lbw smack3  999.000  999.000
+32 1 lbw shout3  999.000  999.000
+32 1 lbw bedroom3  999.000  999.000
+32 1 lbw treats3  999.000  999.000
+32 1 lbw telloff3  999.000  999.000
+32 1 lbw bribe3  999.000  999.000
+32 1 lbw pa5  999.000  999.000
+32 1 lbw pa7  999.000  999.000
+32 1 lbw pa11  999.000  999.000
+32 1 lbw pm14  999.000  999.000
+32 1 lbw pm17  999.000  999.000
+32 1 inftemp hfae  999.000  999.000
+32 1 inftemp bmarried  999.000  999.000
+32 1 inftemp brace  999.000  999.000
+32 1 inftemp sex  999.000  999.000
+32 1 inftemp bpedu  999.000  999.000
+32 1 inftemp incomef  999.000  999.000
+32 1 inftemp ignore3  999.000  999.000
+32 1 inftemp smack3  999.000  999.000
+32 1 inftemp shout3  999.000  999.000
+32 1 inftemp bedroom3  999.000  999.000
+32 1 inftemp treats3  999.000  999.000
+32 1 inftemp telloff3  999.000  999.000
+32 1 inftemp bribe3  999.000  999.000
+32 1 inftemp pa5  999.000  999.000
+32 1 inftemp pa7  999.000  999.000
+32 1 inftemp pa11  999.000  999.000
+32 1 inftemp pm14  999.000  999.000
+32 1 inftemp pm17  999.000  999.000
+32 1 hfae bmarried  999.000  999.000
+32 1 hfae brace  999.000  999.000
+32 1 hfae sex  999.000  999.000
+32 1 hfae bpedu  999.000  999.000
+32 1 hfae incomef  999.000  999.000
+32 1 hfae ignore3  999.000  999.000
+32 1 hfae smack3  999.000  999.000
+32 1 hfae shout3  999.000  999.000
+32 1 hfae bedroom3  999.000  999.000
+32 1 hfae treats3  999.000  999.000
+32 1 hfae telloff3  999.000  999.000
+32 1 hfae bribe3  999.000  999.000
+32 1 hfae pa5  999.000  999.000
+32 1 hfae pa7  999.000  999.000
+32 1 hfae pa11  999.000  999.000
+32 1 hfae pm14  999.000  999.000
+32 1 hfae pm17  999.000  999.000
+32 1 bmarried brace  999.000  999.000
+32 1 bmarried sex  999.000  999.000
+32 1 bmarried bpedu  999.000  999.000
+32 1 bmarried incomef  999.000  999.000
+32 1 bmarried ignore3  999.000  999.000
+32 1 bmarried smack3  999.000  999.000
+32 1 bmarried shout3  999.000  999.000
+32 1 bmarried bedroom3  999.000  999.000
+32 1 bmarried treats3  999.000  999.000
+32 1 bmarried telloff3  999.000  999.000
+32 1 bmarried bribe3  999.000  999.000
+32 1 bmarried pa5  999.000  999.000
+32 1 bmarried pa7  999.000  999.000
+32 1 bmarried pa11  999.000  999.000
+32 1 bmarried pm14  999.000  999.000
+32 1 bmarried pm17  999.000  999.000
+32 1 brace sex  999.000  999.000
+32 1 brace bpedu  999.000  999.000
+32 1 brace incomef  999.000  999.000
+32 1 brace ignore3  999.000  999.000
+32 1 brace smack3  999.000  999.000
+32 1 brace shout3  999.000  999.000
+32 1 brace bedroom3  999.000  999.000
+32 1 brace treats3  999.000  999.000
+32 1 brace telloff3  999.000  999.000
+32 1 brace bribe3  999.000  999.000
+32 1 brace pa5  999.000  999.000
+32 1 brace pa7  999.000  999.000
+32 1 brace pa11  999.000  999.000
+32 1 brace pm14  999.000  999.000
+32 1 brace pm17  999.000  999.000
+32 1 sex bpedu  999.000  999.000
+32 1 sex incomef  999.000  999.000
+32 1 sex ignore3  999.000  999.000
+32 1 sex smack3  999.000  999.000
+32 1 sex shout3  999.000  999.000
+32 1 sex bedroom3  999.000  999.000
+32 1 sex treats3  999.000  999.000
+32 1 sex telloff3  999.000  999.000
+32 1 sex bribe3  999.000  999.000
+32 1 sex pa5  999.000  999.000
+32 1 sex pa7  999.000  999.000
+32 1 sex pa11  999.000  999.000
+32 1 sex pm14  999.000  999.000
+32 1 sex pm17  999.000  999.000
+32 1 bpedu incomef  999.000  999.000
+32 1 bpedu ignore3  999.000  999.000
+32 1 bpedu smack3  999.000  999.000
+32 1 bpedu shout3  999.000  999.000
+32 1 bpedu bedroom3  999.000  999.000
+32 1 bpedu treats3  999.000  999.000
+32 1 bpedu telloff3  999.000  999.000
+32 1 bpedu bribe3  999.000  999.000
+32 1 bpedu pa5  999.000  999.000
+32 1 bpedu pa7  999.000  999.000
+32 1 bpedu pa11  999.000  999.000
+32 1 bpedu pm14  999.000  999.000
+32 1 bpedu pm17  999.000  999.000
+32 1 incomef ignore3  999.000  999.000
+32 1 incomef smack3  999.000  999.000
+32 1 incomef shout3  999.000  999.000
+32 1 incomef bedroom3  999.000  999.000
+32 1 incomef treats3  999.000  999.000
+32 1 incomef telloff3  999.000  999.000
+32 1 incomef bribe3  999.000  999.000
+32 1 incomef pa5  999.000  999.000
+32 1 incomef pa7  999.000  999.000
+32 1 incomef pa11  999.000  999.000
+32 1 incomef pm14  999.000  999.000
+32 1 incomef pm17  999.000  999.000
+32 1 ignore3 smack3  999.000  999.000
+32 1 ignore3 shout3  999.000  999.000
+32 1 ignore3 bedroom3  999.000  999.000
+32 1 ignore3 treats3  999.000  999.000
+32 1 ignore3 telloff3  999.000  999.000
+32 1 ignore3 bribe3  999.000  999.000
+32 1 ignore3 pa5  999.000  999.000
+32 1 ignore3 pa7  999.000  999.000
+32 1 ignore3 pa11  999.000  999.000
+32 1 ignore3 pm14  999.000  999.000
+32 1 ignore3 pm17  999.000  999.000
+32 1 smack3 shout3  999.000  999.000
+32 1 smack3 bedroom3  999.000  999.000
+32 1 smack3 treats3  999.000  999.000
+32 1 smack3 telloff3  999.000  999.000
+32 1 smack3 bribe3  999.000  999.000
+32 1 smack3 pa5  999.000  999.000
+32 1 smack3 pa7  999.000  999.000
+32 1 smack3 pa11  999.000  999.000
+32 1 smack3 pm14  999.000  999.000
+32 1 smack3 pm17  999.000  999.000
+32 1 shout3 bedroom3  999.000  999.000
+32 1 shout3 treats3  999.000  999.000
+32 1 shout3 telloff3  999.000  999.000
+32 1 shout3 bribe3  999.000  999.000
+32 1 shout3 pa5  999.000  999.000
+32 1 shout3 pa7  999.000  999.000
+32 1 shout3 pa11  999.000  999.000
+32 1 shout3 pm14  999.000  999.000
+32 1 shout3 pm17  999.000  999.000
+32 1 bedroom3 treats3  999.000  999.000
+32 1 bedroom3 telloff3  999.000  999.000
+32 1 bedroom3 bribe3  999.000  999.000
+32 1 bedroom3 pa5  999.000  999.000
+32 1 bedroom3 pa7  999.000  999.000
+32 1 bedroom3 pa11  999.000  999.000
+32 1 bedroom3 pm14  999.000  999.000
+32 1 bedroom3 pm17  999.000  999.000
+32 1 treats3 telloff3  999.000  999.000
+32 1 treats3 bribe3  999.000  999.000
+32 1 treats3 pa5  999.000  999.000
+32 1 treats3 pa7  999.000  999.000
+32 1 treats3 pa11  999.000  999.000
+32 1 treats3 pm14  999.000  999.000
+32 1 treats3 pm17  999.000  999.000
+32 1 telloff3 bribe3  999.000  999.000
+32 1 telloff3 pa5  999.000  999.000
+32 1 telloff3 pa7  999.000  999.000
+32 1 telloff3 pa11  999.000  999.000
+32 1 telloff3 pm14  999.000  999.000
+32 1 telloff3 pm17  999.000  999.000
+32 1 bribe3 pa5  999.000  999.000
+32 1 bribe3 pa7  999.000  999.000
+32 1 bribe3 pa11  999.000  999.000
+32 1 bribe3 pm14  999.000  999.000
+32 1 bribe3 pm17  999.000  999.000
+32 1 pa5 pa7  999.000  999.000
+32 1 pa5 pa11  999.000  999.000
+32 1 pa5 pm14  999.000  999.000
+32 1 pa5 pm17  999.000  999.000
+32 1 pa7 pa11  999.000  999.000
+32 1 pa7 pm14  999.000  999.000
+32 1 pa7 pm17  999.000  999.000
+32 1 pa11 pm14  999.000  999.000
+32 1 pa11 pm17  999.000  999.000
+32 1 pm14 pm17  999.000  999.000

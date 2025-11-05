@@ -1,0 +1,84 @@
+TITLE: Longitudinal CFA Configural (DELTA; 6 waves x 7 items)
+
+DATA:
+  FILE = recoded_only_sc_pa_cov.dat;
+
+VARIABLE:
+  Names are 
+     pttype2 nh2 bovwt1 covwt1 dovwt1 eovwt1 fovwt1 govwt1 sptn00 sc3thac
+     sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg sc5thac sc5tcom sc5obey
+     sc5dist sc5temp sc5rest sc5fidg sc5lyin sc7thac sc7tcom sc7obey sc7dist
+     sc7temp sc7rest sc7fidg sc7lyin sc11thac sc11tcom sc11obey sc11dist
+     sc11temp sc11rest sc11fidg sc11lyin sc14thac sc14tcom sc14obey sc14dist
+     sc14temp sc14rest sc14fidg sc14lyin sc17thac sc17tcom sc17obey sc17dist
+     sc17temp sc17rest sc17fidg sc17lyin ignore5 smack5 shout5 bedroom5
+     treats5 telloff5 bribe5 reason5 rindoor5 dinner5 close5 read5 story5
+     music5 paint5 active5 games5 park5 ignore7 smack7 shout7 bedroom7
+     treats7 telloff7 bribe7 reason7 rindoor7 dinner7 close7 read7 story7
+     music7 paint7 active7 games7 park7 tvrules7 bedroom11 treats11 reason11
+     close11 active11 games11 pwhere14 pwho14 pwhat14 cmwhere14 cmwho14
+     cmwhat14 cmwhere17 cmtback17 pwhere17 ptback17 livewp17 pedu bpedu
+     sex race brace bmarried incomec incomel incomef lbw namhapna0 namunfaa0
+     nambrusa0 namfeeda0 naminjua0 nambatha0 namwarya0 nambshya0 namfreta0
+     namsleea0 nammilka0 namsltia0 namnapsa0 namsofoa0 inftempr inftemp
+     dfpw dupd dupw hfae coga scoga age3 age5 age7 age11 age14 age17 mcsid;
+  USEVARIABLES =
+    sc3thac sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg
+    sc5thac sc5tcom sc5obey sc5dist sc5temp sc5rest sc5fidg
+    sc7thac sc7tcom sc7obey sc7dist sc7temp sc7rest sc7fidg
+    sc11thac sc11tcom sc11obey sc11dist sc11temp sc11rest sc11fidg
+    sc14thac sc14tcom sc14obey sc14dist sc14temp sc14rest sc14fidg
+    sc17thac sc17tcom sc17obey sc17dist sc17temp sc17rest sc17fidg;
+  CATEGORICAL = ALL;
+  MISSING ARE ALL (-9999);
+  IDVARIABLE IS mcsid;
+
+! ---- Complex survey design (MCS) ----
+  STRATIFICATION = pttype2;    
+  CLUSTER       = sptn00;       
+  WEIGHT        = govwt1;
+  SUBPOPULATION = (govwt1 > 0);
+
+
+
+ANALYSIS:
+  TYPE = COMPLEX;
+  ESTIMATOR = WLSMV;
+  PARAMETERIZATION = DELTA;
+
+MODEL:
+  ! factors identical to configural
+  SC_3  BY sc3thac* sc3tcom sc3obey 
+sc3dist sc3temp sc3rest sc3fidg;
+  SC_5  BY sc5thac* sc5tcom sc5obey 
+sc5dist sc5temp sc5rest sc5fidg;
+  SC_7  BY sc7thac* sc7tcom sc7obey 
+sc7dist sc7temp sc7rest sc7fidg;
+  SC_11 BY sc11thac* sc11tcom sc11obey 
+sc11dist sc11temp sc11rest sc11fidg;
+  SC_14 BY sc14thac* sc14tcom sc14obey 
+sc14dist sc14temp sc14rest sc14fidg;
+  SC_17 BY sc17thac* sc17tcom sc17obey 
+sc17dist sc17temp sc17rest sc17fidg;
+
+  SC_3-SC_17@1
+  [SC_3-SC_17@0];
+
+! Adjacent correlated uniquenesses 
+  sc3thac WITH sc5thac;  sc5thac WITH sc7thac;  sc7thac WITH sc11thac; 
+sc11thac WITH sc14thac; sc14thac WITH sc17thac;
+  sc3tcom WITH sc5tcom;  sc5tcom WITH sc7tcom;  sc7tcom WITH sc11tcom; 
+sc11tcom WITH sc14tcom; sc14tcom WITH sc17tcom;
+  sc3obey WITH sc5obey;  sc5obey WITH sc7obey;  sc7obey WITH sc11obey; 
+sc11obey WITH sc14obey; sc14obey WITH sc17obey;
+  sc3dist WITH sc5dist;  sc5dist WITH sc7dist;  sc7dist WITH sc11dist; 
+sc11dist WITH sc14dist; sc14dist WITH sc17dist;
+  sc3temp WITH sc5temp;  sc5temp WITH sc7temp;  sc7temp WITH sc11temp; 
+sc11temp WITH sc14temp; sc14temp WITH sc17temp;
+  sc3rest WITH sc5rest;  sc5rest WITH sc7rest;  sc7rest WITH sc11rest; 
+sc11rest WITH sc14rest; sc14rest WITH sc17rest;
+  sc3fidg WITH sc5fidg;  sc5fidg WITH sc7fidg;  sc7fidg WITH sc11fidg; 
+sc11fidg WITH sc14fidg; sc14fidg WITH sc17fidg;
+
+OUTPUT: SAMPSTAT STANDARDIZED MODINDICES(10) TECH1 TECH4;
+SAVEDATA: DIFFTEST = cfg_3to17.dif;

@@ -1,0 +1,165 @@
+TITLE: Two-class growth mixture on continuous wave factor scores
+       with complex survey features and covariates.
+
+DATA:
+  FILE = sc_wave_fscores_complete.dat;
+
+VARIABLE: 
+      NAMES = 
+		SC3THAC SC3TCOM SC3OBEY SC3DIST SC3TEMP SC3REST SC3FIDG 
+		SC5THAC SC5TCOM SC5OBEY SC5DIST SC5TEMP SC5REST SC5FIDG 
+		SC7THAC SC7TCOM SC7OBEY SC7DIST SC7TEMP SC7REST SC7FIDG 
+		SC11THAC SC11TCOM SC11OBEY SC11DIST SC11TEMP SC11REST SC11FIDG 
+		SC14THAC SC14TCOM SC14OBEY SC14DIST SC14TEMP SC14REST SC14FIDG 
+		SC17THAC SC17TCOM SC17OBEY SC17DIST SC17TEMP SC17REST SC17FIDG 
+		IGNORE3 SMACK3 SHOUT3 BEDROOM3 TREATS3 TELLOFF3 BRIBE3
+		IGNORE5 SMACK5 SHOUT5 BEDROOM5 TREATS5 TELLOFF5 BRIBE5 REASON5 
+		RINDOOR5 DINNER5 CLOSE5 READ5 STORY5 MUSIC5 PAINT5 ACTIVE5 GAMES5 PARK5 
+		IGNORE7 SMACK7 SHOUT7 BEDROOM7 TREATS7 TELLOFF7 BRIBE7 REASON7 
+		RINDOOR7 DINNER7 CLOSE7 READ7 STORY7 MUSIC7 PAINT7 ACTIVE7 GAMES7 PARK7 TVRULES7
+		BEDROOM11 TREATS11 REASON11 CLOSE11 ACTIVE11 GAMES11 
+		PWHERE14 PWHO14 PWHAT14 CMWHERE14 CMWHO14 CMWHAT14 
+		CMWHERE17 CMTBACK17 PWHERE17 PTBACK17 LIVEWP17 
+		PEDU BPEDU SEX RACE BRACE BMARRIED INCOMEC INCOMEL INCOMEF LBW 
+		NAMHAPNA NAMUNFAA NAMBRUSA NAMFEEDA NAMINJUA NAMBATHA NAMWARYA 
+		NAMBSHYA NAMFRETA NAMSLEEA NAMMILKA NAMSLTIA NAMNAPSA NAMSOFOA 
+		INFTEMPR INFTEMP DFPW DUPD DUPW HFAE COGA SCOGA AGE3
+		AGE5 AGE7 AGE11 AGE14 AGE17 
+		SC_3 SC_3_SE SC_5 SC_5_SE SC_7 SC_7_SE SC_11 SC_11_SE 
+		SC_14 SC_14_SE SC_17 SC_17_SE 
+		GOVWT1 MCSID PTTYPE2 SPTN00;
+
+      USEVARIABLES =
+		SC_3 SC_5 SC_7 SC_11 SC_14 SC_17
+        scoga lbw inftemp hfae bmarried brace sex bpedu incomef
+		pa3 pa5 pa7 pa11 pm14 pm17;
+
+  IDVARIABLE = mcsid;
+  MISSING = *;
+
+  ! ---- Complex survey design retained in mixture ----
+  STRATIFICATION = pttype2;
+  CLUSTER       = sptn00;
+  WEIGHT        = govwt1;
+  SUBPOPULATION = (govwt1 > 0);
+
+  ! ---- Two latent classes ----
+  CLASSES = c(2);
+
+DEFINE:
+ ! Adding time-variant parenting covariates as sumamted scores
+ pa3  = MEAN(ignore3 smack3 shout3 bedroom3 treats3 telloff3 bribe3);
+ pa5  = MEAN(ignore5 smack5 shout5 bedroom5 treats5 telloff5 bribe5 reason5);
+ pa7  = MEAN(ignore7 smack7 shout7 bedroom7 treats7 telloff7 bribe7 reason7);
+ pa11 = MEAN(bedroom11 treats11 reason11);
+ pm14 = MEAN(pwhere14 pwho14 pwhat14 cmwhere14 cmwho14 cmwhat14);
+ pm17 = MEAN(cmwhere17 cmtback17 pwhere17 ptback17);
+
+ANALYSIS:
+  TYPE = COMPLEX MIXTURE;   ! mixture + survey adjustments are allowed
+  ESTIMATOR = MLR;          ! robust ML for continuous outcomes in mixtures
+  PROCESSORS = 12;
+  STARTS = 500 100;
+  STITERATIONS = 10;
+  STSEED = 20251021;     ! sets the global seed for random starts
+
+
+MODEL:
+  %OVERALL%
+
+  ! ===== Latent growth factors over wave factor scores =====
+  ! Non-linear slope via free time scores; time centered at age 3 (0 -> 1)
+  i s | SC_3@0 SC_5* SC_7* SC_11* SC_14* SC_17@1;
+
+  ! Residual variances of the six repeated measures (equal across classes by placing here)
+  SC_3*; SC_5*; SC_7*; SC_11*; SC_14*; SC_17*;
+
+  ! Growth variances and covariance (equal across classes here for stability)
+  i*     ! ----- REQUIRED PLACEHOLDERS (declare ON-relations in OVERALL) -----
+    ! Time-varying parenting on wave outcomes (fixed to 0 here)
+    SC_3  ON pa3@0;
+    SC_5  ON pa5@0;
+    SC_7  ON pa7@0;
+    SC_11 ON pa11@0;
+    SC_14 ON pm14@0;
+    SC_17 ON pm17@0;
+
+    ! Time-invariant covariates on growth factors (fixed to 0 here)
+    i ON scoga@0 lbw@0 inftemp@0 hfae@0 bmarried@0 brace@0 sex@0 bpedu@0 incomef@0;
+    s ON scoga@0 lbw@0 inftemp@0 hfae@0 bmarried@0 brace@0 sex@0 bpedu@0 incomef@0;
+  i WITH s;
+
+
+
+    ! ===== Class-specific growth means =====
+    %c#1%
+      [i] (mi1);
+      [s] (ms1);
+
+  	! class-specific time-varying parenting effects
+      SC_3  ON PA3  (b_pa3_c1);
+      SC_5  ON PA5  (b_pa5_c1);
+      SC_7  ON PA7  (b_pa7_c1);
+      SC_11 ON PA11 (b_pa11_c1);
+      SC_14 ON PM14 (b_pm14_c1);
+      SC_17 ON PM17 (b_pm17_c1);
+
+    i ON scoga   (i_scoga_c1);
+    i ON lbw     (i_lbw_c1);
+    i ON inftemp (i_inftemp_c1);
+    i ON hfae    (i_hfae_c1);
+    i ON bmarried(i_bmar_c1);
+    i ON brace   (i_brace_c1);
+    i ON sex     (i_sex_c1);
+    i ON bpedu   (i_bpedu_c1);
+    i ON incomef (i_inc_c1);
+
+    s ON scoga   (s_scoga_c1);
+    s ON lbw     (s_lbw_c1);
+    s ON inftemp (s_inftemp_c1);
+    s ON hfae    (s_hfae_c1);
+    s ON bmarried(s_bmar_c1);
+    s ON brace   (s_brace_c1);
+    s ON sex     (s_sex_c1);
+    s ON bpedu   (s_bpedu_c1);
+    s ON incomef (s_inc_c1);
+
+    %c#2%
+      [i] (mi2);
+      [s] (ms2);
+
+      SC_3  ON PA3  (b_pa3_c2);
+      SC_5  ON PA5  (b_pa5_c2);
+      SC_7  ON PA7  (b_pa7_c2);
+      SC_11 ON PA11 (b_pa11_c2);
+      SC_14 ON PM14 (b_pm14_c2);
+      SC_17 ON PM17 (b_pm17_c2);
+
+	  i ON scoga   (i_scoga_c2);
+      i ON lbw     (i_lbw_c2);
+      i ON inftemp (i_inftemp_c2);
+      i ON hfae    (i_hfae_c2);
+      i ON bmarried(i_bmar_c2);
+      i ON brace   (i_brace_c2);
+      i ON sex     (i_sex_c2);
+      i ON bpedu   (i_bpedu_c2);
+      i ON incomef (i_inc_c2);
+
+      s ON scoga   (s_scoga_c2);
+      s ON lbw     (s_lbw_c2);
+      s ON inftemp (s_inftemp_c2);
+      s ON hfae    (s_hfae_c2);
+      s ON bmarried(s_bmar_c2);
+      s ON brace   (s_brace_c2);
+      s ON sex     (s_sex_c2);
+      s ON bpedu   (s_bpedu_c2);
+      s ON incomef (s_inc_c2);
+
+
+
+OUTPUT:
+  TECH1 TECH4 TECH8 TECH11 TECH14 STANDARDIZED;
+
+SAVEDATA:
+  FILE = sc_gmm3_fscores_cprobs.dat;
+  SAVE = CPROB;     ! most-likely class and posterior probabilities

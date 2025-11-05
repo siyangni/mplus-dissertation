@@ -1,0 +1,78 @@
+TITLE: Three-class growth mixture on continuous wave factor scores
+       with complex survey features.
+
+DATA:
+  FILE = sc_wave_fscores.dat;
+
+VARIABLE:
+  NAMES ARE
+	SC3THAC  SC3TCOM  SC3OBEY  SC3DIST  SC3TEMP  SC3REST  SC3FIDG  SC5THAC
+	SC5TCOM  SC5OBEY  SC5DIST  SC5TEMP  SC5REST  SC5FIDG  SC7THAC  SC7TCOM
+	SC7OBEY  SC7DIST  SC7TEMP  SC7REST  SC7FIDG  SC11THAC SC11TCOM SC11OBEY
+	SC11DIST SC11TEMP SC11REST SC11FIDG SC14THAC SC14TCOM SC14OBEY SC14DIST
+	SC14TEMP SC14REST SC14FIDG SC17THAC SC17TCOM SC17OBEY SC17DIST SC17TEMP
+	SC17REST SC17FIDG SC_3     SC_3_SE  SC_5     SC_5_SE  SC_7     SC_7_SE
+	SC_11    SC_11_SE SC_14    SC_14_SE SC_17    SC_17_SE GOVWT1   MCSID
+	PTTYPE2  SPTN00;
+
+  USEVARIABLES = mcsid pttype2 sptn00 govwt1 SC_3 SC_5 SC_7 SC_11 SC_14 SC_17;
+
+  IDVARIABLE = mcsid;
+  MISSING = *;
+
+  ! ---- Complex survey design retained in mixture ----
+  STRATIFICATION = pttype2;
+  CLUSTER       = sptn00;
+  WEIGHT        = govwt1;
+  SUBPOPULATION = (govwt1 > 0);
+
+  ! ---- Two latent classes ----
+  CLASSES = c(3);
+
+ANALYSIS:
+  TYPE = COMPLEX MIXTURE;   ! mixture + survey adjustments are allowed
+  ESTIMATOR = MLR;          ! robust ML for continuous outcomes in mixtures
+  PROCESSORS = 12;
+  STARTS = 4000 1000;
+  STITERATIONS = 30;
+  LRTSTARTS = 800 200 2000 500; ! for TECH14 bootstrapped LRT
+  STSEED = 20251021;     ! sets the global seed for random starts
+
+
+MODEL:
+  %OVERALL%
+
+  ! ===== Latent growth factors over wave factor scores =====
+  ! Non-linear slope via free time scores; time centered at age 3 (0 -> 1)
+  i s | SC_3@0 SC_5* SC_7* SC_11* SC_14* SC_17@1;
+
+  ! Residual variances of the six repeated measures (equal across classes by placing here)
+  SC_3*; SC_5*; SC_7*; SC_11*; SC_14*; SC_17*;
+
+  ! Growth variances and covariance (equal across classes here for stability)
+  i* s*;
+  i WITH s;
+
+  ! ===== Class-specific growth means =====
+  %c#1%
+    [i] (mi1);
+    [s] (ms1);
+
+  %c#2%
+    [i] (mi2);
+    [s] (ms2);
+
+  %c#3%  
+	[i] (mi3);  
+	[s] (ms3);
+
+
+OUTPUT:
+  TECH1 TECH4 TECH8 TECH11 TECH14 STANDARDIZED SVALUES;
+
+PLOT:
+  TYPE = PLOT2 PLOT3;
+
+SAVEDATA:
+  FILE = sc_gmm3_fscores_cprobs.dat;
+  SAVE = CPROB;     ! most-likely class and posterior probabilities

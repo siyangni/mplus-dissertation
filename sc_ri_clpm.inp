@@ -1,0 +1,194 @@
+TITLE: Multiple-indicator RI-CLPM of self-control (6 waves, ordinal, TYPE=COMPLEX)
+
+DATA:
+  FILE = recoded_only_sc_pa_cov.dat;
+
+VARIABLE:
+  NAMES ARE
+       pttype2 nh2 bovwt1 covwt1 dovwt1 eovwt1 fovwt1 govwt1 sptn00 sc3thac
+       sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg sc5thac sc5tcom sc5obey
+       sc5dist sc5temp sc5rest sc5fidg sc5lyin sc7thac sc7tcom sc7obey sc7dist
+       sc7temp sc7rest sc7fidg sc7lyin sc11thac sc11tcom sc11obey sc11dist
+       sc11temp sc11rest sc11fidg sc11lyin sc14thac sc14tcom sc14obey sc14dist
+       sc14temp sc14rest sc14fidg sc14lyin sc17thac sc17tcom sc17obey sc17dist
+       sc17temp sc17rest sc17fidg sc17lyin ignore5 smack5 shout5 bedroom5
+       treats5 telloff5 bribe5 reason5 rindoor5 dinner5 close5 read5 story5
+       music5 paint5 active5 games5 park5 ignore7 smack7 shout7 bedroom7
+       treats7 telloff7 bribe7 reason7 rindoor7 dinner7 close7 read7 story7
+       music7 paint7 active7 games7 park7 tvrules7 bedroom11 treats11 reason11
+       close11 active11 games11 pwhere14 pwho14 pwhat14 cmwhere14 cmwho14
+       cmwhat14 cmwhere17 cmtback17 pwhere17 ptback17 livewp17 pedu bpedu
+       sex race brace bmarried incomec incomel incomef lbw namhapna0 namunfaa0
+       nambrusa0 namfeeda0 naminjua0 nambatha0 namwarya0 nambshya0 namfreta0
+       namsleea0 nammilka0 namsltia0 namnapsa0 namsofoa0 inftempr inftemp
+       dfpw dupd dupw hfae coga scoga age3 age5 age7 age11 age14 age17 mcsid;
+
+  USEVARIABLES =
+      sc3thac sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg
+      sc5thac sc5tcom sc5obey sc5dist sc5temp sc5rest sc5fidg
+      sc7thac sc7tcom sc7obey sc7dist sc7temp sc7rest sc7fidg
+      sc11thac sc11tcom sc11obey sc11dist sc11temp sc11rest sc11fidg
+      sc14thac sc14tcom sc14obey sc14dist sc14temp sc14rest sc14fidg
+      sc17thac sc17tcom sc17obey sc17dist sc17temp sc17rest sc17fidg;
+
+  CATEGORICAL = ALL;
+  MISSING     = ALL (-9999);
+  IDVARIABLE  = mcsid;
+
+  ! Complex survey features (MCS)
+  STRATIFICATION = pttype2;
+  CLUSTER        = sptn00;
+  WEIGHT         = govwt1;
+  SUBPOPULATION  = (govwt1 > 0);
+
+ANALYSIS:
+  TYPE = COMPLEX;
+  ESTIMATOR = WLSMV;
+  PARAMETERIZATION = DELTA;
+  MODEL = NOCOV;   ! See Mulder & Hamaker RI-CLPM page
+
+MODEL:
+
+  ! ---------------------------
+  ! 1) MEASUREMENT MODEL 
+  ! ---------------------------
+
+  ! Wave-specific latent factors with equal loadings (weak MI)
+  SC_3  BY sc3thac@1
+            sc3tcom (l2)
+   sc3obey (l3)
+   sc3dist (l4)
+   sc3temp (l5)
+   sc3rest (l6)
+   sc3fidg (l7);
+  SC_5  BY sc5thac@1
+            sc5tcom (l2)
+   sc5obey (l3)
+   sc5dist (l4)
+   sc5temp (l5)
+   sc5rest (l6)
+   sc5fidg (l7);
+  SC_7  BY sc7thac@1
+            sc7tcom (l2)
+   sc7obey (l3)
+   sc7dist (l4)
+   sc7temp (l5)
+   sc7rest (l6)
+   sc7fidg (l7);
+  SC_11 BY sc11thac@1
+            sc11tcom (l2)
+   sc11obey (l3)
+   sc11dist (l4)
+   sc11temp (l5)
+   sc11rest (l6)
+   sc11fidg (l7);
+  SC_14 BY sc14thac@1
+            sc14tcom (l2)
+   sc14obey (l3)
+   sc14dist (l4)
+   sc14temp (l5)
+   sc14rest (l6)
+   sc14fidg (l7);
+  SC_17 BY sc17thac@1
+            sc17tcom (l2)
+   sc17obey (l3)
+   sc17dist (l4)
+   sc17temp (l5)
+   sc17rest (l6)
+   sc17fidg (l7);
+
+  ! Set latent factor means to 0 for identification with ordinal MI
+  [SC_3-SC_17@0];
+
+  ! Strong MI: equal thresholds for each item across waves (2 thresholds per 3-category item)
+  [sc3thac$1] (t_thac1); [sc5thac$1] (t_thac1); [sc7thac$1] (t_thac1); 
+[sc11thac$1] (t_thac1); [sc14thac$1] (t_thac1); [sc17thac$1] (t_thac1);
+  [sc3thac$2] (t_thac2); [sc5thac$2] (t_thac2); [sc7thac$2] (t_thac2); 
+[sc11thac$2] (t_thac2); [sc14thac$2] (t_thac2); [sc17thac$2] (t_thac2);
+
+  [sc3tcom$1] (t_tcom1); [sc5tcom$1] (t_tcom1); [sc7tcom$1] (t_tcom1); 
+[sc11tcom$1] (t_tcom1); [sc14tcom$1] (t_tcom1); [sc17tcom$1] (t_tcom1);
+  [sc3tcom$2] (t_tcom2); [sc5tcom$2] (t_tcom2); [sc7tcom$2] (t_tcom2); 
+[sc11tcom$2] (t_tcom2); [sc14tcom$2] (t_tcom2); [sc17tcom$2] (t_tcom2);
+
+  [sc3obey$1] (t_obey1); [sc5obey$1] (t_obey1); [sc7obey$1] (t_obey1); 
+[sc11obey$1] (t_obey1); [sc14obey$1] (t_obey1); [sc17obey$1] (t_obey1);
+  [sc3obey$2] (t_obey2); [sc5obey$2] (t_obey2); [sc7obey$2] (t_obey2); 
+[sc11obey$2] (t_obey2); [sc14obey$2] (t_obey2); [sc17obey$2] (t_obey2);
+
+  [sc3dist$1] (t_dist1); [sc5dist$1] (t_dist1); [sc7dist$1] (t_dist1); 
+[sc11dist$1] (t_dist1); [sc14dist$1] (t_dist1); [sc17dist$1] (t_dist1);
+  [sc3dist$2] (t_dist2); [sc5dist$2] (t_dist2); [sc7dist$2] (t_dist2); 
+[sc11dist$2] (t_dist2); [sc14dist$2] (t_dist2); [sc17dist$2] (t_dist2);
+
+  [sc3temp$1] (t_temp1); [sc5temp$1] (t_temp1); [sc7temp$1] (t_temp1); 
+[sc11temp$1] (t_temp1); [sc14temp$1] (t_temp1); [sc17temp$1] (t_temp1);
+  [sc3temp$2] (t_temp2); [sc5temp$2] (t_temp2); [sc7temp$2] (t_temp2); 
+[sc11temp$2] (t_temp2); [sc14temp$2] (t_temp2); [sc17temp$2] (t_temp2);
+
+  [sc3rest$1] (t_rest1); [sc5rest$1] (t_rest1); [sc7rest$1] (t_rest1); 
+[sc11rest$1] (t_rest1); [sc14rest$1] (t_rest1); [sc17rest$1] (t_rest1);
+  [sc3rest$2] (t_rest2); [sc5rest$2] (t_rest2); [sc7rest$2] (t_rest2); 
+[sc11rest$2] (t_rest2); [sc14rest$2] (t_rest2); [sc17rest$2] (t_rest2);
+
+  [sc3fidg$1] (t_fidg1); [sc5fidg$1] (t_fidg1); [sc7fidg$1] (t_fidg1);
+ [sc11fidg$1] (t_fidg1); [sc14fidg$1] (t_fidg1); [sc17fidg$1] (t_fidg1);
+  [sc3fidg$2] (t_fidg2); [sc5fidg$2] (t_fidg2); [sc7fidg$2] (t_fidg2); 
+[sc11fidg$2] (t_fidg2); [sc14fidg$2] (t_fidg2); [sc17fidg$2] (t_fidg2);
+
+  ! Adjacent correlated uniquenesses (item-specific stability)
+  sc3thac WITH sc5thac;  sc5thac WITH sc7thac;  sc7thac WITH sc11thac; 
+sc11thac WITH sc14thac; sc14thac WITH sc17thac;
+  sc3tcom WITH sc5tcom;  sc5tcom WITH sc7tcom;  sc7tcom WITH sc11tcom; 
+sc11tcom WITH sc14tcom; sc14tcom WITH sc17tcom;
+  sc3obey WITH sc5obey;  sc5obey WITH sc7obey;  sc7obey WITH sc11obey; 
+sc11obey WITH sc14obey; sc14obey WITH sc17obey;
+  sc3dist WITH sc5dist;  sc5dist WITH sc7dist;  sc7dist WITH sc11dist; 
+sc11dist WITH sc14dist; sc14dist WITH sc17dist;
+  sc3temp WITH sc5temp;  sc5temp WITH sc7temp;  sc7temp WITH sc11temp; 
+sc11temp WITH sc14temp; sc14temp WITH sc17temp;
+  sc3rest WITH sc5rest;  sc5rest WITH sc7rest;  sc7rest WITH sc11rest; 
+sc11rest WITH sc14rest; sc14rest WITH sc17rest;
+  sc3fidg WITH sc5fidg;  sc5fidg WITH sc7fidg;  sc7fidg WITH sc11fidg; 
+sc11fidg WITH sc14fidg; sc14fidg WITH sc17fidg;
+
+  ! Fix scale factors: reference wave (age 3) @ 1, others free, for delta-parameterized ordinal MI
+  { sc3thac-sc3fidg@1  sc5thac-sc5fidg  sc7thac-sc7fidg  
+sc11thac-sc11fidg  sc14thac-sc14fidg  sc17thac-sc17fidg };
+
+  ! Do NOT free SC_t variances; the RI-CLPM will decompose them and sets them to zero below.
+
+  ! ---------------------------
+  ! 2) BETWEEN-PERSON (trait): Random intercept on the wave factors
+  ! ---------------------------
+  RI_SC BY SC_3@1 SC_5@1 SC_7@1 SC_11@1 SC_14@1 SC_17@1;
+
+  ! Decompose wave factors: all variance in SC_t is captured by RI_SC + within-person part
+  SC_3-SC_17@0;
+
+  ! Leave [RI_SC] at default (0) under strong MI with thresholds constrained; not needed for the stability test.
+
+  ! ---------------------------
+  ! 3) WITHIN-PERSON (state): deviations around person mean + autoregression
+  ! ---------------------------
+  WSC_3  BY SC_3@1;
+  WSC_5  BY SC_5@1;
+  WSC_7  BY SC_7@1;
+  WSC_11 BY SC_11@1;
+  WSC_14 BY SC_14@1;
+  WSC_17 BY SC_17@1;
+
+  ! One-step autoregressive chain for within-person stability (do NOT constrain equal; lags are unequal: 2,2,4,3,3 years)
+  WSC_5  ON WSC_3;   ! approx ages 3 -> 5
+  WSC_7  ON WSC_5;   ! 5 -> 7
+  WSC_11 ON WSC_7;   ! 7 -> 11
+  WSC_14 ON WSC_11;  ! 11 -> 14
+  WSC_17 ON WSC_14;  ! 14 -> 17
+
+  ! (Univariate model has no same-wave cross-variable covariances to specify.)
+
+OUTPUT:
+  TECH1 TECH4 STANDARDIZED(STDYX) SAMPSTAT MODINDICES(10) CINTERVAL;
+
+! Optional: request residual plots for quick diagnostics
+PLOT: TYPE = PLOT3;

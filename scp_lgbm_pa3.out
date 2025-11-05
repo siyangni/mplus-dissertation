@@ -1,0 +1,3849 @@
+Mplus VERSION 8.3
+MUTHEN & MUTHEN
+10/26/2025  12:04 AM
+
+INPUT INSTRUCTIONS
+
+  TITLE: Second-order LGBM with categorical indicators and covariates (pa3 not composite)
+  DATA:
+    FILE = recoded_only_sc_pa_cov.dat;
+
+  VARIABLE:
+    Names are
+       pttype2 nh2 bovwt1 covwt1 dovwt1 eovwt1 fovwt1 govwt1 sptn00 sc3thac
+       sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg sc5thac sc5tcom sc5obey
+       sc5dist sc5temp sc5rest sc5fidg sc5lyin sc7thac sc7tcom sc7obey sc7dist
+       sc7temp sc7rest sc7fidg sc7lyin sc11thac sc11tcom sc11obey sc11dist
+       sc11temp sc11rest sc11fidg sc11lyin sc14thac sc14tcom sc14obey sc14dist
+       sc14temp sc14rest sc14fidg sc14lyin sc17thac sc17tcom sc17obey sc17dist
+       sc17temp sc17rest sc17fidg sc17lyin ignore3 smack3 shout3 bedroom3
+       treats3 telloff3 bribe3 ignore5 smack5 shout5 bedroom5 treats5 telloff5
+       bribe5 reason5 rindoor5 dinner5 close5 read5 story5 music5 paint5
+       active5 games5 park5 ignore7 smack7 shout7 bedroom7 treats7 telloff7
+       bribe7 reason7 rindoor7 dinner7 close7 read7 story7 music7 paint7
+       active7 games7 park7 tvrules7 bedroom11 treats11 reason11 close11
+       active11 games11 pwhere14 pwho14 pwhat14 cmwhere14 cmwho14 cmwhat14
+       cmwhere17 cmtback17 pwhere17 ptback17 livewp17 pedu bpedu sex race
+       brace bmarried incomec incomel incomef lbw namhapna0 namunfaa0 nambrusa0
+       namfeeda0 naminjua0 nambatha0 namwarya0 nambshya0 namfreta0 namsleea0
+       nammilka0 namsltia0 namnapsa0 namsofoa0 inftempr inftemp dfpw dupd
+       dupw hfae coga scoga age3 age5 age7 age11 age14 age17 mcsid;
+
+    USEVARIABLES =
+        sc3thac sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg
+        sc5thac sc5tcom sc5obey sc5dist sc5temp sc5rest sc5fidg
+        sc7thac sc7tcom sc7obey sc7dist sc7temp sc7rest sc7fidg
+        sc11thac sc11tcom sc11obey sc11dist sc11temp sc11rest sc11fidg
+        sc14thac sc14tcom sc14obey sc14dist sc14temp sc14rest sc14fidg
+        sc17thac sc17tcom sc17obey sc17dist sc17temp sc17rest sc17fidg
+  	  scoga lbw inftemp hfae bmarried brace sex bpedu incomef
+        ignore3 smack3 shout3 bedroom3 treats3 telloff3 bribe3
+        pa5 pa7 pa11 pm14 pm17;
+
+    CATEGORICAL =
+      sc3thac sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg
+      sc5thac sc5tcom sc5obey sc5dist sc5temp sc5rest sc5fidg
+      sc7thac sc7tcom sc7obey sc7dist sc7temp sc7rest sc7fidg
+      sc11thac sc11tcom sc11obey sc11dist sc11temp sc11rest sc11fidg
+      sc14thac sc14tcom sc14obey sc14dist sc14temp sc14rest sc14fidg
+      sc17thac sc17tcom sc17obey sc17dist sc17temp sc17rest sc17fidg;
+
+    MISSING ARE ALL (-9999);
+    IDVARIABLE IS mcsid;
+
+    ! ---- Complex survey design (MCS) ----
+      STRATIFICATION = pttype2;
+      CLUSTER       = sptn00;
+      WEIGHT        = govwt1;
+      SUBPOPULATION = (govwt1 > 0);
+
+  DEFINE:
+   ! Adding time-variant parenting covariates as sumamted scores
+   pa5  = MEAN(ignore5 smack5 shout5 bedroom5 treats5 telloff5 bribe5 reason5);
+   pa7  = MEAN(ignore7 smack7 shout7 bedroom7 treats7 telloff7 bribe7 reason7);
+   pa11 = MEAN(bedroom11 treats11 reason11);
+   pm14 = MEAN(pwhere14 pwho14 pwhat14 cmwhere14 cmwho14 cmwhat14);
+   pm17 = MEAN(cmwhere17 cmtback17 pwhere17 ptback17);
+
+    ANALYSIS:
+    TYPE = COMPLEX;
+    ESTIMATOR = WLSMV;
+    PARAMETERIZATION = DELTA;
+
+  MODEL:
+    ! factors same as configural
+    SC_3  BY sc3thac@1
+              sc3tcom (l2)
+  			sc3obey (l3)
+  			sc3dist (l4)
+  			sc3temp (l5)
+  			sc3rest (l6)
+  			sc3fidg (l7);
+    SC_5  BY sc5thac@1
+              sc5tcom (l2)
+  			sc5obey (l3)
+  			sc5dist (l4)
+  			sc5temp (l5)
+  			sc5rest (l6)
+  			sc5fidg (l7);
+    SC_7  BY sc7thac@1
+              sc7tcom (l2)
+  			sc7obey (l3)
+  			sc7dist (l4)
+  			sc7temp (l5)
+  			sc7rest (l6)
+  			sc7fidg (l7);
+    SC_11 BY sc11thac@1
+              sc11tcom (l2)
+  			sc11obey (l3)
+  			sc11dist (l4)
+  			sc11temp (l5)
+  			sc11rest (l6)
+  			sc11fidg (l7);
+    SC_14 BY sc14thac@1
+              sc14tcom (l2)
+  			sc14obey (l3)
+  			sc14dist (l4)
+  			sc14temp (l5)
+  			sc14rest (l6)
+  			sc14fidg (l7);
+    SC_17 BY sc17thac@1
+              sc17tcom (l2)
+  			sc17obey (l3)
+  			sc17dist (l4)
+  			sc17temp (l5)
+  			sc17rest (l6)
+  			sc17fidg (l7);
+
+
+    ! variance free
+    SC_3*; SC_5*; SC_7*; SC_11*; SC_14*; SC_17*;
+    [SC_3-SC_17@0];
+
+    ! equal thresholds across the 6 waves (2 thresholds per 3-category item)
+    [sc3thac$1] (t_thac1);  [sc5thac$1] (t_thac1);  [sc7thac$1] (t_thac1);
+  [sc11thac$1] (t_thac1);  [sc14thac$1] (t_thac1);  [sc17thac$1] (t_thac1);
+    [sc3thac$2] (t_thac2);  [sc5thac$2] (t_thac2);  [sc7thac$2] (t_thac2);
+  [sc11thac$2] (t_thac2);  [sc14thac$2] (t_thac2);  [sc17thac$2] (t_thac2);
+
+    [sc3tcom$1](t_tcom1);  [sc5tcom$1](t_tcom1);  [sc7tcom$1](t_tcom1);
+  [sc11tcom$1](t_tcom1);  [sc14tcom$1](t_tcom1);  [sc17tcom$1](t_tcom1);
+    [sc3tcom$2](t_tcom2);  [sc5tcom$2](t_tcom2);  [sc7tcom$2](t_tcom2);
+  [sc11tcom$2](t_tcom2);  [sc14tcom$2](t_tcom2);  [sc17tcom$2](t_tcom2);
+
+    [sc3obey$1](t_obey1);  [sc5obey$1](t_obey1);  [sc7obey$1](t_obey1);
+  [sc11obey$1](t_obey1);  [sc14obey$1](t_obey1);  [sc17obey$1](t_obey1);
+    [sc3obey$2](t_obey2);  [sc5obey$2](t_obey2);  [sc7obey$2](t_obey2);
+  [sc11obey$2](t_obey2);  [sc14obey$2](t_obey2);  [sc17obey$2](t_obey2);
+
+    [sc3dist$1](t_dist1);  [sc5dist$1](t_dist1);  [sc7dist$1](t_dist1);
+  [sc11dist$1](t_dist1);  [sc14dist$1](t_dist1);  [sc17dist$1](t_dist1);
+    [sc3dist$2](t_dist2);  [sc5dist$2](t_dist2);  [sc7dist$2](t_dist2);
+  [sc11dist$2](t_dist2);  [sc14dist$2](t_dist2);  [sc17dist$2](t_dist2);
+
+    [sc3temp$1](t_temp1);  [sc5temp$1](t_temp1);  [sc7temp$1](t_temp1);
+  [sc11temp$1](t_temp1);  [sc14temp$1](t_temp1);  [sc17temp$1](t_temp1);
+    [sc3temp$2](t_temp2);  [sc5temp$2](t_temp2);  [sc7temp$2](t_temp2);
+  [sc11temp$2](t_temp2);  [sc14temp$2](t_temp2);  [sc17temp$2](t_temp2);
+
+    [sc3rest$1](t_rest1);  [sc5rest$1](t_rest1);  [sc7rest$1](t_rest1);
+  [sc11rest$1](t_rest1);  [sc14rest$1](t_rest1);  [sc17rest$1](t_rest1);
+    [sc3rest$2](t_rest2);  [sc5rest$2](t_rest2);  [sc7rest$2](t_rest2);
+  [sc11rest$2](t_rest2);  [sc14rest$2](t_rest2);  [sc17rest$2](t_rest2);
+
+    [sc3fidg$1](t_fidg1);  [sc5fidg$1](t_fidg1);  [sc7fidg$1](t_fidg1);
+  [sc11fidg$1](t_fidg1);  [sc14fidg$1](t_fidg1);  [sc17fidg$1](t_fidg1);
+    [sc3fidg$2](t_fidg2);  [sc5fidg$2](t_fidg2);  [sc7fidg$2](t_fidg2);
+  [sc11fidg$2](t_fidg2);  [sc14fidg$2](t_fidg2);  [sc17fidg$2](t_fidg2);
+
+
+  ! --------- Adjacent correlated uniquenesses (same as A) ---------
+    sc3thac WITH sc5thac;  sc5thac WITH sc7thac;  sc7thac WITH sc11thac;
+  sc11thac WITH sc14thac; sc14thac WITH sc17thac;
+    sc3tcom WITH sc5tcom;  sc5tcom WITH sc7tcom;  sc7tcom WITH sc11tcom;
+  sc11tcom WITH sc14tcom; sc14tcom WITH sc17tcom;
+    sc3obey WITH sc5obey;  sc5obey WITH sc7obey;  sc7obey WITH sc11obey;
+  sc11obey WITH sc14obey; sc14obey WITH sc17obey;
+    sc3dist WITH sc5dist;  sc5dist WITH sc7dist;  sc7dist WITH sc11dist;
+  sc11dist WITH sc14dist; sc14dist WITH sc17dist;
+    sc3temp WITH sc5temp;  sc5temp WITH sc7temp;  sc7temp WITH sc11temp;
+  sc11temp WITH sc14temp; sc14temp WITH sc17temp;
+    sc3rest WITH sc5rest;  sc5rest WITH sc7rest;  sc7rest WITH sc11rest;
+  sc11rest WITH sc14rest; sc14rest WITH sc17rest;
+    sc3fidg WITH sc5fidg;  sc5fidg WITH sc7fidg;  sc7fidg WITH sc11fidg;
+  sc11fidg WITH sc14fidg; sc14fidg WITH sc17fidg;
+
+  ! Fix scale factors at reference wave (age 3) to 1; free at other waves
+    { sc3thac-sc3fidg@1  sc5thac-sc5fidg  sc7thac-sc7fidg
+  sc11thac-sc11fidg  sc14thac-sc14fidg  sc17thac-sc17fidg };
+
+  ! ===== second-order latent growth factors over SC_t5 .. SC_t17 =====
+    ! time centered at age 3, allow non-linear slope
+    i s | SC_3@0 SC_5* SC_7* SC_11* SC_14* SC_17@1;
+
+  ! identify second-order part and free growth means/variances
+    [i@0 s];
+    i* s*;
+    i WITH s;
+
+  ! Regress parenting on corresponding self-control
+  SC_3  ON ignore3 smack3 shout3
+  bedroom3 treats3 telloff3 bribe3;
+  SC_5  ON pa5;
+  SC_7  ON pa7;
+  SC_11 ON pa11;
+  SC_14 ON pm14;
+  SC_17 ON pm17;
+
+  ! Time-invariate Covariates
+  i s ON scoga lbw inftemp hfae bmarried brace sex bpedu incomef;
+
+
+  OUTPUT: STANDARDIZED MODINDICES(10) TECH1 TECH4;
+
+
+
+*** WARNING
+  Data set contains cases with missing on all variables.
+  These cases were not included in the analysis.
+  Number of cases with missing on all variables:  9
+*** WARNING
+  Data set contains cases with missing on x-variables.
+  These cases were not included in the analysis.
+  Number of cases with missing on x-variables:  17051
+   2 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
+
+
+
+Second-order LGBM with categorical indicators and covariates (pa3 not composite)
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                        2183
+
+Number of dependent variables                                   42
+Number of independent variables                                 21
+Number of continuous latent variables                            8
+
+Observed dependent variables
+
+  Binary and ordered categorical (ordinal)
+   SC3THAC     SC3TCOM     SC3OBEY     SC3DIST     SC3TEMP     SC3REST
+   SC3FIDG     SC5THAC     SC5TCOM     SC5OBEY     SC5DIST     SC5TEMP
+   SC5REST     SC5FIDG     SC7THAC     SC7TCOM     SC7OBEY     SC7DIST
+   SC7TEMP     SC7REST     SC7FIDG     SC11THAC    SC11TCOM    SC11OBEY
+   SC11DIST    SC11TEMP    SC11REST    SC11FIDG    SC14THAC    SC14TCOM
+   SC14OBEY    SC14DIST    SC14TEMP    SC14REST    SC14FIDG    SC17THAC
+   SC17TCOM    SC17OBEY    SC17DIST    SC17TEMP    SC17REST    SC17FIDG
+
+Observed independent variables
+   SCOGA       LBW         INFTEMP     HFAE        BMARRIED    BRACE
+   SEX         BPEDU       INCOMEF     IGNORE3     SMACK3      SHOUT3
+   BEDROOM3    TREATS3     TELLOFF3    BRIBE3      PA5         PA7
+   PA11        PM14        PM17
+
+Continuous latent variables
+   SC_3        SC_5        SC_7        SC_11       SC_14       SC_17
+   I           S
+
+Variables with special functions
+
+  Stratification        PTTYPE2
+  Cluster variable      SPTN00
+  Weight variable       GOVWT1
+  ID variable           MCSID
+
+Estimator                                                    WLSMV
+Maximum number of iterations                                  1000
+Convergence criterion                                    0.500D-04
+Maximum number of steepest descent iterations                   20
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+Parameterization                                             DELTA
+Link                                                        PROBIT
+
+Input data file(s)
+  recoded_only_sc_pa_cov.dat
+
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns           183
+     Number of strata                            3
+     Number of clusters                        199
+
+
+UNIVARIATE PROPORTIONS AND COUNTS FOR CATEGORICAL VARIABLES
+
+    SC3THAC
+      Category 1    0.147          301.707
+      Category 2    0.665         1361.628
+      Category 3    0.187          383.639
+    SC3TCOM
+      Category 1    0.115          245.092
+      Category 2    0.623         1329.393
+      Category 3    0.262          560.058
+    SC3OBEY
+      Category 1    0.038           82.424
+      Category 2    0.570         1240.343
+      Category 3    0.392          852.272
+    SC3DIST
+      Category 1    0.084          181.005
+      Category 2    0.461          990.441
+      Category 3    0.454          974.774
+    SC3TEMP
+      Category 1    0.168          365.232
+      Category 2    0.457          989.809
+      Category 3    0.375          812.705
+    SC3REST
+      Category 1    0.131          282.490
+      Category 2    0.315          679.133
+      Category 3    0.553         1191.660
+    SC3FIDG
+      Category 1    0.091          195.458
+      Category 2    0.282          605.781
+      Category 3    0.627         1345.401
+    SC5THAC
+      Category 1    0.085          182.904
+      Category 2    0.681         1458.645
+      Category 3    0.234          500.528
+    SC5TCOM
+      Category 1    0.065          141.370
+      Category 2    0.508         1102.724
+      Category 3    0.426          924.862
+    SC5OBEY
+      Category 1    0.019           41.659
+      Category 2    0.365          796.124
+      Category 3    0.616         1341.511
+    SC5DIST
+      Category 1    0.086          186.815
+      Category 2    0.376          812.899
+      Category 3    0.538         1162.762
+    SC5TEMP
+      Category 1    0.091          196.855
+      Category 2    0.337          732.653
+      Category 3    0.572         1244.034
+    SC5REST
+      Category 1    0.083          181.337
+      Category 2    0.223          484.579
+      Category 3    0.694         1511.343
+    SC5FIDG
+      Category 1    0.077          167.104
+      Category 2    0.252          547.385
+      Category 3    0.671         1456.398
+    SC7THAC
+      Category 1    0.081          174.390
+      Category 2    0.642         1387.979
+      Category 3    0.277          598.955
+    SC7TCOM
+      Category 1    0.096          207.729
+      Category 2    0.449          976.915
+      Category 3    0.455          989.499
+    SC7OBEY
+      Category 1    0.020           43.713
+      Category 2    0.326          711.262
+      Category 3    0.654         1425.410
+    SC7DIST
+      Category 1    0.118          255.505
+      Category 2    0.371          806.427
+      Category 3    0.512         1112.371
+    SC7TEMP
+      Category 1    0.092          198.885
+      Category 2    0.288          625.296
+      Category 3    0.620         1345.385
+    SC7REST
+      Category 1    0.094          203.826
+      Category 2    0.227          495.185
+      Category 3    0.679         1480.800
+    SC7FIDG
+      Category 1    0.084          183.973
+      Category 2    0.261          569.609
+      Category 3    0.654         1426.918
+    SC11THAC
+      Category 1    0.078          169.203
+      Category 2    0.580         1262.038
+      Category 3    0.343          746.331
+    SC11TCOM
+      Category 1    0.097          210.323
+      Category 2    0.445          968.951
+      Category 3    0.459          998.866
+    SC11OBEY
+      Category 1    0.019           41.876
+      Category 2    0.301          656.317
+      Category 3    0.680         1483.186
+    SC11DIST
+      Category 1    0.108          236.132
+      Category 2    0.359          782.291
+      Category 3    0.532         1160.020
+    SC11TEMP
+      Category 1    0.100          218.446
+      Category 2    0.308          671.020
+      Category 3    0.592         1289.341
+    SC11REST
+      Category 1    0.079          172.042
+      Category 2    0.234          509.337
+      Category 3    0.687         1497.262
+    SC11FIDG
+      Category 1    0.056          122.381
+      Category 2    0.198          430.613
+      Category 3    0.746         1626.920
+    SC14THAC
+      Category 1    0.088          180.392
+      Category 2    0.562         1156.836
+      Category 3    0.350          720.297
+    SC14TCOM
+      Category 1    0.088          181.439
+      Category 2    0.442          911.216
+      Category 3    0.470          968.788
+    SC14OBEY
+      Category 1    0.030           62.009
+      Category 2    0.329          677.960
+      Category 3    0.641         1321.743
+    SC14DIST
+      Category 1    0.110          226.524
+      Category 2    0.320          658.029
+      Category 3    0.570         1173.649
+    SC14TEMP
+      Category 1    0.100          205.014
+      Category 2    0.274          563.925
+      Category 3    0.626         1285.948
+    SC14REST
+      Category 1    0.069          142.199
+      Category 2    0.214          442.063
+      Category 3    0.717         1481.155
+    SC14FIDG
+      Category 1    0.046           95.005
+      Category 2    0.141          289.231
+      Category 3    0.813         1669.031
+    SC17THAC
+      Category 1    0.061          114.809
+      Category 2    0.491          922.048
+      Category 3    0.448          842.064
+    SC17TCOM
+      Category 1    0.077          144.409
+      Category 2    0.383          718.455
+      Category 3    0.540         1014.558
+    SC17OBEY
+      Category 1    0.034           64.020
+      Category 2    0.312          585.276
+      Category 3    0.653         1224.457
+    SC17DIST
+      Category 1    0.091          170.834
+      Category 2    0.299          561.477
+      Category 3    0.610         1144.638
+    SC17TEMP
+      Category 1    0.064          120.193
+      Category 2    0.225          421.471
+      Category 3    0.711         1332.143
+    SC17REST
+      Category 1    0.043           80.597
+      Category 2    0.174          326.583
+      Category 3    0.784         1475.081
+    SC17FIDG
+      Category 1    0.037           69.930
+      Category 2    0.108          202.495
+      Category 3    0.854         1599.336
+
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     SCOGA                 0.373      -0.207      -2.413    0.05%      -0.395      0.155      0.399
+            2183.000       0.763      -0.028       2.661    0.05%       0.644      1.072
+     LBW                   0.052       4.018       0.000   94.64%       0.000      0.000      0.000
+            2183.000       0.050      14.144       1.000    5.36%       0.000      0.000
+     INFTEMP               0.227      -0.433      -3.396    0.09%      -0.506      0.020      0.283
+            2183.000       0.774       0.005       2.122    0.46%       0.414      0.940
+     HFAE                  0.005      13.962       0.000   99.40%       0.000      0.000      0.000
+            2183.000       0.005     192.933       1.000    0.60%       0.000      0.000
+     BMARRIED              0.717      -0.965       0.000   29.55%       0.000      1.000      1.000
+            2183.000       0.203      -1.068       1.000   70.45%       1.000      1.000
+     BRACE                 0.061       3.675       0.000   89.65%       0.000      0.000      0.000
+            2183.000       0.057      11.505       1.000   10.35%       0.000      0.000
+     SEX                   0.532      -0.128       0.000   46.40%       0.000      0.000      1.000
+            2183.000       0.249      -1.984       1.000   53.60%       1.000      1.000
+     BPEDU                 0.274       1.011       0.000   72.79%       0.000      0.000      0.000
+            2183.000       0.199      -0.978       1.000   27.21%       0.000      1.000
+     INCOMEF               3.006      -0.039       0.000    0.92%       2.000      3.000      3.000
+            2183.000       1.300      -0.650       5.000    9.21%       3.000      4.000
+     IGNORE3               1.719       0.289       0.000   20.38%       0.000      1.000      1.000
+            2183.000       1.793      -1.282       4.000   11.22%       2.000      3.000
+     SMACK3                0.909       1.145       0.000   34.49%       0.000      1.000      1.000
+            2183.000       0.793       1.145       4.000    0.78%       1.000      1.000
+     SHOUT3                2.413      -0.364       0.000    2.84%       1.000      2.000      3.000
+            2183.000       1.235      -1.058       4.000   14.48%       3.000      3.000
+     BEDROOM3              1.759       0.020       0.000   22.72%       0.000      1.000      2.000
+            2183.000       1.640      -1.325       4.000    6.28%       2.000      3.000
+     TREATS3               1.848       0.037       0.000   12.37%       1.000      1.000      2.000
+            2183.000       1.317      -1.171       4.000    5.08%       2.000      3.000
+     TELLOFF3              3.205      -1.210       0.000    0.41%       3.000      3.000      3.000
+            2183.000       0.703       1.343       4.000   39.53%       3.000      4.000
+     BRIBE3                1.530       0.343       0.000   27.35%       0.000      1.000      1.000
+            2183.000       1.664      -1.217       4.000    6.28%       2.000      3.000
+     PA5                   1.821       0.051       0.000    0.05%       1.375      1.625      1.750
+            2183.000       0.272      -0.017       3.500    0.05%       2.000      2.250
+     PA7                   1.681       0.011       0.000    0.05%       1.250      1.500      1.625
+            2183.000       0.275      -0.147       3.375    0.14%       1.857      2.125
+     PA11                  1.647       0.034       0.000    2.57%       1.000      1.333      1.667
+            2183.000       0.527      -0.275       4.000    0.05%       2.000      2.333
+     PM14                  2.618      -1.368       0.167    0.05%       2.333      2.667      2.667
+            2183.000       0.163       2.447       3.000   30.69%       2.833      3.000
+     PM17                  2.205      -0.568       0.000    0.18%       1.750      2.000      2.250
+            2183.000       0.295       0.173       3.000   12.41%       2.500      2.750
+
+
+THE MODEL ESTIMATION TERMINATED NORMALLY
+
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                      134
+
+Chi-Square Test of Model Fit
+
+          Value                           4185.526*
+          Degrees of Freedom                  1693
+          P-Value                           0.0000
+
+*   The chi-square value for MLM, MLMV, MLR, ULSMV, WLSM and WLSMV cannot be used
+    for chi-square difference testing in the regular way.  MLM, MLR and WLSM
+    chi-square difference testing is described on the Mplus website.  MLMV, WLSMV,
+    and ULSMV difference testing is done using the DIFFTEST option.
+
+RMSEA (Root Mean Square Error Of Approximation)
+
+          Estimate                           0.026
+          90 Percent C.I.                    0.025  0.027
+          Probability RMSEA <= .05           1.000
+
+CFI/TLI
+
+          CFI                                0.894
+          TLI                                0.891
+
+Chi-Square Test of Model Fit for the Baseline Model
+
+          Value                          25253.952
+          Degrees of Freedom                  1743
+          P-Value                           0.0000
+
+SRMR (Standardized Root Mean Square Residual)
+
+          Value                              0.106
+
+Optimum Function Value for Weighted Least-Squares Estimator
+
+          Value                     0.22720042D+01
+
+
+
+MODEL RESULTS
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ I        |
+    SC_3               1.000      0.000    999.000    999.000
+    SC_5               1.000      0.000    999.000    999.000
+    SC_7               1.000      0.000    999.000    999.000
+    SC_11              1.000      0.000    999.000    999.000
+    SC_14              1.000      0.000    999.000    999.000
+    SC_17              1.000      0.000    999.000    999.000
+
+ S        |
+    SC_3               0.000      0.000    999.000    999.000
+    SC_5               0.088      0.041      2.141      0.032
+    SC_7               0.245      0.044      5.563      0.000
+    SC_11              0.470      0.053      8.925      0.000
+    SC_14              0.752      0.068     10.998      0.000
+    SC_17              1.000      0.000    999.000    999.000
+
+ SC_3     BY
+    SC3THAC            1.000      0.000    999.000    999.000
+    SC3TCOM            1.894      0.179     10.596      0.000
+    SC3OBEY            1.279      0.135      9.497      0.000
+    SC3DIST            2.328      0.223     10.436      0.000
+    SC3TEMP            0.941      0.119      7.882      0.000
+    SC3REST            2.341      0.242      9.682      0.000
+    SC3FIDG            2.090      0.214      9.779      0.000
+
+ SC_5     BY
+    SC5THAC            1.000      0.000    999.000    999.000
+    SC5TCOM            1.894      0.179     10.596      0.000
+    SC5OBEY            1.279      0.135      9.497      0.000
+    SC5DIST            2.328      0.223     10.436      0.000
+    SC5TEMP            0.941      0.119      7.882      0.000
+    SC5REST            2.341      0.242      9.682      0.000
+    SC5FIDG            2.090      0.214      9.779      0.000
+
+ SC_7     BY
+    SC7THAC            1.000      0.000    999.000    999.000
+    SC7TCOM            1.894      0.179     10.596      0.000
+    SC7OBEY            1.279      0.135      9.497      0.000
+    SC7DIST            2.328      0.223     10.436      0.000
+    SC7TEMP            0.941      0.119      7.882      0.000
+    SC7REST            2.341      0.242      9.682      0.000
+    SC7FIDG            2.090      0.214      9.779      0.000
+
+ SC_11    BY
+    SC11THAC           1.000      0.000    999.000    999.000
+    SC11TCOM           1.894      0.179     10.596      0.000
+    SC11OBEY           1.279      0.135      9.497      0.000
+    SC11DIST           2.328      0.223     10.436      0.000
+    SC11TEMP           0.941      0.119      7.882      0.000
+    SC11REST           2.341      0.242      9.682      0.000
+    SC11FIDG           2.090      0.214      9.779      0.000
+
+ SC_14    BY
+    SC14THAC           1.000      0.000    999.000    999.000
+    SC14TCOM           1.894      0.179     10.596      0.000
+    SC14OBEY           1.279      0.135      9.497      0.000
+    SC14DIST           2.328      0.223     10.436      0.000
+    SC14TEMP           0.941      0.119      7.882      0.000
+    SC14REST           2.341      0.242      9.682      0.000
+    SC14FIDG           2.090      0.214      9.779      0.000
+
+ SC_17    BY
+    SC17THAC           1.000      0.000    999.000    999.000
+    SC17TCOM           1.894      0.179     10.596      0.000
+    SC17OBEY           1.279      0.135      9.497      0.000
+    SC17DIST           2.328      0.223     10.436      0.000
+    SC17TEMP           0.941      0.119      7.882      0.000
+    SC17REST           2.341      0.242      9.682      0.000
+    SC17FIDG           2.090      0.214      9.779      0.000
+
+ SC_3     ON
+    IGNORE3           -0.006      0.007     -0.863      0.388
+    SMACK3            -0.032      0.013     -2.499      0.012
+    SHOUT3            -0.040      0.011     -3.765      0.000
+    BEDROOM3          -0.015      0.007     -2.011      0.044
+    TREATS3           -0.010      0.007     -1.372      0.170
+    TELLOFF3          -0.048      0.014     -3.359      0.001
+    BRIBE3            -0.032      0.009     -3.723      0.000
+
+ SC_5     ON
+    PA5               -0.122      0.022     -5.476      0.000
+
+ SC_7     ON
+    PA7               -0.196      0.029     -6.669      0.000
+
+ SC_11    ON
+    PA11              -0.169      0.020     -8.331      0.000
+
+ SC_14    ON
+    PM14               0.155      0.029      5.288      0.000
+
+ SC_17    ON
+    PM17              -0.022      0.020     -1.090      0.276
+
+ I        ON
+    SCOGA              0.052      0.009      5.577      0.000
+    LBW               -0.040      0.029     -1.382      0.167
+    INFTEMP            0.025      0.008      3.182      0.001
+    HFAE              -0.015      0.078     -0.192      0.848
+    BMARRIED           0.050      0.015      3.409      0.001
+    BRACE             -0.012      0.023     -0.492      0.623
+    SEX                0.055      0.014      3.949      0.000
+    BPEDU              0.109      0.021      5.179      0.000
+    INCOMEF            0.016      0.006      2.816      0.005
+
+ S        ON
+    SCOGA              0.011      0.012      0.927      0.354
+    LBW                0.028      0.047      0.588      0.557
+    INFTEMP           -0.012      0.012     -1.028      0.304
+    HFAE              -0.050      0.105     -0.476      0.634
+    BMARRIED          -0.038      0.023     -1.648      0.099
+    BRACE              0.034      0.039      0.866      0.386
+    SEX                0.008      0.022      0.336      0.737
+    BPEDU             -0.029      0.028     -1.053      0.292
+    INCOMEF            0.011      0.011      0.970      0.332
+
+ I        WITH
+    S                 -0.019      0.007     -2.599      0.009
+
+ SC3THAC  WITH
+    SC5THAC            0.097      0.015      6.462      0.000
+
+ SC5THAC  WITH
+    SC7THAC            0.059      0.013      4.438      0.000
+
+ SC7THAC  WITH
+    SC11THAC           0.054      0.012      4.474      0.000
+
+ SC11THAC WITH
+    SC14THAC           0.051      0.012      4.123      0.000
+
+ SC14THAC WITH
+    SC17THAC           0.093      0.027      3.492      0.000
+
+ SC3TCOM  WITH
+    SC5TCOM            0.113      0.017      6.501      0.000
+
+ SC5TCOM  WITH
+    SC7TCOM            0.068      0.010      6.612      0.000
+
+ SC7TCOM  WITH
+    SC11TCOM           0.089      0.014      6.131      0.000
+
+ SC11TCOM WITH
+    SC14TCOM           0.104      0.019      5.458      0.000
+
+ SC14TCOM WITH
+    SC17TCOM           0.139      0.032      4.297      0.000
+
+ SC3OBEY  WITH
+    SC5OBEY            0.193      0.023      8.219      0.000
+
+ SC5OBEY  WITH
+    SC7OBEY            0.152      0.029      5.154      0.000
+
+ SC7OBEY  WITH
+    SC11OBEY           0.141      0.031      4.562      0.000
+
+ SC11OBEY WITH
+    SC14OBEY           0.266      0.055      4.864      0.000
+
+ SC14OBEY WITH
+    SC17OBEY           0.510      0.123      4.155      0.000
+
+ SC3DIST  WITH
+    SC5DIST            0.105      0.015      6.789      0.000
+
+ SC5DIST  WITH
+    SC7DIST            0.087      0.014      6.122      0.000
+
+ SC7DIST  WITH
+    SC11DIST           0.112      0.017      6.449      0.000
+
+ SC11DIST WITH
+    SC14DIST           0.127      0.025      5.100      0.000
+
+ SC14DIST WITH
+    SC17DIST           0.189      0.045      4.164      0.000
+
+ SC3TEMP  WITH
+    SC5TEMP            0.296      0.036      8.344      0.000
+
+ SC5TEMP  WITH
+    SC7TEMP            0.240      0.046      5.207      0.000
+
+ SC7TEMP  WITH
+    SC11TEMP           0.192      0.037      5.171      0.000
+
+ SC11TEMP WITH
+    SC14TEMP           0.232      0.050      4.608      0.000
+
+ SC14TEMP WITH
+    SC17TEMP           0.266      0.067      3.949      0.000
+
+ SC3REST  WITH
+    SC5REST            0.161      0.018      8.886      0.000
+
+ SC5REST  WITH
+    SC7REST            0.132      0.018      7.322      0.000
+
+ SC7REST  WITH
+    SC11REST           0.146      0.022      6.665      0.000
+
+ SC11REST WITH
+    SC14REST           0.167      0.032      5.169      0.000
+
+ SC14REST WITH
+    SC17REST           0.294      0.066      4.465      0.000
+
+ SC3FIDG  WITH
+    SC5FIDG            0.183      0.020      8.962      0.000
+
+ SC5FIDG  WITH
+    SC7FIDG            0.181      0.024      7.598      0.000
+
+ SC7FIDG  WITH
+    SC11FIDG           0.163      0.026      6.252      0.000
+
+ SC11FIDG WITH
+    SC14FIDG           0.158      0.035      4.475      0.000
+
+ SC14FIDG WITH
+    SC17FIDG           0.141      0.042      3.362      0.001
+
+ Intercepts
+    SC_3               0.000      0.000    999.000    999.000
+    SC_5               0.000      0.000    999.000    999.000
+    SC_7               0.000      0.000    999.000    999.000
+    SC_11              0.000      0.000    999.000    999.000
+    SC_14              0.000      0.000    999.000    999.000
+    SC_17              0.000      0.000    999.000    999.000
+    I                  0.000      0.000    999.000    999.000
+    S                 -0.226      0.095     -2.381      0.017
+
+ Thresholds
+    SC3THAC$1         -1.121      0.121     -9.293      0.000
+    SC3THAC$2          0.001      0.091      0.013      0.990
+    SC3TCOM$1         -1.417      0.131    -10.847      0.000
+    SC3TCOM$2         -0.168      0.126     -1.334      0.182
+    SC3OBEY$1         -1.999      0.186    -10.741      0.000
+    SC3OBEY$2         -0.397      0.137     -2.897      0.004
+    SC3DIST$1         -1.582      0.164     -9.651      0.000
+    SC3DIST$2         -0.439      0.161     -2.721      0.007
+    SC3TEMP$1         -2.047      0.211     -9.707      0.000
+    SC3TEMP$2         -1.091      0.155     -7.050      0.000
+    SC3REST$1         -1.748      0.173    -10.111      0.000
+    SC3REST$2         -0.850      0.168     -5.050      0.000
+    SC3FIDG$1         -2.043      0.182    -11.222      0.000
+    SC3FIDG$2         -1.216      0.168     -7.243      0.000
+    SC5THAC$1         -1.121      0.121     -9.293      0.000
+    SC5THAC$2          0.001      0.091      0.013      0.990
+    SC5TCOM$1         -1.417      0.131    -10.847      0.000
+    SC5TCOM$2         -0.168      0.126     -1.334      0.182
+    SC5OBEY$1         -1.999      0.186    -10.741      0.000
+    SC5OBEY$2         -0.397      0.137     -2.897      0.004
+    SC5DIST$1         -1.582      0.164     -9.651      0.000
+    SC5DIST$2         -0.439      0.161     -2.721      0.007
+    SC5TEMP$1         -2.047      0.211     -9.707      0.000
+    SC5TEMP$2         -1.091      0.155     -7.050      0.000
+    SC5REST$1         -1.748      0.173    -10.111      0.000
+    SC5REST$2         -0.850      0.168     -5.050      0.000
+    SC5FIDG$1         -2.043      0.182    -11.222      0.000
+    SC5FIDG$2         -1.216      0.168     -7.243      0.000
+    SC7THAC$1         -1.121      0.121     -9.293      0.000
+    SC7THAC$2          0.001      0.091      0.013      0.990
+    SC7TCOM$1         -1.417      0.131    -10.847      0.000
+    SC7TCOM$2         -0.168      0.126     -1.334      0.182
+    SC7OBEY$1         -1.999      0.186    -10.741      0.000
+    SC7OBEY$2         -0.397      0.137     -2.897      0.004
+    SC7DIST$1         -1.582      0.164     -9.651      0.000
+    SC7DIST$2         -0.439      0.161     -2.721      0.007
+    SC7TEMP$1         -2.047      0.211     -9.707      0.000
+    SC7TEMP$2         -1.091      0.155     -7.050      0.000
+    SC7REST$1         -1.748      0.173    -10.111      0.000
+    SC7REST$2         -0.850      0.168     -5.050      0.000
+    SC7FIDG$1         -2.043      0.182    -11.222      0.000
+    SC7FIDG$2         -1.216      0.168     -7.243      0.000
+    SC11THAC$1        -1.121      0.121     -9.293      0.000
+    SC11THAC$2         0.001      0.091      0.013      0.990
+    SC11TCOM$1        -1.417      0.131    -10.847      0.000
+    SC11TCOM$2        -0.168      0.126     -1.334      0.182
+    SC11OBEY$1        -1.999      0.186    -10.741      0.000
+    SC11OBEY$2        -0.397      0.137     -2.897      0.004
+    SC11DIST$1        -1.582      0.164     -9.651      0.000
+    SC11DIST$2        -0.439      0.161     -2.721      0.007
+    SC11TEMP$1        -2.047      0.211     -9.707      0.000
+    SC11TEMP$2        -1.091      0.155     -7.050      0.000
+    SC11REST$1        -1.748      0.173    -10.111      0.000
+    SC11REST$2        -0.850      0.168     -5.050      0.000
+    SC11FIDG$1        -2.043      0.182    -11.222      0.000
+    SC11FIDG$2        -1.216      0.168     -7.243      0.000
+    SC14THAC$1        -1.121      0.121     -9.293      0.000
+    SC14THAC$2         0.001      0.091      0.013      0.990
+    SC14TCOM$1        -1.417      0.131    -10.847      0.000
+    SC14TCOM$2        -0.168      0.126     -1.334      0.182
+    SC14OBEY$1        -1.999      0.186    -10.741      0.000
+    SC14OBEY$2        -0.397      0.137     -2.897      0.004
+    SC14DIST$1        -1.582      0.164     -9.651      0.000
+    SC14DIST$2        -0.439      0.161     -2.721      0.007
+    SC14TEMP$1        -2.047      0.211     -9.707      0.000
+    SC14TEMP$2        -1.091      0.155     -7.050      0.000
+    SC14REST$1        -1.748      0.173    -10.111      0.000
+    SC14REST$2        -0.850      0.168     -5.050      0.000
+    SC14FIDG$1        -2.043      0.182    -11.222      0.000
+    SC14FIDG$2        -1.216      0.168     -7.243      0.000
+    SC17THAC$1        -1.121      0.121     -9.293      0.000
+    SC17THAC$2         0.001      0.091      0.013      0.990
+    SC17TCOM$1        -1.417      0.131    -10.847      0.000
+    SC17TCOM$2        -0.168      0.126     -1.334      0.182
+    SC17OBEY$1        -1.999      0.186    -10.741      0.000
+    SC17OBEY$2        -0.397      0.137     -2.897      0.004
+    SC17DIST$1        -1.582      0.164     -9.651      0.000
+    SC17DIST$2        -0.439      0.161     -2.721      0.007
+    SC17TEMP$1        -2.047      0.211     -9.707      0.000
+    SC17TEMP$2        -1.091      0.155     -7.050      0.000
+    SC17REST$1        -1.748      0.173    -10.111      0.000
+    SC17REST$2        -0.850      0.168     -5.050      0.000
+    SC17FIDG$1        -2.043      0.182    -11.222      0.000
+    SC17FIDG$2        -1.216      0.168     -7.243      0.000
+
+ Residual Variances
+    SC_3               0.053      0.011      5.044      0.000
+    SC_5               0.011      0.003      3.901      0.000
+    SC_7               0.019      0.004      4.610      0.000
+    SC_11              0.020      0.004      4.675      0.000
+    SC_14              0.033      0.008      3.920      0.000
+    SC_17              0.037      0.012      3.062      0.002
+    I                  0.053      0.010      5.123      0.000
+    S                  0.088      0.022      3.926      0.000
+
+ Scales
+    SC3THAC            1.000      0.000    999.000    999.000
+    SC3TCOM            1.000      0.000    999.000    999.000
+    SC3OBEY            1.000      0.000    999.000    999.000
+    SC3DIST            1.000      0.000    999.000    999.000
+    SC3TEMP            1.000      0.000    999.000    999.000
+    SC3REST            1.000      0.000    999.000    999.000
+    SC3FIDG            1.000      0.000    999.000    999.000
+    SC5THAC            2.047      0.212      9.635      0.000
+    SC5TCOM            1.540      0.088     17.524      0.000
+    SC5OBEY            1.440      0.120     12.052      0.000
+    SC5DIST            1.308      0.062     21.140      0.000
+    SC5TEMP            1.414      0.148      9.549      0.000
+    SC5REST            1.331      0.057     23.210      0.000
+    SC5FIDG            1.318      0.064     20.751      0.000
+    SC7THAC            2.072      0.229      9.031      0.000
+    SC7TCOM            1.498      0.088     16.938      0.000
+    SC7OBEY            1.445      0.137     10.570      0.000
+    SC7DIST            1.313      0.063     20.937      0.000
+    SC7TEMP            1.511      0.140     10.824      0.000
+    SC7REST            1.239      0.062     19.899      0.000
+    SC7FIDG            1.274      0.072     17.692      0.000
+    SC11THAC           2.131      0.210     10.151      0.000
+    SC11TCOM           1.447      0.109     13.297      0.000
+    SC11OBEY           1.231      0.119     10.304      0.000
+    SC11DIST           1.273      0.087     14.640      0.000
+    SC11TEMP           1.462      0.158      9.230      0.000
+    SC11REST           1.137      0.078     14.623      0.000
+    SC11FIDG           1.230      0.088     13.965      0.000
+    SC14THAC           1.724      0.211      8.175      0.000
+    SC14TCOM           1.238      0.120     10.346      0.000
+    SC14OBEY           0.913      0.105      8.706      0.000
+    SC14DIST           1.084      0.099     10.940      0.000
+    SC14TEMP           1.284      0.161      7.997      0.000
+    SC14REST           0.964      0.090     10.691      0.000
+    SC14FIDG           1.176      0.112     10.485      0.000
+    SC17THAC           1.400      0.196      7.135      0.000
+    SC17TCOM           1.051      0.130      8.058      0.000
+    SC17OBEY           0.814      0.103      7.916      0.000
+    SC17DIST           0.950      0.117      8.149      0.000
+    SC17TEMP           1.351      0.173      7.812      0.000
+    SC17REST           0.886      0.107      8.248      0.000
+    SC17FIDG           1.046      0.133      7.852      0.000
+
+
+STANDARDIZED MODEL RESULTS
+
+
+STDYX Standardization
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ I        |
+    SC_3               0.689      0.021     33.266      0.000
+    SC_5               0.913      0.020     46.187      0.000
+    SC_7               0.841      0.034     24.973      0.000
+    SC_11              0.788      0.050     15.771      0.000
+    SC_14              0.718      0.067     10.661      0.000
+    SC_17              0.648      0.079      8.206      0.000
+
+ S        |
+    SC_3               0.000      0.000    999.000    999.000
+    SC_5               0.095      0.044      2.171      0.030
+    SC_7               0.245      0.042      5.838      0.000
+    SC_11              0.439      0.043     10.288      0.000
+    SC_14              0.640      0.046     13.993      0.000
+    SC_17              0.768      0.044     17.665      0.000
+
+ SC_3     BY
+    SC3THAC            0.359      0.033     10.861      0.000
+    SC3TCOM            0.659      0.024     27.732      0.000
+    SC3OBEY            0.456      0.030     15.218      0.000
+    SC3DIST            0.793      0.019     40.805      0.000
+    SC3TEMP            0.338      0.031     10.833      0.000
+    SC3REST            0.797      0.018     44.724      0.000
+    SC3FIDG            0.720      0.021     34.773      0.000
+
+ SC_5     BY
+    SC5THAC            0.546      0.026     21.216      0.000
+    SC5TCOM            0.757      0.018     41.928      0.000
+    SC5OBEY            0.494      0.026     18.758      0.000
+    SC5DIST            0.787      0.016     48.623      0.000
+    SC5TEMP            0.361      0.030     12.209      0.000
+    SC5REST            0.803      0.016     49.312      0.000
+    SC5FIDG            0.719      0.021     34.064      0.000
+
+ SC_7     BY
+    SC7THAC            0.592      0.025     23.808      0.000
+    SC7TCOM            0.783      0.013     58.075      0.000
+    SC7OBEY            0.533      0.029     18.317      0.000
+    SC7DIST            0.835      0.014     59.026      0.000
+    SC7TEMP            0.415      0.028     14.777      0.000
+    SC7REST            0.799      0.017     48.039      0.000
+    SC7FIDG            0.742      0.018     40.341      0.000
+
+ SC_11    BY
+    SC11THAC           0.641      0.018     34.938      0.000
+    SC11TCOM           0.798      0.015     52.413      0.000
+    SC11OBEY           0.485      0.030     16.155      0.000
+    SC11DIST           0.851      0.014     60.483      0.000
+    SC11TEMP           0.427      0.029     14.728      0.000
+    SC11REST           0.779      0.017     46.386      0.000
+    SC11FIDG           0.756      0.020     37.718      0.000
+
+ SC_14    BY
+    SC14THAC           0.589      0.024     24.940      0.000
+    SC14TCOM           0.788      0.016     50.070      0.000
+    SC14OBEY           0.404      0.032     12.474      0.000
+    SC14DIST           0.843      0.014     60.808      0.000
+    SC14TEMP           0.417      0.029     14.455      0.000
+    SC14REST           0.761      0.021     36.804      0.000
+    SC14FIDG           0.823      0.023     36.072      0.000
+
+ SC_17    BY
+    SC17THAC           0.537      0.026     21.023      0.000
+    SC17TCOM           0.756      0.020     38.536      0.000
+    SC17OBEY           0.400      0.033     12.195      0.000
+    SC17DIST           0.837      0.018     46.367      0.000
+    SC17TEMP           0.488      0.033     14.912      0.000
+    SC17REST           0.787      0.024     33.008      0.000
+    SC17FIDG           0.828      0.022     36.872      0.000
+
+ SC_3     ON
+    IGNORE3           -0.023      0.027     -0.863      0.388
+    SMACK3            -0.078      0.031     -2.536      0.011
+    SHOUT3            -0.121      0.031     -3.893      0.000
+    BEDROOM3          -0.053      0.026     -2.056      0.040
+    TREATS3           -0.032      0.024     -1.367      0.172
+    TELLOFF3          -0.111      0.030     -3.727      0.000
+    BRIBE3            -0.115      0.027     -4.319      0.000
+
+ SC_5     ON
+    PA5               -0.232      0.032     -7.304      0.000
+
+ SC_7     ON
+    PA7               -0.344      0.033    -10.459      0.000
+
+ SC_11    ON
+    PA11              -0.386      0.024    -15.980      0.000
+
+ SC_14    ON
+    PM14               0.179      0.025      7.181      0.000
+
+ SC_17    ON
+    PM17              -0.031      0.028     -1.096      0.273
+
+ I        ON
+    SCOGA              0.181      0.025      7.132      0.000
+    LBW               -0.036      0.026     -1.396      0.163
+    INFTEMP            0.087      0.027      3.239      0.001
+    HFAE              -0.004      0.022     -0.192      0.848
+    BMARRIED           0.090      0.025      3.604      0.000
+    BRACE             -0.011      0.022     -0.490      0.624
+    SEX                0.110      0.026      4.303      0.000
+    BPEDU              0.194      0.029      6.668      0.000
+    INCOMEF            0.074      0.025      2.927      0.003
+
+ S        ON
+    SCOGA              0.032      0.034      0.944      0.345
+    LBW                0.021      0.035      0.587      0.557
+    INFTEMP           -0.036      0.036     -1.014      0.311
+    HFAE              -0.012      0.025     -0.476      0.634
+    BMARRIED          -0.058      0.035     -1.656      0.098
+    BRACE              0.027      0.032      0.857      0.392
+    SEX                0.013      0.037      0.339      0.734
+    BPEDU             -0.044      0.043     -1.018      0.309
+    INCOMEF            0.041      0.040      1.006      0.314
+
+ I        WITH
+    S                 -0.272      0.101     -2.678      0.007
+
+ SC3THAC  WITH
+    SC5THAC            0.245      0.032      7.642      0.000
+
+ SC5THAC  WITH
+    SC7THAC            0.345      0.026     13.396      0.000
+
+ SC7THAC  WITH
+    SC11THAC           0.349      0.033     10.720      0.000
+
+ SC11THAC WITH
+    SC14THAC           0.282      0.030      9.349      0.000
+
+ SC14THAC WITH
+    SC17THAC           0.321      0.035      9.054      0.000
+
+ SC3TCOM  WITH
+    SC5TCOM            0.320      0.041      7.844      0.000
+
+ SC5TCOM  WITH
+    SC7TCOM            0.340      0.030     11.477      0.000
+
+ SC7TCOM  WITH
+    SC11TCOM           0.435      0.038     11.392      0.000
+
+ SC11TCOM WITH
+    SC14TCOM           0.441      0.040     10.934      0.000
+
+ SC14TCOM WITH
+    SC17TCOM           0.425      0.047      9.055      0.000
+
+ SC3OBEY  WITH
+    SC5OBEY            0.344      0.031     10.926      0.000
+
+ SC5OBEY  WITH
+    SC7OBEY            0.406      0.033     12.281      0.000
+
+ SC7OBEY  WITH
+    SC11OBEY           0.318      0.035      9.150      0.000
+
+ SC11OBEY WITH
+    SC14OBEY           0.359      0.029     12.188      0.000
+
+ SC14OBEY WITH
+    SC17OBEY           0.445      0.030     14.663      0.000
+
+ SC3DIST  WITH
+    SC5DIST            0.322      0.047      6.815      0.000
+
+ SC5DIST  WITH
+    SC7DIST            0.381      0.045      8.436      0.000
+
+ SC7DIST  WITH
+    SC11DIST           0.538      0.046     11.637      0.000
+
+ SC11DIST WITH
+    SC14DIST           0.537      0.049     11.007      0.000
+
+ SC14DIST WITH
+    SC17DIST           0.621      0.055     11.194      0.000
+
+ SC3TEMP  WITH
+    SC5TEMP            0.466      0.028     16.575      0.000
+
+ SC5TEMP  WITH
+    SC7TEMP            0.584      0.026     22.648      0.000
+
+ SC7TEMP  WITH
+    SC11TEMP           0.494      0.031     15.691      0.000
+
+ SC11TEMP WITH
+    SC14TEMP           0.513      0.030     17.046      0.000
+
+ SC14TEMP WITH
+    SC17TEMP           0.571      0.032     18.132      0.000
+
+ SC3REST  WITH
+    SC5REST            0.523      0.054      9.737      0.000
+
+ SC5REST  WITH
+    SC7REST            0.526      0.043     12.321      0.000
+
+ SC7REST  WITH
+    SC11REST           0.463      0.047      9.769      0.000
+
+ SC11REST WITH
+    SC14REST           0.399      0.050      7.943      0.000
+
+ SC14REST WITH
+    SC17REST           0.593      0.052     11.494      0.000
+
+ SC3FIDG  WITH
+    SC5FIDG            0.451      0.040     11.191      0.000
+
+ SC5FIDG  WITH
+    SC7FIDG            0.581      0.037     15.892      0.000
+
+ SC7FIDG  WITH
+    SC11FIDG           0.502      0.044     11.395      0.000
+
+ SC11FIDG WITH
+    SC14FIDG           0.544      0.061      8.921      0.000
+
+ SC14FIDG WITH
+    SC17FIDG           0.510      0.093      5.511      0.000
+
+ Intercepts
+    SC_3               0.000      0.000    999.000    999.000
+    SC_5               0.000      0.000    999.000    999.000
+    SC_7               0.000      0.000    999.000    999.000
+    SC_11              0.000      0.000    999.000    999.000
+    SC_14              0.000      0.000    999.000    999.000
+    SC_17              0.000      0.000    999.000    999.000
+    I                  0.000      0.000    999.000    999.000
+    S                 -0.759      0.337     -2.256      0.024
+
+ Thresholds
+    SC3THAC$1         -1.107      0.117     -9.427      0.000
+    SC3THAC$2          0.001      0.090      0.013      0.990
+    SC3TCOM$1         -1.355      0.123    -10.985      0.000
+    SC3TCOM$2         -0.160      0.120     -1.335      0.182
+    SC3OBEY$1         -1.958      0.179    -10.921      0.000
+    SC3OBEY$2         -0.389      0.134     -2.904      0.004
+    SC3DIST$1         -1.482      0.152     -9.766      0.000
+    SC3DIST$2         -0.412      0.151     -2.732      0.006
+    SC3TEMP$1         -2.024      0.206     -9.823      0.000
+    SC3TEMP$2         -1.079      0.152     -7.102      0.000
+    SC3REST$1         -1.636      0.158    -10.328      0.000
+    SC3REST$2         -0.796      0.156     -5.106      0.000
+    SC3FIDG$1         -1.937      0.170    -11.404      0.000
+    SC3FIDG$2         -1.152      0.158     -7.317      0.000
+    SC5THAC$1         -2.231      0.197    -11.313      0.000
+    SC5THAC$2          0.002      0.182      0.013      0.990
+    SC5TCOM$1         -2.063      0.173    -11.960      0.000
+    SC5TCOM$2         -0.244      0.183     -1.333      0.183
+    SC5OBEY$1         -2.813      0.225    -12.506      0.000
+    SC5OBEY$2         -0.559      0.192     -2.915      0.004
+    SC5DIST$1         -1.948      0.198     -9.826      0.000
+    SC5DIST$2         -0.541      0.199     -2.719      0.007
+    SC5TEMP$1         -2.859      0.244    -11.739      0.000
+    SC5TEMP$2         -1.524      0.205     -7.429      0.000
+    SC5REST$1         -2.184      0.213    -10.239      0.000
+    SC5REST$2         -1.062      0.211     -5.035      0.000
+    SC5FIDG$1         -2.562      0.226    -11.348      0.000
+    SC5FIDG$2         -1.525      0.213     -7.147      0.000
+    SC7THAC$1         -2.227      0.193    -11.510      0.000
+    SC7THAC$2          0.002      0.181      0.013      0.990
+    SC7TCOM$1         -1.965      0.171    -11.462      0.000
+    SC7TCOM$2         -0.233      0.176     -1.319      0.187
+    SC7OBEY$1         -2.792      0.211    -13.245      0.000
+    SC7OBEY$2         -0.555      0.189     -2.937      0.003
+    SC7DIST$1         -1.903      0.194     -9.794      0.000
+    SC7DIST$2         -0.529      0.197     -2.684      0.007
+    SC7TEMP$1         -3.031      0.243    -12.495      0.000
+    SC7TEMP$2         -1.616      0.207     -7.798      0.000
+    SC7REST$1         -2.000      0.201     -9.973      0.000
+    SC7REST$2         -0.973      0.198     -4.902      0.000
+    SC7FIDG$1         -2.432      0.210    -11.577      0.000
+    SC7FIDG$2         -1.447      0.203     -7.137      0.000
+    SC11THAC$1        -2.260      0.193    -11.692      0.000
+    SC11THAC$2         0.002      0.184      0.013      0.990
+    SC11TCOM$1        -1.877      0.189     -9.921      0.000
+    SC11TCOM$2        -0.222      0.171     -1.296      0.195
+    SC11OBEY$1        -2.385      0.215    -11.091      0.000
+    SC11OBEY$2        -0.474      0.169     -2.805      0.005
+    SC11DIST$1        -1.819      0.199     -9.144      0.000
+    SC11DIST$2        -0.505      0.191     -2.638      0.008
+    SC11TEMP$1        -2.922      0.227    -12.894      0.000
+    SC11TEMP$2        -1.558      0.199     -7.842      0.000
+    SC11REST$1        -1.827      0.204     -8.958      0.000
+    SC11REST$2        -0.889      0.190     -4.670      0.000
+    SC11FIDG$1        -2.323      0.210    -11.037      0.000
+    SC11FIDG$2        -1.382      0.200     -6.920      0.000
+    SC14THAC$1        -1.893      0.210     -9.020      0.000
+    SC14THAC$2         0.002      0.154      0.013      0.990
+    SC14TCOM$1        -1.689      0.195     -8.672      0.000
+    SC14TCOM$2        -0.200      0.156     -1.283      0.200
+    SC14OBEY$1        -1.807      0.194     -9.312      0.000
+    SC14OBEY$2        -0.359      0.131     -2.740      0.006
+    SC14DIST$1        -1.642      0.210     -7.835      0.000
+    SC14DIST$2        -0.456      0.179     -2.541      0.011
+    SC14TEMP$1        -2.602      0.244    -10.674      0.000
+    SC14TEMP$2        -1.387      0.194     -7.158      0.000
+    SC14REST$1        -1.627      0.208     -7.819      0.000
+    SC14REST$2        -0.792      0.180     -4.406      0.000
+    SC14FIDG$1        -2.306      0.251     -9.180      0.000
+    SC14FIDG$2        -1.372      0.220     -6.223      0.000
+    SC17THAC$1        -1.556      0.197     -7.913      0.000
+    SC17THAC$2         0.002      0.127      0.013      0.990
+    SC17TCOM$1        -1.462      0.200     -7.318      0.000
+    SC17TCOM$2        -0.173      0.137     -1.263      0.207
+    SC17OBEY$1        -1.619      0.200     -8.096      0.000
+    SC17OBEY$2        -0.322      0.121     -2.669      0.008
+    SC17DIST$1        -1.471      0.221     -6.660      0.000
+    SC17DIST$2        -0.409      0.167     -2.448      0.014
+    SC17TEMP$1        -2.746      0.255    -10.772      0.000
+    SC17TEMP$2        -1.464      0.201     -7.292      0.000
+    SC17REST$1        -1.519      0.227     -6.692      0.000
+    SC17REST$2        -0.739      0.180     -4.103      0.000
+    SC17FIDG$1        -2.093      0.276     -7.574      0.000
+    SC17FIDG$2        -1.245      0.223     -5.589      0.000
+
+ Residual Variances
+    SC_3               0.401      0.028     14.401      0.000
+    SC_5               0.141      0.021      6.578      0.000
+    SC_7               0.212      0.016     12.974      0.000
+    SC_11              0.199      0.017     11.804      0.000
+    SC_14              0.268      0.029      9.369      0.000
+    SC_17              0.244      0.040      6.035      0.000
+    I                  0.849      0.017     51.326      0.000
+    S                  0.992      0.006    171.772      0.000
+
+ Scales
+    SC3THAC            1.000      0.000      0.000      1.000
+    SC3TCOM            1.000      0.000      0.000      1.000
+    SC3OBEY            1.000      0.000      0.000      1.000
+    SC3DIST            1.000      0.000      0.000      1.000
+    SC3TEMP            1.000      0.000      0.000      1.000
+    SC3REST            1.000      0.000      0.000      1.000
+    SC3FIDG            1.000      0.000      0.000      1.000
+    SC5THAC            1.000      0.000      0.000      1.000
+    SC5TCOM            1.000      0.000      0.000      1.000
+    SC5OBEY            1.000      0.000      0.000      1.000
+    SC5DIST            1.000      0.000      0.000      1.000
+    SC5TEMP            1.000      0.000      0.000      1.000
+    SC5REST            1.000      0.000      0.000      1.000
+    SC5FIDG            1.000      0.000      0.000      1.000
+    SC7THAC            1.000      0.000      0.000      1.000
+    SC7TCOM            1.000      0.000      0.000      1.000
+    SC7OBEY            1.000      0.000      0.000      1.000
+    SC7DIST            1.000      0.000      0.000      1.000
+    SC7TEMP            1.000      0.000      0.000      1.000
+    SC7REST            1.000      0.000      0.000      1.000
+    SC7FIDG            1.000      0.000      0.000      1.000
+    SC11THAC           1.000      0.000      0.000      1.000
+    SC11TCOM           1.000      0.000      0.000      1.000
+    SC11OBEY           1.000      0.000      0.000      1.000
+    SC11DIST           1.000      0.000      0.000      1.000
+    SC11TEMP           1.000      0.000      0.000      1.000
+    SC11REST           1.000      0.000      0.000      1.000
+    SC11FIDG           1.000      0.000      0.000      1.000
+    SC14THAC           1.000      0.000      0.000      1.000
+    SC14TCOM           1.000      0.000      0.000      1.000
+    SC14OBEY           1.000      0.000      0.000      1.000
+    SC14DIST           1.000      0.000      0.000      1.000
+    SC14TEMP           1.000      0.000      0.000      1.000
+    SC14REST           1.000      0.000      0.000      1.000
+    SC14FIDG           1.000      0.000      0.000      1.000
+    SC17THAC           1.000      0.000      0.000      1.000
+    SC17TCOM           1.000      0.000      0.000      1.000
+    SC17OBEY           1.000      0.000      0.000      1.000
+    SC17DIST           1.000      0.000      0.000      1.000
+    SC17TEMP           1.000      0.000      0.000      1.000
+    SC17REST           1.000      0.000      0.000      1.000
+    SC17FIDG           1.000      0.000      0.000      1.000
+
+
+STDY Standardization
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ I        |
+    SC_3               0.689      0.021     33.266      0.000
+    SC_5               0.913      0.020     46.187      0.000
+    SC_7               0.841      0.034     24.973      0.000
+    SC_11              0.788      0.050     15.771      0.000
+    SC_14              0.718      0.067     10.661      0.000
+    SC_17              0.648      0.079      8.206      0.000
+
+ S        |
+    SC_3               0.000      0.000    999.000    999.000
+    SC_5               0.095      0.044      2.171      0.030
+    SC_7               0.245      0.042      5.838      0.000
+    SC_11              0.439      0.043     10.288      0.000
+    SC_14              0.640      0.046     13.993      0.000
+    SC_17              0.768      0.044     17.665      0.000
+
+ SC_3     BY
+    SC3THAC            0.359      0.033     10.861      0.000
+    SC3TCOM            0.659      0.024     27.732      0.000
+    SC3OBEY            0.456      0.030     15.218      0.000
+    SC3DIST            0.793      0.019     40.805      0.000
+    SC3TEMP            0.338      0.031     10.833      0.000
+    SC3REST            0.797      0.018     44.724      0.000
+    SC3FIDG            0.720      0.021     34.773      0.000
+
+ SC_5     BY
+    SC5THAC            0.546      0.026     21.216      0.000
+    SC5TCOM            0.757      0.018     41.928      0.000
+    SC5OBEY            0.494      0.026     18.758      0.000
+    SC5DIST            0.787      0.016     48.623      0.000
+    SC5TEMP            0.361      0.030     12.209      0.000
+    SC5REST            0.803      0.016     49.312      0.000
+    SC5FIDG            0.719      0.021     34.064      0.000
+
+ SC_7     BY
+    SC7THAC            0.592      0.025     23.808      0.000
+    SC7TCOM            0.783      0.013     58.075      0.000
+    SC7OBEY            0.533      0.029     18.317      0.000
+    SC7DIST            0.835      0.014     59.026      0.000
+    SC7TEMP            0.415      0.028     14.777      0.000
+    SC7REST            0.799      0.017     48.039      0.000
+    SC7FIDG            0.742      0.018     40.341      0.000
+
+ SC_11    BY
+    SC11THAC           0.641      0.018     34.938      0.000
+    SC11TCOM           0.798      0.015     52.413      0.000
+    SC11OBEY           0.485      0.030     16.155      0.000
+    SC11DIST           0.851      0.014     60.483      0.000
+    SC11TEMP           0.427      0.029     14.728      0.000
+    SC11REST           0.779      0.017     46.386      0.000
+    SC11FIDG           0.756      0.020     37.718      0.000
+
+ SC_14    BY
+    SC14THAC           0.589      0.024     24.940      0.000
+    SC14TCOM           0.788      0.016     50.070      0.000
+    SC14OBEY           0.404      0.032     12.474      0.000
+    SC14DIST           0.843      0.014     60.808      0.000
+    SC14TEMP           0.417      0.029     14.455      0.000
+    SC14REST           0.761      0.021     36.804      0.000
+    SC14FIDG           0.823      0.023     36.072      0.000
+
+ SC_17    BY
+    SC17THAC           0.537      0.026     21.023      0.000
+    SC17TCOM           0.756      0.020     38.536      0.000
+    SC17OBEY           0.400      0.033     12.195      0.000
+    SC17DIST           0.837      0.018     46.367      0.000
+    SC17TEMP           0.488      0.033     14.912      0.000
+    SC17REST           0.787      0.024     33.008      0.000
+    SC17FIDG           0.828      0.022     36.872      0.000
+
+ SC_3     ON
+    IGNORE3           -0.017      0.020     -0.863      0.388
+    SMACK3            -0.088      0.035     -2.538      0.011
+    SHOUT3            -0.109      0.028     -3.899      0.000
+    BEDROOM3          -0.041      0.020     -2.057      0.040
+    TREATS3           -0.028      0.021     -1.368      0.171
+    TELLOFF3          -0.132      0.035     -3.732      0.000
+    BRIBE3            -0.089      0.021     -4.328      0.000
+
+ SC_5     ON
+    PA5               -0.445      0.061     -7.343      0.000
+
+ SC_7     ON
+    PA7               -0.656      0.062    -10.558      0.000
+
+ SC_11    ON
+    PA11              -0.531      0.033    -16.304      0.000
+
+ SC_14    ON
+    PM14               0.443      0.061      7.220      0.000
+
+ SC_17    ON
+    PM17              -0.057      0.052     -1.097      0.273
+
+ I        ON
+    SCOGA              0.207      0.029      7.168      0.000
+    LBW               -0.161      0.115     -1.397      0.163
+    INFTEMP            0.099      0.030      3.243      0.001
+    HFAE              -0.060      0.313     -0.192      0.848
+    BMARRIED           0.199      0.055      3.609      0.000
+    BRACE             -0.046      0.094     -0.490      0.624
+    SEX                0.221      0.051      4.312      0.000
+    BPEDU              0.435      0.065      6.698      0.000
+    INCOMEF            0.065      0.022      2.929      0.003
+
+ S        ON
+    SCOGA              0.037      0.039      0.944      0.345
+    LBW                0.093      0.158      0.587      0.557
+    INFTEMP           -0.041      0.041     -1.014      0.311
+    HFAE              -0.168      0.352     -0.476      0.634
+    BMARRIED          -0.128      0.077     -1.656      0.098
+    BRACE              0.115      0.134      0.857      0.392
+    SEX                0.025      0.075      0.339      0.734
+    BPEDU             -0.099      0.097     -1.018      0.309
+    INCOMEF            0.036      0.035      1.006      0.314
+
+ I        WITH
+    S                 -0.272      0.101     -2.678      0.007
+
+ SC3THAC  WITH
+    SC5THAC            0.245      0.032      7.642      0.000
+
+ SC5THAC  WITH
+    SC7THAC            0.345      0.026     13.396      0.000
+
+ SC7THAC  WITH
+    SC11THAC           0.349      0.033     10.720      0.000
+
+ SC11THAC WITH
+    SC14THAC           0.282      0.030      9.349      0.000
+
+ SC14THAC WITH
+    SC17THAC           0.321      0.035      9.054      0.000
+
+ SC3TCOM  WITH
+    SC5TCOM            0.320      0.041      7.844      0.000
+
+ SC5TCOM  WITH
+    SC7TCOM            0.340      0.030     11.477      0.000
+
+ SC7TCOM  WITH
+    SC11TCOM           0.435      0.038     11.392      0.000
+
+ SC11TCOM WITH
+    SC14TCOM           0.441      0.040     10.934      0.000
+
+ SC14TCOM WITH
+    SC17TCOM           0.425      0.047      9.055      0.000
+
+ SC3OBEY  WITH
+    SC5OBEY            0.344      0.031     10.926      0.000
+
+ SC5OBEY  WITH
+    SC7OBEY            0.406      0.033     12.281      0.000
+
+ SC7OBEY  WITH
+    SC11OBEY           0.318      0.035      9.150      0.000
+
+ SC11OBEY WITH
+    SC14OBEY           0.359      0.029     12.188      0.000
+
+ SC14OBEY WITH
+    SC17OBEY           0.445      0.030     14.663      0.000
+
+ SC3DIST  WITH
+    SC5DIST            0.322      0.047      6.815      0.000
+
+ SC5DIST  WITH
+    SC7DIST            0.381      0.045      8.436      0.000
+
+ SC7DIST  WITH
+    SC11DIST           0.538      0.046     11.637      0.000
+
+ SC11DIST WITH
+    SC14DIST           0.537      0.049     11.007      0.000
+
+ SC14DIST WITH
+    SC17DIST           0.621      0.055     11.194      0.000
+
+ SC3TEMP  WITH
+    SC5TEMP            0.466      0.028     16.575      0.000
+
+ SC5TEMP  WITH
+    SC7TEMP            0.584      0.026     22.648      0.000
+
+ SC7TEMP  WITH
+    SC11TEMP           0.494      0.031     15.691      0.000
+
+ SC11TEMP WITH
+    SC14TEMP           0.513      0.030     17.046      0.000
+
+ SC14TEMP WITH
+    SC17TEMP           0.571      0.032     18.132      0.000
+
+ SC3REST  WITH
+    SC5REST            0.523      0.054      9.737      0.000
+
+ SC5REST  WITH
+    SC7REST            0.526      0.043     12.321      0.000
+
+ SC7REST  WITH
+    SC11REST           0.463      0.047      9.769      0.000
+
+ SC11REST WITH
+    SC14REST           0.399      0.050      7.943      0.000
+
+ SC14REST WITH
+    SC17REST           0.593      0.052     11.494      0.000
+
+ SC3FIDG  WITH
+    SC5FIDG            0.451      0.040     11.191      0.000
+
+ SC5FIDG  WITH
+    SC7FIDG            0.581      0.037     15.892      0.000
+
+ SC7FIDG  WITH
+    SC11FIDG           0.502      0.044     11.395      0.000
+
+ SC11FIDG WITH
+    SC14FIDG           0.544      0.061      8.921      0.000
+
+ SC14FIDG WITH
+    SC17FIDG           0.510      0.093      5.511      0.000
+
+ Intercepts
+    SC_3               0.000      0.000    999.000    999.000
+    SC_5               0.000      0.000    999.000    999.000
+    SC_7               0.000      0.000    999.000    999.000
+    SC_11              0.000      0.000    999.000    999.000
+    SC_14              0.000      0.000    999.000    999.000
+    SC_17              0.000      0.000    999.000    999.000
+    I                  0.000      0.000    999.000    999.000
+    S                 -0.759      0.337     -2.256      0.024
+
+ Thresholds
+    SC3THAC$1         -1.107      0.117     -9.427      0.000
+    SC3THAC$2          0.001      0.090      0.013      0.990
+    SC3TCOM$1         -1.355      0.123    -10.985      0.000
+    SC3TCOM$2         -0.160      0.120     -1.335      0.182
+    SC3OBEY$1         -1.958      0.179    -10.921      0.000
+    SC3OBEY$2         -0.389      0.134     -2.904      0.004
+    SC3DIST$1         -1.482      0.152     -9.766      0.000
+    SC3DIST$2         -0.412      0.151     -2.732      0.006
+    SC3TEMP$1         -2.024      0.206     -9.823      0.000
+    SC3TEMP$2         -1.079      0.152     -7.102      0.000
+    SC3REST$1         -1.636      0.158    -10.328      0.000
+    SC3REST$2         -0.796      0.156     -5.106      0.000
+    SC3FIDG$1         -1.937      0.170    -11.404      0.000
+    SC3FIDG$2         -1.152      0.158     -7.317      0.000
+    SC5THAC$1         -2.231      0.197    -11.313      0.000
+    SC5THAC$2          0.002      0.182      0.013      0.990
+    SC5TCOM$1         -2.063      0.173    -11.960      0.000
+    SC5TCOM$2         -0.244      0.183     -1.333      0.183
+    SC5OBEY$1         -2.813      0.225    -12.506      0.000
+    SC5OBEY$2         -0.559      0.192     -2.915      0.004
+    SC5DIST$1         -1.948      0.198     -9.826      0.000
+    SC5DIST$2         -0.541      0.199     -2.719      0.007
+    SC5TEMP$1         -2.859      0.244    -11.739      0.000
+    SC5TEMP$2         -1.524      0.205     -7.429      0.000
+    SC5REST$1         -2.184      0.213    -10.239      0.000
+    SC5REST$2         -1.062      0.211     -5.035      0.000
+    SC5FIDG$1         -2.562      0.226    -11.348      0.000
+    SC5FIDG$2         -1.525      0.213     -7.147      0.000
+    SC7THAC$1         -2.227      0.193    -11.510      0.000
+    SC7THAC$2          0.002      0.181      0.013      0.990
+    SC7TCOM$1         -1.965      0.171    -11.462      0.000
+    SC7TCOM$2         -0.233      0.176     -1.319      0.187
+    SC7OBEY$1         -2.792      0.211    -13.245      0.000
+    SC7OBEY$2         -0.555      0.189     -2.937      0.003
+    SC7DIST$1         -1.903      0.194     -9.794      0.000
+    SC7DIST$2         -0.529      0.197     -2.684      0.007
+    SC7TEMP$1         -3.031      0.243    -12.495      0.000
+    SC7TEMP$2         -1.616      0.207     -7.798      0.000
+    SC7REST$1         -2.000      0.201     -9.973      0.000
+    SC7REST$2         -0.973      0.198     -4.902      0.000
+    SC7FIDG$1         -2.432      0.210    -11.577      0.000
+    SC7FIDG$2         -1.447      0.203     -7.137      0.000
+    SC11THAC$1        -2.260      0.193    -11.692      0.000
+    SC11THAC$2         0.002      0.184      0.013      0.990
+    SC11TCOM$1        -1.877      0.189     -9.921      0.000
+    SC11TCOM$2        -0.222      0.171     -1.296      0.195
+    SC11OBEY$1        -2.385      0.215    -11.091      0.000
+    SC11OBEY$2        -0.474      0.169     -2.805      0.005
+    SC11DIST$1        -1.819      0.199     -9.144      0.000
+    SC11DIST$2        -0.505      0.191     -2.638      0.008
+    SC11TEMP$1        -2.922      0.227    -12.894      0.000
+    SC11TEMP$2        -1.558      0.199     -7.842      0.000
+    SC11REST$1        -1.827      0.204     -8.958      0.000
+    SC11REST$2        -0.889      0.190     -4.670      0.000
+    SC11FIDG$1        -2.323      0.210    -11.037      0.000
+    SC11FIDG$2        -1.382      0.200     -6.920      0.000
+    SC14THAC$1        -1.893      0.210     -9.020      0.000
+    SC14THAC$2         0.002      0.154      0.013      0.990
+    SC14TCOM$1        -1.689      0.195     -8.672      0.000
+    SC14TCOM$2        -0.200      0.156     -1.283      0.200
+    SC14OBEY$1        -1.807      0.194     -9.312      0.000
+    SC14OBEY$2        -0.359      0.131     -2.740      0.006
+    SC14DIST$1        -1.642      0.210     -7.835      0.000
+    SC14DIST$2        -0.456      0.179     -2.541      0.011
+    SC14TEMP$1        -2.602      0.244    -10.674      0.000
+    SC14TEMP$2        -1.387      0.194     -7.158      0.000
+    SC14REST$1        -1.627      0.208     -7.819      0.000
+    SC14REST$2        -0.792      0.180     -4.406      0.000
+    SC14FIDG$1        -2.306      0.251     -9.180      0.000
+    SC14FIDG$2        -1.372      0.220     -6.223      0.000
+    SC17THAC$1        -1.556      0.197     -7.913      0.000
+    SC17THAC$2         0.002      0.127      0.013      0.990
+    SC17TCOM$1        -1.462      0.200     -7.318      0.000
+    SC17TCOM$2        -0.173      0.137     -1.263      0.207
+    SC17OBEY$1        -1.619      0.200     -8.096      0.000
+    SC17OBEY$2        -0.322      0.121     -2.669      0.008
+    SC17DIST$1        -1.471      0.221     -6.660      0.000
+    SC17DIST$2        -0.409      0.167     -2.448      0.014
+    SC17TEMP$1        -2.746      0.255    -10.772      0.000
+    SC17TEMP$2        -1.464      0.201     -7.292      0.000
+    SC17REST$1        -1.519      0.227     -6.692      0.000
+    SC17REST$2        -0.739      0.180     -4.103      0.000
+    SC17FIDG$1        -2.093      0.276     -7.574      0.000
+    SC17FIDG$2        -1.245      0.223     -5.589      0.000
+
+ Residual Variances
+    SC_3               0.401      0.028     14.401      0.000
+    SC_5               0.141      0.021      6.578      0.000
+    SC_7               0.212      0.016     12.974      0.000
+    SC_11              0.199      0.017     11.804      0.000
+    SC_14              0.268      0.029      9.369      0.000
+    SC_17              0.244      0.040      6.035      0.000
+    I                  0.849      0.017     51.326      0.000
+    S                  0.992      0.006    171.772      0.000
+
+ Scales
+    SC3THAC            1.000      0.000      0.000      1.000
+    SC3TCOM            1.000      0.000      0.000      1.000
+    SC3OBEY            1.000      0.000      0.000      1.000
+    SC3DIST            1.000      0.000      0.000      1.000
+    SC3TEMP            1.000      0.000      0.000      1.000
+    SC3REST            1.000      0.000      0.000      1.000
+    SC3FIDG            1.000      0.000      0.000      1.000
+    SC5THAC            1.000      0.000      0.000      1.000
+    SC5TCOM            1.000      0.000      0.000      1.000
+    SC5OBEY            1.000      0.000      0.000      1.000
+    SC5DIST            1.000      0.000      0.000      1.000
+    SC5TEMP            1.000      0.000      0.000      1.000
+    SC5REST            1.000      0.000      0.000      1.000
+    SC5FIDG            1.000      0.000      0.000      1.000
+    SC7THAC            1.000      0.000      0.000      1.000
+    SC7TCOM            1.000      0.000      0.000      1.000
+    SC7OBEY            1.000      0.000      0.000      1.000
+    SC7DIST            1.000      0.000      0.000      1.000
+    SC7TEMP            1.000      0.000      0.000      1.000
+    SC7REST            1.000      0.000      0.000      1.000
+    SC7FIDG            1.000      0.000      0.000      1.000
+    SC11THAC           1.000      0.000      0.000      1.000
+    SC11TCOM           1.000      0.000      0.000      1.000
+    SC11OBEY           1.000      0.000      0.000      1.000
+    SC11DIST           1.000      0.000      0.000      1.000
+    SC11TEMP           1.000      0.000      0.000      1.000
+    SC11REST           1.000      0.000      0.000      1.000
+    SC11FIDG           1.000      0.000      0.000      1.000
+    SC14THAC           1.000      0.000      0.000      1.000
+    SC14TCOM           1.000      0.000      0.000      1.000
+    SC14OBEY           1.000      0.000      0.000      1.000
+    SC14DIST           1.000      0.000      0.000      1.000
+    SC14TEMP           1.000      0.000      0.000      1.000
+    SC14REST           1.000      0.000      0.000      1.000
+    SC14FIDG           1.000      0.000      0.000      1.000
+    SC17THAC           1.000      0.000      0.000      1.000
+    SC17TCOM           1.000      0.000      0.000      1.000
+    SC17OBEY           1.000      0.000      0.000      1.000
+    SC17DIST           1.000      0.000      0.000      1.000
+    SC17TEMP           1.000      0.000      0.000      1.000
+    SC17REST           1.000      0.000      0.000      1.000
+    SC17FIDG           1.000      0.000      0.000      1.000
+
+
+STD Standardization
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ I        |
+    SC_3               0.689      0.021     33.266      0.000
+    SC_5               0.913      0.020     46.187      0.000
+    SC_7               0.841      0.034     24.973      0.000
+    SC_11              0.788      0.050     15.771      0.000
+    SC_14              0.718      0.067     10.661      0.000
+    SC_17              0.648      0.079      8.206      0.000
+
+ S        |
+    SC_3               0.000      0.000    999.000    999.000
+    SC_5               0.095      0.044      2.171      0.030
+    SC_7               0.245      0.042      5.838      0.000
+    SC_11              0.439      0.043     10.288      0.000
+    SC_14              0.640      0.046     13.993      0.000
+    SC_17              0.768      0.044     17.665      0.000
+
+ SC_3     BY
+    SC3THAC            0.364      0.034     10.564      0.000
+    SC3TCOM            0.689      0.028     24.844      0.000
+    SC3OBEY            0.465      0.032     14.537      0.000
+    SC3DIST            0.847      0.025     34.052      0.000
+    SC3TEMP            0.342      0.032     10.576      0.000
+    SC3REST            0.851      0.024     35.710      0.000
+    SC3FIDG            0.760      0.025     29.861      0.000
+
+ SC_5     BY
+    SC5THAC            0.274      0.027     10.047      0.000
+    SC5TCOM            0.520      0.027     19.001      0.000
+    SC5OBEY            0.351      0.025     13.944      0.000
+    SC5DIST            0.639      0.028     23.122      0.000
+    SC5TEMP            0.258      0.024     10.749      0.000
+    SC5REST            0.643      0.027     23.452      0.000
+    SC5FIDG            0.574      0.026     22.257      0.000
+
+ SC_7     BY
+    SC7THAC            0.298      0.030      9.962      0.000
+    SC7TCOM            0.565      0.033     17.260      0.000
+    SC7OBEY            0.381      0.028     13.866      0.000
+    SC7DIST            0.694      0.033     20.890      0.000
+    SC7TEMP            0.281      0.027     10.397      0.000
+    SC7REST            0.698      0.033     21.363      0.000
+    SC7FIDG            0.623      0.032     19.367      0.000
+
+ SC_11    BY
+    SC11THAC           0.318      0.033      9.650      0.000
+    SC11TCOM           0.602      0.043     13.881      0.000
+    SC11OBEY           0.407      0.032     12.834      0.000
+    SC11DIST           0.741      0.050     14.836      0.000
+    SC11TEMP           0.299      0.030      9.814      0.000
+    SC11REST           0.745      0.047     15.826      0.000
+    SC11FIDG           0.665      0.046     14.500      0.000
+
+ SC_14    BY
+    SC14THAC           0.349      0.042      8.393      0.000
+    SC14TCOM           0.661      0.064     10.288      0.000
+    SC14OBEY           0.446      0.045      9.955      0.000
+    SC14DIST           0.813      0.075     10.789      0.000
+    SC14TEMP           0.328      0.038      8.674      0.000
+    SC14REST           0.817      0.074     11.077      0.000
+    SC14FIDG           0.729      0.070     10.430      0.000
+
+ SC_17    BY
+    SC17THAC           0.387      0.054      7.132      0.000
+    SC17TCOM           0.732      0.090      8.122      0.000
+    SC17OBEY           0.495      0.059      8.363      0.000
+    SC17DIST           0.900      0.106      8.480      0.000
+    SC17TEMP           0.364      0.049      7.477      0.000
+    SC17REST           0.905      0.105      8.657      0.000
+    SC17FIDG           0.808      0.098      8.222      0.000
+
+ SC_3     ON
+    IGNORE3           -0.017      0.020     -0.863      0.388
+    SMACK3            -0.088      0.035     -2.538      0.011
+    SHOUT3            -0.109      0.028     -3.899      0.000
+    BEDROOM3          -0.041      0.020     -2.057      0.040
+    TREATS3           -0.028      0.021     -1.368      0.171
+    TELLOFF3          -0.132      0.035     -3.732      0.000
+    BRIBE3            -0.089      0.021     -4.328      0.000
+
+ SC_5     ON
+    PA5               -0.445      0.061     -7.343      0.000
+
+ SC_7     ON
+    PA7               -0.656      0.062    -10.558      0.000
+
+ SC_11    ON
+    PA11              -0.531      0.033    -16.304      0.000
+
+ SC_14    ON
+    PM14               0.443      0.061      7.220      0.000
+
+ SC_17    ON
+    PM17              -0.057      0.052     -1.097      0.273
+
+ I        ON
+    SCOGA              0.207      0.029      7.168      0.000
+    LBW               -0.161      0.115     -1.397      0.163
+    INFTEMP            0.099      0.030      3.243      0.001
+    HFAE              -0.060      0.313     -0.192      0.848
+    BMARRIED           0.199      0.055      3.609      0.000
+    BRACE             -0.046      0.094     -0.490      0.624
+    SEX                0.221      0.051      4.312      0.000
+    BPEDU              0.435      0.065      6.698      0.000
+    INCOMEF            0.065      0.022      2.929      0.003
+
+ S        ON
+    SCOGA              0.037      0.039      0.944      0.345
+    LBW                0.093      0.158      0.587      0.557
+    INFTEMP           -0.041      0.041     -1.014      0.311
+    HFAE              -0.168      0.352     -0.476      0.634
+    BMARRIED          -0.128      0.077     -1.656      0.098
+    BRACE              0.115      0.134      0.857      0.392
+    SEX                0.025      0.075      0.339      0.734
+    BPEDU             -0.099      0.097     -1.018      0.309
+    INCOMEF            0.036      0.035      1.006      0.314
+
+ I        WITH
+    S                 -0.272      0.101     -2.678      0.007
+
+ SC3THAC  WITH
+    SC5THAC            0.097      0.015      6.462      0.000
+
+ SC5THAC  WITH
+    SC7THAC            0.059      0.013      4.438      0.000
+
+ SC7THAC  WITH
+    SC11THAC           0.054      0.012      4.474      0.000
+
+ SC11THAC WITH
+    SC14THAC           0.051      0.012      4.123      0.000
+
+ SC14THAC WITH
+    SC17THAC           0.093      0.027      3.492      0.000
+
+ SC3TCOM  WITH
+    SC5TCOM            0.113      0.017      6.501      0.000
+
+ SC5TCOM  WITH
+    SC7TCOM            0.068      0.010      6.612      0.000
+
+ SC7TCOM  WITH
+    SC11TCOM           0.089      0.014      6.131      0.000
+
+ SC11TCOM WITH
+    SC14TCOM           0.104      0.019      5.458      0.000
+
+ SC14TCOM WITH
+    SC17TCOM           0.139      0.032      4.297      0.000
+
+ SC3OBEY  WITH
+    SC5OBEY            0.193      0.023      8.219      0.000
+
+ SC5OBEY  WITH
+    SC7OBEY            0.152      0.029      5.154      0.000
+
+ SC7OBEY  WITH
+    SC11OBEY           0.141      0.031      4.562      0.000
+
+ SC11OBEY WITH
+    SC14OBEY           0.266      0.055      4.864      0.000
+
+ SC14OBEY WITH
+    SC17OBEY           0.510      0.123      4.155      0.000
+
+ SC3DIST  WITH
+    SC5DIST            0.105      0.015      6.789      0.000
+
+ SC5DIST  WITH
+    SC7DIST            0.087      0.014      6.122      0.000
+
+ SC7DIST  WITH
+    SC11DIST           0.112      0.017      6.449      0.000
+
+ SC11DIST WITH
+    SC14DIST           0.127      0.025      5.100      0.000
+
+ SC14DIST WITH
+    SC17DIST           0.189      0.045      4.164      0.000
+
+ SC3TEMP  WITH
+    SC5TEMP            0.296      0.036      8.344      0.000
+
+ SC5TEMP  WITH
+    SC7TEMP            0.240      0.046      5.207      0.000
+
+ SC7TEMP  WITH
+    SC11TEMP           0.192      0.037      5.171      0.000
+
+ SC11TEMP WITH
+    SC14TEMP           0.232      0.050      4.608      0.000
+
+ SC14TEMP WITH
+    SC17TEMP           0.266      0.067      3.949      0.000
+
+ SC3REST  WITH
+    SC5REST            0.161      0.018      8.886      0.000
+
+ SC5REST  WITH
+    SC7REST            0.132      0.018      7.322      0.000
+
+ SC7REST  WITH
+    SC11REST           0.146      0.022      6.665      0.000
+
+ SC11REST WITH
+    SC14REST           0.167      0.032      5.169      0.000
+
+ SC14REST WITH
+    SC17REST           0.294      0.066      4.465      0.000
+
+ SC3FIDG  WITH
+    SC5FIDG            0.183      0.020      8.962      0.000
+
+ SC5FIDG  WITH
+    SC7FIDG            0.181      0.024      7.598      0.000
+
+ SC7FIDG  WITH
+    SC11FIDG           0.163      0.026      6.252      0.000
+
+ SC11FIDG WITH
+    SC14FIDG           0.158      0.035      4.475      0.000
+
+ SC14FIDG WITH
+    SC17FIDG           0.141      0.042      3.362      0.001
+
+ Intercepts
+    SC_3               0.000      0.000    999.000    999.000
+    SC_5               0.000      0.000    999.000    999.000
+    SC_7               0.000      0.000    999.000    999.000
+    SC_11              0.000      0.000    999.000    999.000
+    SC_14              0.000      0.000    999.000    999.000
+    SC_17              0.000      0.000    999.000    999.000
+    I                  0.000      0.000    999.000    999.000
+    S                 -0.759      0.337     -2.256      0.024
+
+ Thresholds
+    SC3THAC$1         -1.121      0.121     -9.293      0.000
+    SC3THAC$2          0.001      0.091      0.013      0.990
+    SC3TCOM$1         -1.417      0.131    -10.847      0.000
+    SC3TCOM$2         -0.168      0.126     -1.334      0.182
+    SC3OBEY$1         -1.999      0.186    -10.741      0.000
+    SC3OBEY$2         -0.397      0.137     -2.897      0.004
+    SC3DIST$1         -1.582      0.164     -9.651      0.000
+    SC3DIST$2         -0.439      0.161     -2.721      0.007
+    SC3TEMP$1         -2.047      0.211     -9.707      0.000
+    SC3TEMP$2         -1.091      0.155     -7.050      0.000
+    SC3REST$1         -1.748      0.173    -10.111      0.000
+    SC3REST$2         -0.850      0.168     -5.050      0.000
+    SC3FIDG$1         -2.043      0.182    -11.222      0.000
+    SC3FIDG$2         -1.216      0.168     -7.243      0.000
+    SC5THAC$1         -1.121      0.121     -9.293      0.000
+    SC5THAC$2          0.001      0.091      0.013      0.990
+    SC5TCOM$1         -1.417      0.131    -10.847      0.000
+    SC5TCOM$2         -0.168      0.126     -1.334      0.182
+    SC5OBEY$1         -1.999      0.186    -10.741      0.000
+    SC5OBEY$2         -0.397      0.137     -2.897      0.004
+    SC5DIST$1         -1.582      0.164     -9.651      0.000
+    SC5DIST$2         -0.439      0.161     -2.721      0.007
+    SC5TEMP$1         -2.047      0.211     -9.707      0.000
+    SC5TEMP$2         -1.091      0.155     -7.050      0.000
+    SC5REST$1         -1.748      0.173    -10.111      0.000
+    SC5REST$2         -0.850      0.168     -5.050      0.000
+    SC5FIDG$1         -2.043      0.182    -11.222      0.000
+    SC5FIDG$2         -1.216      0.168     -7.243      0.000
+    SC7THAC$1         -1.121      0.121     -9.293      0.000
+    SC7THAC$2          0.001      0.091      0.013      0.990
+    SC7TCOM$1         -1.417      0.131    -10.847      0.000
+    SC7TCOM$2         -0.168      0.126     -1.334      0.182
+    SC7OBEY$1         -1.999      0.186    -10.741      0.000
+    SC7OBEY$2         -0.397      0.137     -2.897      0.004
+    SC7DIST$1         -1.582      0.164     -9.651      0.000
+    SC7DIST$2         -0.439      0.161     -2.721      0.007
+    SC7TEMP$1         -2.047      0.211     -9.707      0.000
+    SC7TEMP$2         -1.091      0.155     -7.050      0.000
+    SC7REST$1         -1.748      0.173    -10.111      0.000
+    SC7REST$2         -0.850      0.168     -5.050      0.000
+    SC7FIDG$1         -2.043      0.182    -11.222      0.000
+    SC7FIDG$2         -1.216      0.168     -7.243      0.000
+    SC11THAC$1        -1.121      0.121     -9.293      0.000
+    SC11THAC$2         0.001      0.091      0.013      0.990
+    SC11TCOM$1        -1.417      0.131    -10.847      0.000
+    SC11TCOM$2        -0.168      0.126     -1.334      0.182
+    SC11OBEY$1        -1.999      0.186    -10.741      0.000
+    SC11OBEY$2        -0.397      0.137     -2.897      0.004
+    SC11DIST$1        -1.582      0.164     -9.651      0.000
+    SC11DIST$2        -0.439      0.161     -2.721      0.007
+    SC11TEMP$1        -2.047      0.211     -9.707      0.000
+    SC11TEMP$2        -1.091      0.155     -7.050      0.000
+    SC11REST$1        -1.748      0.173    -10.111      0.000
+    SC11REST$2        -0.850      0.168     -5.050      0.000
+    SC11FIDG$1        -2.043      0.182    -11.222      0.000
+    SC11FIDG$2        -1.216      0.168     -7.243      0.000
+    SC14THAC$1        -1.121      0.121     -9.293      0.000
+    SC14THAC$2         0.001      0.091      0.013      0.990
+    SC14TCOM$1        -1.417      0.131    -10.847      0.000
+    SC14TCOM$2        -0.168      0.126     -1.334      0.182
+    SC14OBEY$1        -1.999      0.186    -10.741      0.000
+    SC14OBEY$2        -0.397      0.137     -2.897      0.004
+    SC14DIST$1        -1.582      0.164     -9.651      0.000
+    SC14DIST$2        -0.439      0.161     -2.721      0.007
+    SC14TEMP$1        -2.047      0.211     -9.707      0.000
+    SC14TEMP$2        -1.091      0.155     -7.050      0.000
+    SC14REST$1        -1.748      0.173    -10.111      0.000
+    SC14REST$2        -0.850      0.168     -5.050      0.000
+    SC14FIDG$1        -2.043      0.182    -11.222      0.000
+    SC14FIDG$2        -1.216      0.168     -7.243      0.000
+    SC17THAC$1        -1.121      0.121     -9.293      0.000
+    SC17THAC$2         0.001      0.091      0.013      0.990
+    SC17TCOM$1        -1.417      0.131    -10.847      0.000
+    SC17TCOM$2        -0.168      0.126     -1.334      0.182
+    SC17OBEY$1        -1.999      0.186    -10.741      0.000
+    SC17OBEY$2        -0.397      0.137     -2.897      0.004
+    SC17DIST$1        -1.582      0.164     -9.651      0.000
+    SC17DIST$2        -0.439      0.161     -2.721      0.007
+    SC17TEMP$1        -2.047      0.211     -9.707      0.000
+    SC17TEMP$2        -1.091      0.155     -7.050      0.000
+    SC17REST$1        -1.748      0.173    -10.111      0.000
+    SC17REST$2        -0.850      0.168     -5.050      0.000
+    SC17FIDG$1        -2.043      0.182    -11.222      0.000
+    SC17FIDG$2        -1.216      0.168     -7.243      0.000
+
+ Residual Variances
+    SC_3               0.401      0.028     14.401      0.000
+    SC_5               0.141      0.021      6.578      0.000
+    SC_7               0.212      0.016     12.974      0.000
+    SC_11              0.199      0.017     11.804      0.000
+    SC_14              0.268      0.029      9.369      0.000
+    SC_17              0.244      0.040      6.035      0.000
+    I                  0.849      0.017     51.326      0.000
+    S                  0.992      0.006    171.772      0.000
+
+ Scales
+    SC3THAC            1.000      0.000    999.000    999.000
+    SC3TCOM            1.000      0.000    999.000    999.000
+    SC3OBEY            1.000      0.000    999.000    999.000
+    SC3DIST            1.000      0.000    999.000    999.000
+    SC3TEMP            1.000      0.000    999.000    999.000
+    SC3REST            1.000      0.000    999.000    999.000
+    SC3FIDG            1.000      0.000    999.000    999.000
+    SC5THAC            2.047      0.212      9.635      0.000
+    SC5TCOM            1.540      0.088     17.524      0.000
+    SC5OBEY            1.440      0.120     12.052      0.000
+    SC5DIST            1.308      0.062     21.140      0.000
+    SC5TEMP            1.414      0.148      9.549      0.000
+    SC5REST            1.331      0.057     23.210      0.000
+    SC5FIDG            1.318      0.064     20.751      0.000
+    SC7THAC            2.072      0.229      9.031      0.000
+    SC7TCOM            1.498      0.088     16.938      0.000
+    SC7OBEY            1.445      0.137     10.570      0.000
+    SC7DIST            1.313      0.063     20.937      0.000
+    SC7TEMP            1.511      0.140     10.824      0.000
+    SC7REST            1.239      0.062     19.899      0.000
+    SC7FIDG            1.274      0.072     17.692      0.000
+    SC11THAC           2.131      0.210     10.151      0.000
+    SC11TCOM           1.447      0.109     13.297      0.000
+    SC11OBEY           1.231      0.119     10.304      0.000
+    SC11DIST           1.273      0.087     14.640      0.000
+    SC11TEMP           1.462      0.158      9.230      0.000
+    SC11REST           1.137      0.078     14.623      0.000
+    SC11FIDG           1.230      0.088     13.965      0.000
+    SC14THAC           1.724      0.211      8.175      0.000
+    SC14TCOM           1.238      0.120     10.346      0.000
+    SC14OBEY           0.913      0.105      8.706      0.000
+    SC14DIST           1.084      0.099     10.940      0.000
+    SC14TEMP           1.284      0.161      7.997      0.000
+    SC14REST           0.964      0.090     10.691      0.000
+    SC14FIDG           1.176      0.112     10.485      0.000
+    SC17THAC           1.400      0.196      7.135      0.000
+    SC17TCOM           1.051      0.130      8.058      0.000
+    SC17OBEY           0.814      0.103      7.916      0.000
+    SC17DIST           0.950      0.117      8.149      0.000
+    SC17TEMP           1.351      0.173      7.812      0.000
+    SC17REST           0.886      0.107      8.248      0.000
+    SC17FIDG           1.046      0.133      7.852      0.000
+
+
+R-SQUARE
+
+    Observed                                        Two-Tailed   Residual
+    Variable        Estimate       S.E.  Est./S.E.    P-Value    Variance
+
+    SC3THAC            0.129      0.024      5.431      0.000      0.894
+    SC3TCOM            0.434      0.031     13.866      0.000      0.619
+    SC3OBEY            0.208      0.027      7.609      0.000      0.826
+    SC3DIST            0.629      0.031     20.402      0.000      0.424
+    SC3TEMP            0.114      0.021      5.416      0.000      0.906
+    SC3REST            0.635      0.028     22.362      0.000      0.417
+    SC3FIDG            0.519      0.030     17.386      0.000      0.536
+    SC5THAC            0.298      0.028     10.608      0.000      0.177
+    SC5TCOM            0.573      0.027     20.964      0.000      0.201
+    SC5OBEY            0.244      0.026      9.379      0.000      0.382
+    SC5DIST            0.619      0.025     24.312      0.000      0.251
+    SC5TEMP            0.130      0.021      6.105      0.000      0.446
+    SC5REST            0.644      0.026     24.656      0.000      0.228
+    SC5FIDG            0.517      0.030     17.032      0.000      0.307
+    SC7THAC            0.351      0.029     11.904      0.000      0.165
+    SC7TCOM            0.614      0.021     29.038      0.000      0.201
+    SC7OBEY            0.284      0.031      9.158      0.000      0.367
+    SC7DIST            0.697      0.024     29.513      0.000      0.209
+    SC7TEMP            0.173      0.023      7.389      0.000      0.377
+    SC7REST            0.638      0.027     24.020      0.000      0.277
+    SC7FIDG            0.550      0.027     20.170      0.000      0.318
+    SC11THAC           0.411      0.024     17.469      0.000      0.145
+    SC11TCOM           0.637      0.024     26.206      0.000      0.207
+    SC11OBEY           0.236      0.029      8.078      0.000      0.537
+    SC11DIST           0.724      0.024     30.242      0.000      0.209
+    SC11TEMP           0.182      0.025      7.364      0.000      0.401
+    SC11REST           0.606      0.026     23.193      0.000      0.360
+    SC11FIDG           0.571      0.030     18.859      0.000      0.332
+    SC14THAC           0.347      0.028     12.470      0.000      0.229
+    SC14TCOM           0.621      0.025     25.035      0.000      0.267
+    SC14OBEY           0.163      0.026      6.237      0.000      1.024
+    SC14DIST           0.711      0.023     30.404      0.000      0.268
+    SC14TEMP           0.174      0.024      7.227      0.000      0.511
+    SC14REST           0.579      0.031     18.402      0.000      0.486
+    SC14FIDG           0.678      0.038     18.036      0.000      0.253
+    SC17THAC           0.288      0.027     10.512      0.000      0.370
+    SC17TCOM           0.571      0.030     19.268      0.000      0.402
+    SC17OBEY           0.160      0.026      6.097      0.000      1.281
+    SC17DIST           0.701      0.030     23.184      0.000      0.346
+    SC17TEMP           0.238      0.032      7.456      0.000      0.424
+    SC17REST           0.619      0.038     16.504      0.000      0.505
+    SC17FIDG           0.685      0.037     18.436      0.000      0.300
+
+     Latent                                         Two-Tailed
+    Variable        Estimate       S.E.  Est./S.E.    P-Value
+
+    SC_3               0.599      0.028     21.548      0.000
+    SC_5               0.859      0.021     40.012      0.000
+    SC_7               0.788      0.016     48.363      0.000
+    SC_11              0.801      0.017     47.555      0.000
+    SC_14              0.732      0.029     25.616      0.000
+    SC_17              0.756      0.040     18.677      0.000
+    I                  0.151      0.017      9.104      0.000
+    S                  0.008      0.006      1.423      0.155
+
+
+QUALITY OF NUMERICAL RESULTS
+
+     Condition Number for the Information Matrix              0.124E-06
+       (ratio of smallest to largest eigenvalue)
+
+
+MODEL MODIFICATION INDICES
+
+NOTE:  Modification indices for direct effects of observed dependent variables
+regressed on covariates and residual covariances among observed dependent
+variables may not be included.  To include these, request MODINDICES (ALL).
+
+Minimum M.I. value for printing the modification index    10.000
+
+                                   M.I.     E.P.C.  Std E.P.C.  StdYX E.P.C.
+
+BY Statements
+
+SC_11    BY SC14DIST              13.640     0.810      0.258        0.267
+SC_11    BY SC17DIST              12.453     0.825      0.263        0.244
+
+ON/BY Statements
+
+SC_5     ON SC_11    /
+SC_11    BY SC_5                  12.261     0.179      0.208        0.208
+SC_7     ON SC_11    /
+SC_11    BY SC_7                  12.224     0.170      0.182        0.182
+SC_14    ON SC_11    /
+SC_11    BY SC_14                 63.229     0.568      0.518        0.518
+SC_17    ON SC_11    /
+SC_11    BY SC_17                 49.370     0.654      0.538        0.538
+I        ON SC_7     /
+SC_7     BY I                     30.676     0.320      0.381        0.381
+I        ON SC_11    /
+SC_11    BY I                    191.932     0.557      0.707        0.707
+I        ON SC_14    /
+SC_14    BY I                     34.298     0.347      0.483        0.483
+S        ON SC_7     /
+SC_7     BY S                     29.026     0.637      0.639        0.639
+S        ON SC_11    /
+SC_11    BY S                    233.215     1.320      1.413        1.413
+S        ON SC_14    /
+SC_14    BY S                     49.149     1.077      1.265        1.265
+
+ON Statements
+
+SC_5     ON PA11                  28.933    -0.071     -0.257       -0.187
+SC_7     ON PA11                  36.869    -0.081     -0.270       -0.196
+SC_11    ON PA7                   11.920    -0.080     -0.250       -0.131
+SC_14    ON PA7                   11.634    -0.103     -0.295       -0.155
+SC_14    ON PA11                 106.074    -0.174     -0.498       -0.361
+SC_17    ON PA11                  84.236    -0.193     -0.498       -0.362
+SC_17    ON PM14                  34.769     0.188      0.486        0.196
+I        ON SMACK3                12.274    -0.017     -0.068       -0.061
+I        ON PA7                   31.724    -0.066     -0.265       -0.139
+I        ON PA11                 209.117    -0.101     -0.402       -0.292
+I        ON PM14                  34.735     0.059      0.235        0.095
+S        ON PA7                   29.521    -0.127     -0.426       -0.223
+S        ON PA11                 234.982    -0.225     -0.757       -0.550
+S        ON PM14                  48.245     0.169      0.568        0.229
+
+WITH Statements
+
+SC3TCOM  WITH SC3THAC             10.260     0.146      0.146        0.197
+SC3FIDG  WITH SC3REST             10.275     0.158      0.158        0.335
+SC5TCOM  WITH SC5THAC             13.083     0.052      0.052        0.276
+SC5DIST  WITH SC5TCOM             17.698     0.086      0.086        0.383
+SC5REST  WITH SC3FIDG             10.487     0.122      0.122        0.348
+SC5REST  WITH SC5TCOM             16.890    -0.106     -0.106       -0.496
+SC5FIDG  WITH SC5TCOM             12.829    -0.102     -0.102       -0.412
+SC5FIDG  WITH SC5REST             39.120     0.156      0.156        0.591
+SC7OBEY  WITH SC3OBEY             15.341     0.155      0.155        0.282
+SC7DIST  WITH SC7TCOM             19.658     0.085      0.085        0.416
+SC7TEMP  WITH SC3TEMP             91.331     0.265      0.265        0.454
+SC7REST  WITH SC3REST             15.994     0.156      0.156        0.460
+SC7REST  WITH SC7TCOM             13.761    -0.099     -0.099       -0.420
+SC7FIDG  WITH SC3FIDG             15.953     0.159      0.159        0.386
+SC7FIDG  WITH SC5REST             14.340     0.099      0.099        0.369
+SC7FIDG  WITH SC7TCOM             13.862    -0.103     -0.103       -0.409
+SC7FIDG  WITH SC7REST             41.258     0.165      0.165        0.557
+SC11THAC WITH SC3THAC             10.034     0.072      0.072        0.201
+SC11THAC WITH SC5THAC             24.473     0.055      0.055        0.343
+SC11OBEY WITH SC5OBEY             32.107     0.161      0.161        0.355
+SC11DIST WITH SC7TCOM             10.309     0.072      0.072        0.350
+SC11DIST WITH SC11TCOM            25.975     0.108      0.108        0.520
+SC11TEMP WITH SC3TEMP             12.190     0.152      0.152        0.252
+SC11TEMP WITH SC5TEMP             44.314     0.168      0.168        0.398
+SC11TEMP WITH SC11OBEY            10.952     0.096      0.096        0.207
+SC11REST WITH SC11TCOM            10.357    -0.123     -0.123       -0.450
+SC11FIDG WITH SC5FIDG             18.381     0.137      0.137        0.428
+SC11FIDG WITH SC11REST            40.296     0.195      0.195        0.565
+SC14THAC WITH SC5THAC             13.677     0.049      0.049        0.242
+SC14TCOM WITH SC7TCOM             10.301     0.082      0.082        0.352
+SC14OBEY WITH SC5OBEY             11.734     0.165      0.165        0.264
+SC14OBEY WITH SC7OBEY             13.141     0.166      0.166        0.270
+SC14DIST WITH SC7DIST             11.197     0.106      0.106        0.447
+SC14TEMP WITH SC5TEMP             19.658     0.148      0.148        0.311
+SC14TEMP WITH SC7TEMP             31.800     0.169      0.169        0.385
+SC14TEMP WITH SC14OBEY            18.965     0.212      0.212        0.293
+SC14REST WITH SC14TCOM            17.980    -0.228     -0.228       -0.633
+SC14FIDG WITH SC11REST            10.170     0.146      0.146        0.484
+SC14FIDG WITH SC14TCOM            15.689    -0.180     -0.180       -0.691
+SC14FIDG WITH SC14REST            63.469     0.315      0.315        0.898
+SC17THAC WITH SC11THAC            12.092     0.063      0.063        0.270
+SC17TCOM WITH SC17THAC            12.567     0.126      0.126        0.327
+SC17OBEY WITH SC7OBEY             11.876     0.173      0.173        0.252
+SC17OBEY WITH SC11OBEY            19.663     0.269      0.269        0.325
+SC17DIST WITH SC11DIST            15.018     0.150      0.150        0.556
+SC17TEMP WITH SC5TEMP             19.018     0.129      0.129        0.296
+SC17TEMP WITH SC7TEMP             14.773     0.118      0.118        0.295
+SC17TEMP WITH SC11TEMP            26.426     0.165      0.165        0.400
+SC17REST WITH SC17TCOM            14.144    -0.308     -0.308       -0.684
+SC17FIDG WITH SC17THAC            10.329    -0.156     -0.156       -0.469
+SC17FIDG WITH SC17REST            40.841     0.332      0.332        0.853
+
+
+TECHNICAL 1 OUTPUT
+
+
+     PARAMETER SPECIFICATION
+
+
+           TAU
+              SC3THAC$      SC3THAC$      SC3TCOM$      SC3TCOM$      SC3OBEY$
+              ________      ________      ________      ________      ________
+                  1             2             3             4             5
+
+
+           TAU
+              SC3OBEY$      SC3DIST$      SC3DIST$      SC3TEMP$      SC3TEMP$
+              ________      ________      ________      ________      ________
+                  6             7             8             9            10
+
+
+           TAU
+              SC3REST$      SC3REST$      SC3FIDG$      SC3FIDG$      SC5THAC$
+              ________      ________      ________      ________      ________
+                 11            12            13            14             1
+
+
+           TAU
+              SC5THAC$      SC5TCOM$      SC5TCOM$      SC5OBEY$      SC5OBEY$
+              ________      ________      ________      ________      ________
+                  2             3             4             5             6
+
+
+           TAU
+              SC5DIST$      SC5DIST$      SC5TEMP$      SC5TEMP$      SC5REST$
+              ________      ________      ________      ________      ________
+                  7             8             9            10            11
+
+
+           TAU
+              SC5REST$      SC5FIDG$      SC5FIDG$      SC7THAC$      SC7THAC$
+              ________      ________      ________      ________      ________
+                 12            13            14             1             2
+
+
+           TAU
+              SC7TCOM$      SC7TCOM$      SC7OBEY$      SC7OBEY$      SC7DIST$
+              ________      ________      ________      ________      ________
+                  3             4             5             6             7
+
+
+           TAU
+              SC7DIST$      SC7TEMP$      SC7TEMP$      SC7REST$      SC7REST$
+              ________      ________      ________      ________      ________
+                  8             9            10            11            12
+
+
+           TAU
+              SC7FIDG$      SC7FIDG$      SC11THAC      SC11THAC      SC11TCOM
+              ________      ________      ________      ________      ________
+                 13            14             1             2             3
+
+
+           TAU
+              SC11TCOM      SC11OBEY      SC11OBEY      SC11DIST      SC11DIST
+              ________      ________      ________      ________      ________
+                  4             5             6             7             8
+
+
+           TAU
+              SC11TEMP      SC11TEMP      SC11REST      SC11REST      SC11FIDG
+              ________      ________      ________      ________      ________
+                  9            10            11            12            13
+
+
+           TAU
+              SC11FIDG      SC14THAC      SC14THAC      SC14TCOM      SC14TCOM
+              ________      ________      ________      ________      ________
+                 14             1             2             3             4
+
+
+           TAU
+              SC14OBEY      SC14OBEY      SC14DIST      SC14DIST      SC14TEMP
+              ________      ________      ________      ________      ________
+                  5             6             7             8             9
+
+
+           TAU
+              SC14TEMP      SC14REST      SC14REST      SC14FIDG      SC14FIDG
+              ________      ________      ________      ________      ________
+                 10            11            12            13            14
+
+
+           TAU
+              SC17THAC      SC17THAC      SC17TCOM      SC17TCOM      SC17OBEY
+              ________      ________      ________      ________      ________
+                  1             2             3             4             5
+
+
+           TAU
+              SC17OBEY      SC17DIST      SC17DIST      SC17TEMP      SC17TEMP
+              ________      ________      ________      ________      ________
+                  6             7             8             9            10
+
+
+           TAU
+              SC17REST      SC17REST      SC17FIDG      SC17FIDG
+              ________      ________      ________      ________
+                 11            12            13            14
+
+
+           NU
+              SC3THAC       SC3TCOM       SC3OBEY       SC3DIST       SC3TEMP
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              SC3REST       SC3FIDG       SC5THAC       SC5TCOM       SC5OBEY
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              SC5DIST       SC5TEMP       SC5REST       SC5FIDG       SC7THAC
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              SC7TCOM       SC7OBEY       SC7DIST       SC7TEMP       SC7REST
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              SC7FIDG       SC11THAC      SC11TCOM      SC11OBEY      SC11DIST
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              SC11TEMP      SC11REST      SC11FIDG      SC14THAC      SC14TCOM
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              SC14OBEY      SC14DIST      SC14TEMP      SC14REST      SC14FIDG
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              SC17THAC      SC17TCOM      SC17OBEY      SC17DIST      SC17TEMP
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           NU
+              SC17REST      SC17FIDG
+              ________      ________
+                  0             0
+
+
+           LAMBDA
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+ SC3THAC            0             0             0             0             0
+ SC3TCOM           15             0             0             0             0
+ SC3OBEY           16             0             0             0             0
+ SC3DIST           17             0             0             0             0
+ SC3TEMP           18             0             0             0             0
+ SC3REST           19             0             0             0             0
+ SC3FIDG           20             0             0             0             0
+ SC5THAC            0             0             0             0             0
+ SC5TCOM            0            15             0             0             0
+ SC5OBEY            0            16             0             0             0
+ SC5DIST            0            17             0             0             0
+ SC5TEMP            0            18             0             0             0
+ SC5REST            0            19             0             0             0
+ SC5FIDG            0            20             0             0             0
+ SC7THAC            0             0             0             0             0
+ SC7TCOM            0             0            15             0             0
+ SC7OBEY            0             0            16             0             0
+ SC7DIST            0             0            17             0             0
+ SC7TEMP            0             0            18             0             0
+ SC7REST            0             0            19             0             0
+ SC7FIDG            0             0            20             0             0
+ SC11THAC           0             0             0             0             0
+ SC11TCOM           0             0             0            15             0
+ SC11OBEY           0             0             0            16             0
+ SC11DIST           0             0             0            17             0
+ SC11TEMP           0             0             0            18             0
+ SC11REST           0             0             0            19             0
+ SC11FIDG           0             0             0            20             0
+ SC14THAC           0             0             0             0             0
+ SC14TCOM           0             0             0             0            15
+ SC14OBEY           0             0             0             0            16
+ SC14DIST           0             0             0             0            17
+ SC14TEMP           0             0             0             0            18
+ SC14REST           0             0             0             0            19
+ SC14FIDG           0             0             0             0            20
+ SC17THAC           0             0             0             0             0
+ SC17TCOM           0             0             0             0             0
+ SC17OBEY           0             0             0             0             0
+ SC17DIST           0             0             0             0             0
+ SC17TEMP           0             0             0             0             0
+ SC17REST           0             0             0             0             0
+ SC17FIDG           0             0             0             0             0
+
+
+           LAMBDA
+              SC_17         I             S
+              ________      ________      ________
+ SC3THAC            0             0             0
+ SC3TCOM            0             0             0
+ SC3OBEY            0             0             0
+ SC3DIST            0             0             0
+ SC3TEMP            0             0             0
+ SC3REST            0             0             0
+ SC3FIDG            0             0             0
+ SC5THAC            0             0             0
+ SC5TCOM            0             0             0
+ SC5OBEY            0             0             0
+ SC5DIST            0             0             0
+ SC5TEMP            0             0             0
+ SC5REST            0             0             0
+ SC5FIDG            0             0             0
+ SC7THAC            0             0             0
+ SC7TCOM            0             0             0
+ SC7OBEY            0             0             0
+ SC7DIST            0             0             0
+ SC7TEMP            0             0             0
+ SC7REST            0             0             0
+ SC7FIDG            0             0             0
+ SC11THAC           0             0             0
+ SC11TCOM           0             0             0
+ SC11OBEY           0             0             0
+ SC11DIST           0             0             0
+ SC11TEMP           0             0             0
+ SC11REST           0             0             0
+ SC11FIDG           0             0             0
+ SC14THAC           0             0             0
+ SC14TCOM           0             0             0
+ SC14OBEY           0             0             0
+ SC14DIST           0             0             0
+ SC14TEMP           0             0             0
+ SC14REST           0             0             0
+ SC14FIDG           0             0             0
+ SC17THAC           0             0             0
+ SC17TCOM          15             0             0
+ SC17OBEY          16             0             0
+ SC17DIST          17             0             0
+ SC17TEMP          18             0             0
+ SC17REST          19             0             0
+ SC17FIDG          20             0             0
+
+
+           THETA
+              SC3THAC       SC3TCOM       SC3OBEY       SC3DIST       SC3TEMP
+              ________      ________      ________      ________      ________
+ SC3THAC            0
+ SC3TCOM            0             0
+ SC3OBEY            0             0             0
+ SC3DIST            0             0             0             0
+ SC3TEMP            0             0             0             0             0
+ SC3REST            0             0             0             0             0
+ SC3FIDG            0             0             0             0             0
+ SC5THAC           21             0             0             0             0
+ SC5TCOM            0            22             0             0             0
+ SC5OBEY            0             0            23             0             0
+ SC5DIST            0             0             0            24             0
+ SC5TEMP            0             0             0             0            25
+ SC5REST            0             0             0             0             0
+ SC5FIDG            0             0             0             0             0
+ SC7THAC            0             0             0             0             0
+ SC7TCOM            0             0             0             0             0
+ SC7OBEY            0             0             0             0             0
+ SC7DIST            0             0             0             0             0
+ SC7TEMP            0             0             0             0             0
+ SC7REST            0             0             0             0             0
+ SC7FIDG            0             0             0             0             0
+ SC11THAC           0             0             0             0             0
+ SC11TCOM           0             0             0             0             0
+ SC11OBEY           0             0             0             0             0
+ SC11DIST           0             0             0             0             0
+ SC11TEMP           0             0             0             0             0
+ SC11REST           0             0             0             0             0
+ SC11FIDG           0             0             0             0             0
+ SC14THAC           0             0             0             0             0
+ SC14TCOM           0             0             0             0             0
+ SC14OBEY           0             0             0             0             0
+ SC14DIST           0             0             0             0             0
+ SC14TEMP           0             0             0             0             0
+ SC14REST           0             0             0             0             0
+ SC14FIDG           0             0             0             0             0
+ SC17THAC           0             0             0             0             0
+ SC17TCOM           0             0             0             0             0
+ SC17OBEY           0             0             0             0             0
+ SC17DIST           0             0             0             0             0
+ SC17TEMP           0             0             0             0             0
+ SC17REST           0             0             0             0             0
+ SC17FIDG           0             0             0             0             0
+
+
+           THETA
+              SC3REST       SC3FIDG       SC5THAC       SC5TCOM       SC5OBEY
+              ________      ________      ________      ________      ________
+ SC3REST            0
+ SC3FIDG            0             0
+ SC5THAC            0             0             0
+ SC5TCOM            0             0             0             0
+ SC5OBEY            0             0             0             0             0
+ SC5DIST            0             0             0             0             0
+ SC5TEMP            0             0             0             0             0
+ SC5REST           26             0             0             0             0
+ SC5FIDG            0            27             0             0             0
+ SC7THAC            0             0            28             0             0
+ SC7TCOM            0             0             0            29             0
+ SC7OBEY            0             0             0             0            30
+ SC7DIST            0             0             0             0             0
+ SC7TEMP            0             0             0             0             0
+ SC7REST            0             0             0             0             0
+ SC7FIDG            0             0             0             0             0
+ SC11THAC           0             0             0             0             0
+ SC11TCOM           0             0             0             0             0
+ SC11OBEY           0             0             0             0             0
+ SC11DIST           0             0             0             0             0
+ SC11TEMP           0             0             0             0             0
+ SC11REST           0             0             0             0             0
+ SC11FIDG           0             0             0             0             0
+ SC14THAC           0             0             0             0             0
+ SC14TCOM           0             0             0             0             0
+ SC14OBEY           0             0             0             0             0
+ SC14DIST           0             0             0             0             0
+ SC14TEMP           0             0             0             0             0
+ SC14REST           0             0             0             0             0
+ SC14FIDG           0             0             0             0             0
+ SC17THAC           0             0             0             0             0
+ SC17TCOM           0             0             0             0             0
+ SC17OBEY           0             0             0             0             0
+ SC17DIST           0             0             0             0             0
+ SC17TEMP           0             0             0             0             0
+ SC17REST           0             0             0             0             0
+ SC17FIDG           0             0             0             0             0
+
+
+           THETA
+              SC5DIST       SC5TEMP       SC5REST       SC5FIDG       SC7THAC
+              ________      ________      ________      ________      ________
+ SC5DIST            0
+ SC5TEMP            0             0
+ SC5REST            0             0             0
+ SC5FIDG            0             0             0             0
+ SC7THAC            0             0             0             0             0
+ SC7TCOM            0             0             0             0             0
+ SC7OBEY            0             0             0             0             0
+ SC7DIST           31             0             0             0             0
+ SC7TEMP            0            32             0             0             0
+ SC7REST            0             0            33             0             0
+ SC7FIDG            0             0             0            34             0
+ SC11THAC           0             0             0             0            35
+ SC11TCOM           0             0             0             0             0
+ SC11OBEY           0             0             0             0             0
+ SC11DIST           0             0             0             0             0
+ SC11TEMP           0             0             0             0             0
+ SC11REST           0             0             0             0             0
+ SC11FIDG           0             0             0             0             0
+ SC14THAC           0             0             0             0             0
+ SC14TCOM           0             0             0             0             0
+ SC14OBEY           0             0             0             0             0
+ SC14DIST           0             0             0             0             0
+ SC14TEMP           0             0             0             0             0
+ SC14REST           0             0             0             0             0
+ SC14FIDG           0             0             0             0             0
+ SC17THAC           0             0             0             0             0
+ SC17TCOM           0             0             0             0             0
+ SC17OBEY           0             0             0             0             0
+ SC17DIST           0             0             0             0             0
+ SC17TEMP           0             0             0             0             0
+ SC17REST           0             0             0             0             0
+ SC17FIDG           0             0             0             0             0
+
+
+           THETA
+              SC7TCOM       SC7OBEY       SC7DIST       SC7TEMP       SC7REST
+              ________      ________      ________      ________      ________
+ SC7TCOM            0
+ SC7OBEY            0             0
+ SC7DIST            0             0             0
+ SC7TEMP            0             0             0             0
+ SC7REST            0             0             0             0             0
+ SC7FIDG            0             0             0             0             0
+ SC11THAC           0             0             0             0             0
+ SC11TCOM          36             0             0             0             0
+ SC11OBEY           0            37             0             0             0
+ SC11DIST           0             0            38             0             0
+ SC11TEMP           0             0             0            39             0
+ SC11REST           0             0             0             0            40
+ SC11FIDG           0             0             0             0             0
+ SC14THAC           0             0             0             0             0
+ SC14TCOM           0             0             0             0             0
+ SC14OBEY           0             0             0             0             0
+ SC14DIST           0             0             0             0             0
+ SC14TEMP           0             0             0             0             0
+ SC14REST           0             0             0             0             0
+ SC14FIDG           0             0             0             0             0
+ SC17THAC           0             0             0             0             0
+ SC17TCOM           0             0             0             0             0
+ SC17OBEY           0             0             0             0             0
+ SC17DIST           0             0             0             0             0
+ SC17TEMP           0             0             0             0             0
+ SC17REST           0             0             0             0             0
+ SC17FIDG           0             0             0             0             0
+
+
+           THETA
+              SC7FIDG       SC11THAC      SC11TCOM      SC11OBEY      SC11DIST
+              ________      ________      ________      ________      ________
+ SC7FIDG            0
+ SC11THAC           0             0
+ SC11TCOM           0             0             0
+ SC11OBEY           0             0             0             0
+ SC11DIST           0             0             0             0             0
+ SC11TEMP           0             0             0             0             0
+ SC11REST           0             0             0             0             0
+ SC11FIDG          41             0             0             0             0
+ SC14THAC           0            42             0             0             0
+ SC14TCOM           0             0            43             0             0
+ SC14OBEY           0             0             0            44             0
+ SC14DIST           0             0             0             0            45
+ SC14TEMP           0             0             0             0             0
+ SC14REST           0             0             0             0             0
+ SC14FIDG           0             0             0             0             0
+ SC17THAC           0             0             0             0             0
+ SC17TCOM           0             0             0             0             0
+ SC17OBEY           0             0             0             0             0
+ SC17DIST           0             0             0             0             0
+ SC17TEMP           0             0             0             0             0
+ SC17REST           0             0             0             0             0
+ SC17FIDG           0             0             0             0             0
+
+
+           THETA
+              SC11TEMP      SC11REST      SC11FIDG      SC14THAC      SC14TCOM
+              ________      ________      ________      ________      ________
+ SC11TEMP           0
+ SC11REST           0             0
+ SC11FIDG           0             0             0
+ SC14THAC           0             0             0             0
+ SC14TCOM           0             0             0             0             0
+ SC14OBEY           0             0             0             0             0
+ SC14DIST           0             0             0             0             0
+ SC14TEMP          46             0             0             0             0
+ SC14REST           0            47             0             0             0
+ SC14FIDG           0             0            48             0             0
+ SC17THAC           0             0             0            49             0
+ SC17TCOM           0             0             0             0            50
+ SC17OBEY           0             0             0             0             0
+ SC17DIST           0             0             0             0             0
+ SC17TEMP           0             0             0             0             0
+ SC17REST           0             0             0             0             0
+ SC17FIDG           0             0             0             0             0
+
+
+           THETA
+              SC14OBEY      SC14DIST      SC14TEMP      SC14REST      SC14FIDG
+              ________      ________      ________      ________      ________
+ SC14OBEY           0
+ SC14DIST           0             0
+ SC14TEMP           0             0             0
+ SC14REST           0             0             0             0
+ SC14FIDG           0             0             0             0             0
+ SC17THAC           0             0             0             0             0
+ SC17TCOM           0             0             0             0             0
+ SC17OBEY          51             0             0             0             0
+ SC17DIST           0            52             0             0             0
+ SC17TEMP           0             0            53             0             0
+ SC17REST           0             0             0            54             0
+ SC17FIDG           0             0             0             0            55
+
+
+           THETA
+              SC17THAC      SC17TCOM      SC17OBEY      SC17DIST      SC17TEMP
+              ________      ________      ________      ________      ________
+ SC17THAC           0
+ SC17TCOM           0             0
+ SC17OBEY           0             0             0
+ SC17DIST           0             0             0             0
+ SC17TEMP           0             0             0             0             0
+ SC17REST           0             0             0             0             0
+ SC17FIDG           0             0             0             0             0
+
+
+           THETA
+              SC17REST      SC17FIDG
+              ________      ________
+ SC17REST           0
+ SC17FIDG           0             0
+
+
+           ALPHA
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           ALPHA
+              SC_17         I             S
+              ________      ________      ________
+                  0             0            56
+
+
+           BETA
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+ SC_3               0             0             0             0             0
+ SC_5               0             0             0             0             0
+ SC_7               0             0             0             0             0
+ SC_11              0             0             0             0             0
+ SC_14              0             0             0             0             0
+ SC_17              0             0             0             0             0
+ I                  0             0             0             0             0
+ S                  0             0             0             0             0
+
+
+           BETA
+              SC_17         I             S
+              ________      ________      ________
+ SC_3               0             0             0
+ SC_5               0             0            57
+ SC_7               0             0            58
+ SC_11              0             0            59
+ SC_14              0             0            60
+ SC_17              0             0             0
+ I                  0             0             0
+ S                  0             0             0
+
+
+           GAMMA
+              SCOGA         LBW           INFTEMP       HFAE          BMARRIED
+              ________      ________      ________      ________      ________
+ SC_3               0             0             0             0             0
+ SC_5               0             0             0             0             0
+ SC_7               0             0             0             0             0
+ SC_11              0             0             0             0             0
+ SC_14              0             0             0             0             0
+ SC_17              0             0             0             0             0
+ I                 73            74            75            76            77
+ S                 82            83            84            85            86
+
+
+           GAMMA
+              BRACE         SEX           BPEDU         INCOMEF       IGNORE3
+              ________      ________      ________      ________      ________
+ SC_3               0             0             0             0            61
+ SC_5               0             0             0             0             0
+ SC_7               0             0             0             0             0
+ SC_11              0             0             0             0             0
+ SC_14              0             0             0             0             0
+ SC_17              0             0             0             0             0
+ I                 78            79            80            81             0
+ S                 87            88            89            90             0
+
+
+           GAMMA
+              SMACK3        SHOUT3        BEDROOM3      TREATS3       TELLOFF3
+              ________      ________      ________      ________      ________
+ SC_3              62            63            64            65            66
+ SC_5               0             0             0             0             0
+ SC_7               0             0             0             0             0
+ SC_11              0             0             0             0             0
+ SC_14              0             0             0             0             0
+ SC_17              0             0             0             0             0
+ I                  0             0             0             0             0
+ S                  0             0             0             0             0
+
+
+           GAMMA
+              BRIBE3        PA5           PA7           PA11          PM14
+              ________      ________      ________      ________      ________
+ SC_3              67             0             0             0             0
+ SC_5               0            68             0             0             0
+ SC_7               0             0            69             0             0
+ SC_11              0             0             0            70             0
+ SC_14              0             0             0             0            71
+ SC_17              0             0             0             0             0
+ I                  0             0             0             0             0
+ S                  0             0             0             0             0
+
+
+           GAMMA
+              PM17
+              ________
+ SC_3               0
+ SC_5               0
+ SC_7               0
+ SC_11              0
+ SC_14              0
+ SC_17             72
+ I                  0
+ S                  0
+
+
+           PSI
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+ SC_3              91
+ SC_5               0            92
+ SC_7               0             0            93
+ SC_11              0             0             0            94
+ SC_14              0             0             0             0            95
+ SC_17              0             0             0             0             0
+ I                  0             0             0             0             0
+ S                  0             0             0             0             0
+
+
+           PSI
+              SC_17         I             S
+              ________      ________      ________
+ SC_17             96
+ I                  0            97
+ S                  0            98            99
+
+
+           DELTA
+              SC3THAC       SC3TCOM       SC3OBEY       SC3DIST       SC3TEMP
+              ________      ________      ________      ________      ________
+                  0             0             0             0             0
+
+
+           DELTA
+              SC3REST       SC3FIDG       SC5THAC       SC5TCOM       SC5OBEY
+              ________      ________      ________      ________      ________
+                  0             0           100           101           102
+
+
+           DELTA
+              SC5DIST       SC5TEMP       SC5REST       SC5FIDG       SC7THAC
+              ________      ________      ________      ________      ________
+                103           104           105           106           107
+
+
+           DELTA
+              SC7TCOM       SC7OBEY       SC7DIST       SC7TEMP       SC7REST
+              ________      ________      ________      ________      ________
+                108           109           110           111           112
+
+
+           DELTA
+              SC7FIDG       SC11THAC      SC11TCOM      SC11OBEY      SC11DIST
+              ________      ________      ________      ________      ________
+                113           114           115           116           117
+
+
+           DELTA
+              SC11TEMP      SC11REST      SC11FIDG      SC14THAC      SC14TCOM
+              ________      ________      ________      ________      ________
+                118           119           120           121           122
+
+
+           DELTA
+              SC14OBEY      SC14DIST      SC14TEMP      SC14REST      SC14FIDG
+              ________      ________      ________      ________      ________
+                123           124           125           126           127
+
+
+           DELTA
+              SC17THAC      SC17TCOM      SC17OBEY      SC17DIST      SC17TEMP
+              ________      ________      ________      ________      ________
+                128           129           130           131           132
+
+
+           DELTA
+              SC17REST      SC17FIDG
+              ________      ________
+                133           134
+
+
+     STARTING VALUES
+
+
+           TAU
+              SC3THAC$      SC3THAC$      SC3TCOM$      SC3TCOM$      SC3OBEY$
+              ________      ________      ________      ________      ________
+               -1.357         0.521        -1.350         0.169        -1.946
+
+
+           TAU
+              SC3OBEY$      SC3DIST$      SC3DIST$      SC3TEMP$      SC3TEMP$
+              ________      ________      ________      ________      ________
+               -0.273        -1.287        -0.091        -1.285        -0.213
+
+
+           TAU
+              SC3REST$      SC3REST$      SC3FIDG$      SC3FIDG$      SC5THAC$
+              ________      ________      ________      ________      ________
+               -1.406        -0.492        -1.531        -0.628        -1.357
+
+
+           TAU
+              SC5THAC$      SC5TCOM$      SC5TCOM$      SC5OBEY$      SC5OBEY$
+              ________      ________      ________      ________      ________
+                0.521        -1.350         0.169        -1.946        -0.273
+
+
+           TAU
+              SC5DIST$      SC5DIST$      SC5TEMP$      SC5TEMP$      SC5REST$
+              ________      ________      ________      ________      ________
+               -1.287        -0.091        -1.285        -0.213        -1.406
+
+
+           TAU
+              SC5REST$      SC5FIDG$      SC5FIDG$      SC7THAC$      SC7THAC$
+              ________      ________      ________      ________      ________
+               -0.492        -1.531        -0.628        -1.357         0.521
+
+
+           TAU
+              SC7TCOM$      SC7TCOM$      SC7OBEY$      SC7OBEY$      SC7DIST$
+              ________      ________      ________      ________      ________
+               -1.350         0.169        -1.946        -0.273        -1.287
+
+
+           TAU
+              SC7DIST$      SC7TEMP$      SC7TEMP$      SC7REST$      SC7REST$
+              ________      ________      ________      ________      ________
+               -0.091        -1.285        -0.213        -1.406        -0.492
+
+
+           TAU
+              SC7FIDG$      SC7FIDG$      SC11THAC      SC11THAC      SC11TCOM
+              ________      ________      ________      ________      ________
+               -1.531        -0.628        -1.357         0.521        -1.350
+
+
+           TAU
+              SC11TCOM      SC11OBEY      SC11OBEY      SC11DIST      SC11DIST
+              ________      ________      ________      ________      ________
+                0.169        -1.946        -0.273        -1.287        -0.091
+
+
+           TAU
+              SC11TEMP      SC11TEMP      SC11REST      SC11REST      SC11FIDG
+              ________      ________      ________      ________      ________
+               -1.285        -0.213        -1.406        -0.492        -1.531
+
+
+           TAU
+              SC11FIDG      SC14THAC      SC14THAC      SC14TCOM      SC14TCOM
+              ________      ________      ________      ________      ________
+               -0.628        -1.357         0.521        -1.350         0.169
+
+
+           TAU
+              SC14OBEY      SC14OBEY      SC14DIST      SC14DIST      SC14TEMP
+              ________      ________      ________      ________      ________
+               -1.946        -0.273        -1.287        -0.091        -1.285
+
+
+           TAU
+              SC14TEMP      SC14REST      SC14REST      SC14FIDG      SC14FIDG
+              ________      ________      ________      ________      ________
+               -0.213        -1.406        -0.492        -1.531        -0.628
+
+
+           TAU
+              SC17THAC      SC17THAC      SC17TCOM      SC17TCOM      SC17OBEY
+              ________      ________      ________      ________      ________
+               -1.357         0.521        -1.350         0.169        -1.946
+
+
+           TAU
+              SC17OBEY      SC17DIST      SC17DIST      SC17TEMP      SC17TEMP
+              ________      ________      ________      ________      ________
+               -0.273        -1.287        -0.091        -1.285        -0.213
+
+
+           TAU
+              SC17REST      SC17REST      SC17FIDG      SC17FIDG
+              ________      ________      ________      ________
+               -1.406        -0.492        -1.531        -0.628
+
+
+           NU
+              SC3THAC       SC3TCOM       SC3OBEY       SC3DIST       SC3TEMP
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              SC3REST       SC3FIDG       SC5THAC       SC5TCOM       SC5OBEY
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              SC5DIST       SC5TEMP       SC5REST       SC5FIDG       SC7THAC
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              SC7TCOM       SC7OBEY       SC7DIST       SC7TEMP       SC7REST
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              SC7FIDG       SC11THAC      SC11TCOM      SC11OBEY      SC11DIST
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              SC11TEMP      SC11REST      SC11FIDG      SC14THAC      SC14TCOM
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              SC14OBEY      SC14DIST      SC14TEMP      SC14REST      SC14FIDG
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              SC17THAC      SC17TCOM      SC17OBEY      SC17DIST      SC17TEMP
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           NU
+              SC17REST      SC17FIDG
+              ________      ________
+                0.000         0.000
+
+
+           LAMBDA
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+ SC3THAC        1.000         0.000         0.000         0.000         0.000
+ SC3TCOM        1.961         0.000         0.000         0.000         0.000
+ SC3OBEY        0.925         0.000         0.000         0.000         0.000
+ SC3DIST        1.316         0.000         0.000         0.000         0.000
+ SC3TEMP        0.524         0.000         0.000         0.000         0.000
+ SC3REST        1.183         0.000         0.000         0.000         0.000
+ SC3FIDG        0.774         0.000         0.000         0.000         0.000
+ SC5THAC        0.000         1.000         0.000         0.000         0.000
+ SC5TCOM        0.000         1.536         0.000         0.000         0.000
+ SC5OBEY        0.000         0.716         0.000         0.000         0.000
+ SC5DIST        0.000         1.274         0.000         0.000         0.000
+ SC5TEMP        0.000         0.325         0.000         0.000         0.000
+ SC5REST        0.000         1.002         0.000         0.000         0.000
+ SC5FIDG        0.000         0.746         0.000         0.000         0.000
+ SC7THAC        0.000         0.000         1.000         0.000         0.000
+ SC7TCOM        0.000         0.000         1.355         0.000         0.000
+ SC7OBEY        0.000         0.000         0.744         0.000         0.000
+ SC7DIST        0.000         0.000         1.236         0.000         0.000
+ SC7TEMP        0.000         0.000         0.517         0.000         0.000
+ SC7REST        0.000         0.000         0.942         0.000         0.000
+ SC7FIDG        0.000         0.000         0.813         0.000         0.000
+ SC11THAC       0.000         0.000         0.000         1.000         0.000
+ SC11TCOM       0.000         0.000         0.000         1.336         0.000
+ SC11OBEY       0.000         0.000         0.000         0.650         0.000
+ SC11DIST       0.000         0.000         0.000         1.261         0.000
+ SC11TEMP       0.000         0.000         0.000         0.457         0.000
+ SC11REST       0.000         0.000         0.000         0.889         0.000
+ SC11FIDG       0.000         0.000         0.000         0.830         0.000
+ SC14THAC       0.000         0.000         0.000         0.000         1.000
+ SC14TCOM       0.000         0.000         0.000         0.000         1.312
+ SC14OBEY       0.000         0.000         0.000         0.000         0.709
+ SC14DIST       0.000         0.000         0.000         0.000         1.247
+ SC14TEMP       0.000         0.000         0.000         0.000         0.621
+ SC14REST       0.000         0.000         0.000         0.000         0.750
+ SC14FIDG       0.000         0.000         0.000         0.000         0.965
+ SC17THAC       0.000         0.000         0.000         0.000         0.000
+ SC17TCOM       0.000         0.000         0.000         0.000         0.000
+ SC17OBEY       0.000         0.000         0.000         0.000         0.000
+ SC17DIST       0.000         0.000         0.000         0.000         0.000
+ SC17TEMP       0.000         0.000         0.000         0.000         0.000
+ SC17REST       0.000         0.000         0.000         0.000         0.000
+ SC17FIDG       0.000         0.000         0.000         0.000         0.000
+
+
+           LAMBDA
+              SC_17         I             S
+              ________      ________      ________
+ SC3THAC        0.000         0.000         0.000
+ SC3TCOM        0.000         0.000         0.000
+ SC3OBEY        0.000         0.000         0.000
+ SC3DIST        0.000         0.000         0.000
+ SC3TEMP        0.000         0.000         0.000
+ SC3REST        0.000         0.000         0.000
+ SC3FIDG        0.000         0.000         0.000
+ SC5THAC        0.000         0.000         0.000
+ SC5TCOM        0.000         0.000         0.000
+ SC5OBEY        0.000         0.000         0.000
+ SC5DIST        0.000         0.000         0.000
+ SC5TEMP        0.000         0.000         0.000
+ SC5REST        0.000         0.000         0.000
+ SC5FIDG        0.000         0.000         0.000
+ SC7THAC        0.000         0.000         0.000
+ SC7TCOM        0.000         0.000         0.000
+ SC7OBEY        0.000         0.000         0.000
+ SC7DIST        0.000         0.000         0.000
+ SC7TEMP        0.000         0.000         0.000
+ SC7REST        0.000         0.000         0.000
+ SC7FIDG        0.000         0.000         0.000
+ SC11THAC       0.000         0.000         0.000
+ SC11TCOM       0.000         0.000         0.000
+ SC11OBEY       0.000         0.000         0.000
+ SC11DIST       0.000         0.000         0.000
+ SC11TEMP       0.000         0.000         0.000
+ SC11REST       0.000         0.000         0.000
+ SC11FIDG       0.000         0.000         0.000
+ SC14THAC       0.000         0.000         0.000
+ SC14TCOM       0.000         0.000         0.000
+ SC14OBEY       0.000         0.000         0.000
+ SC14DIST       0.000         0.000         0.000
+ SC14TEMP       0.000         0.000         0.000
+ SC14REST       0.000         0.000         0.000
+ SC14FIDG       0.000         0.000         0.000
+ SC17THAC       1.000         0.000         0.000
+ SC17TCOM       1.360         0.000         0.000
+ SC17OBEY       0.812         0.000         0.000
+ SC17DIST       1.114         0.000         0.000
+ SC17TEMP       0.685         0.000         0.000
+ SC17REST       0.588         0.000         0.000
+ SC17FIDG       0.823         0.000         0.000
+
+
+           THETA
+              SC3THAC       SC3TCOM       SC3OBEY       SC3DIST       SC3TEMP
+              ________      ________      ________      ________      ________
+ SC3THAC        1.000
+ SC3TCOM        0.000         1.000
+ SC3OBEY        0.000         0.000         1.000
+ SC3DIST        0.000         0.000         0.000         1.000
+ SC3TEMP        0.000         0.000         0.000         0.000         1.000
+ SC3REST        0.000         0.000         0.000         0.000         0.000
+ SC3FIDG        0.000         0.000         0.000         0.000         0.000
+ SC5THAC        0.000         0.000         0.000         0.000         0.000
+ SC5TCOM        0.000         0.000         0.000         0.000         0.000
+ SC5OBEY        0.000         0.000         0.000         0.000         0.000
+ SC5DIST        0.000         0.000         0.000         0.000         0.000
+ SC5TEMP        0.000         0.000         0.000         0.000         0.000
+ SC5REST        0.000         0.000         0.000         0.000         0.000
+ SC5FIDG        0.000         0.000         0.000         0.000         0.000
+ SC7THAC        0.000         0.000         0.000         0.000         0.000
+ SC7TCOM        0.000         0.000         0.000         0.000         0.000
+ SC7OBEY        0.000         0.000         0.000         0.000         0.000
+ SC7DIST        0.000         0.000         0.000         0.000         0.000
+ SC7TEMP        0.000         0.000         0.000         0.000         0.000
+ SC7REST        0.000         0.000         0.000         0.000         0.000
+ SC7FIDG        0.000         0.000         0.000         0.000         0.000
+ SC11THAC       0.000         0.000         0.000         0.000         0.000
+ SC11TCOM       0.000         0.000         0.000         0.000         0.000
+ SC11OBEY       0.000         0.000         0.000         0.000         0.000
+ SC11DIST       0.000         0.000         0.000         0.000         0.000
+ SC11TEMP       0.000         0.000         0.000         0.000         0.000
+ SC11REST       0.000         0.000         0.000         0.000         0.000
+ SC11FIDG       0.000         0.000         0.000         0.000         0.000
+ SC14THAC       0.000         0.000         0.000         0.000         0.000
+ SC14TCOM       0.000         0.000         0.000         0.000         0.000
+ SC14OBEY       0.000         0.000         0.000         0.000         0.000
+ SC14DIST       0.000         0.000         0.000         0.000         0.000
+ SC14TEMP       0.000         0.000         0.000         0.000         0.000
+ SC14REST       0.000         0.000         0.000         0.000         0.000
+ SC14FIDG       0.000         0.000         0.000         0.000         0.000
+ SC17THAC       0.000         0.000         0.000         0.000         0.000
+ SC17TCOM       0.000         0.000         0.000         0.000         0.000
+ SC17OBEY       0.000         0.000         0.000         0.000         0.000
+ SC17DIST       0.000         0.000         0.000         0.000         0.000
+ SC17TEMP       0.000         0.000         0.000         0.000         0.000
+ SC17REST       0.000         0.000         0.000         0.000         0.000
+ SC17FIDG       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              SC3REST       SC3FIDG       SC5THAC       SC5TCOM       SC5OBEY
+              ________      ________      ________      ________      ________
+ SC3REST        1.000
+ SC3FIDG        0.000         1.000
+ SC5THAC        0.000         0.000         1.000
+ SC5TCOM        0.000         0.000         0.000         1.000
+ SC5OBEY        0.000         0.000         0.000         0.000         1.000
+ SC5DIST        0.000         0.000         0.000         0.000         0.000
+ SC5TEMP        0.000         0.000         0.000         0.000         0.000
+ SC5REST        0.000         0.000         0.000         0.000         0.000
+ SC5FIDG        0.000         0.000         0.000         0.000         0.000
+ SC7THAC        0.000         0.000         0.000         0.000         0.000
+ SC7TCOM        0.000         0.000         0.000         0.000         0.000
+ SC7OBEY        0.000         0.000         0.000         0.000         0.000
+ SC7DIST        0.000         0.000         0.000         0.000         0.000
+ SC7TEMP        0.000         0.000         0.000         0.000         0.000
+ SC7REST        0.000         0.000         0.000         0.000         0.000
+ SC7FIDG        0.000         0.000         0.000         0.000         0.000
+ SC11THAC       0.000         0.000         0.000         0.000         0.000
+ SC11TCOM       0.000         0.000         0.000         0.000         0.000
+ SC11OBEY       0.000         0.000         0.000         0.000         0.000
+ SC11DIST       0.000         0.000         0.000         0.000         0.000
+ SC11TEMP       0.000         0.000         0.000         0.000         0.000
+ SC11REST       0.000         0.000         0.000         0.000         0.000
+ SC11FIDG       0.000         0.000         0.000         0.000         0.000
+ SC14THAC       0.000         0.000         0.000         0.000         0.000
+ SC14TCOM       0.000         0.000         0.000         0.000         0.000
+ SC14OBEY       0.000         0.000         0.000         0.000         0.000
+ SC14DIST       0.000         0.000         0.000         0.000         0.000
+ SC14TEMP       0.000         0.000         0.000         0.000         0.000
+ SC14REST       0.000         0.000         0.000         0.000         0.000
+ SC14FIDG       0.000         0.000         0.000         0.000         0.000
+ SC17THAC       0.000         0.000         0.000         0.000         0.000
+ SC17TCOM       0.000         0.000         0.000         0.000         0.000
+ SC17OBEY       0.000         0.000         0.000         0.000         0.000
+ SC17DIST       0.000         0.000         0.000         0.000         0.000
+ SC17TEMP       0.000         0.000         0.000         0.000         0.000
+ SC17REST       0.000         0.000         0.000         0.000         0.000
+ SC17FIDG       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              SC5DIST       SC5TEMP       SC5REST       SC5FIDG       SC7THAC
+              ________      ________      ________      ________      ________
+ SC5DIST        1.000
+ SC5TEMP        0.000         1.000
+ SC5REST        0.000         0.000         1.000
+ SC5FIDG        0.000         0.000         0.000         1.000
+ SC7THAC        0.000         0.000         0.000         0.000         1.000
+ SC7TCOM        0.000         0.000         0.000         0.000         0.000
+ SC7OBEY        0.000         0.000         0.000         0.000         0.000
+ SC7DIST        0.000         0.000         0.000         0.000         0.000
+ SC7TEMP        0.000         0.000         0.000         0.000         0.000
+ SC7REST        0.000         0.000         0.000         0.000         0.000
+ SC7FIDG        0.000         0.000         0.000         0.000         0.000
+ SC11THAC       0.000         0.000         0.000         0.000         0.000
+ SC11TCOM       0.000         0.000         0.000         0.000         0.000
+ SC11OBEY       0.000         0.000         0.000         0.000         0.000
+ SC11DIST       0.000         0.000         0.000         0.000         0.000
+ SC11TEMP       0.000         0.000         0.000         0.000         0.000
+ SC11REST       0.000         0.000         0.000         0.000         0.000
+ SC11FIDG       0.000         0.000         0.000         0.000         0.000
+ SC14THAC       0.000         0.000         0.000         0.000         0.000
+ SC14TCOM       0.000         0.000         0.000         0.000         0.000
+ SC14OBEY       0.000         0.000         0.000         0.000         0.000
+ SC14DIST       0.000         0.000         0.000         0.000         0.000
+ SC14TEMP       0.000         0.000         0.000         0.000         0.000
+ SC14REST       0.000         0.000         0.000         0.000         0.000
+ SC14FIDG       0.000         0.000         0.000         0.000         0.000
+ SC17THAC       0.000         0.000         0.000         0.000         0.000
+ SC17TCOM       0.000         0.000         0.000         0.000         0.000
+ SC17OBEY       0.000         0.000         0.000         0.000         0.000
+ SC17DIST       0.000         0.000         0.000         0.000         0.000
+ SC17TEMP       0.000         0.000         0.000         0.000         0.000
+ SC17REST       0.000         0.000         0.000         0.000         0.000
+ SC17FIDG       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              SC7TCOM       SC7OBEY       SC7DIST       SC7TEMP       SC7REST
+              ________      ________      ________      ________      ________
+ SC7TCOM        1.000
+ SC7OBEY        0.000         1.000
+ SC7DIST        0.000         0.000         1.000
+ SC7TEMP        0.000         0.000         0.000         1.000
+ SC7REST        0.000         0.000         0.000         0.000         1.000
+ SC7FIDG        0.000         0.000         0.000         0.000         0.000
+ SC11THAC       0.000         0.000         0.000         0.000         0.000
+ SC11TCOM       0.000         0.000         0.000         0.000         0.000
+ SC11OBEY       0.000         0.000         0.000         0.000         0.000
+ SC11DIST       0.000         0.000         0.000         0.000         0.000
+ SC11TEMP       0.000         0.000         0.000         0.000         0.000
+ SC11REST       0.000         0.000         0.000         0.000         0.000
+ SC11FIDG       0.000         0.000         0.000         0.000         0.000
+ SC14THAC       0.000         0.000         0.000         0.000         0.000
+ SC14TCOM       0.000         0.000         0.000         0.000         0.000
+ SC14OBEY       0.000         0.000         0.000         0.000         0.000
+ SC14DIST       0.000         0.000         0.000         0.000         0.000
+ SC14TEMP       0.000         0.000         0.000         0.000         0.000
+ SC14REST       0.000         0.000         0.000         0.000         0.000
+ SC14FIDG       0.000         0.000         0.000         0.000         0.000
+ SC17THAC       0.000         0.000         0.000         0.000         0.000
+ SC17TCOM       0.000         0.000         0.000         0.000         0.000
+ SC17OBEY       0.000         0.000         0.000         0.000         0.000
+ SC17DIST       0.000         0.000         0.000         0.000         0.000
+ SC17TEMP       0.000         0.000         0.000         0.000         0.000
+ SC17REST       0.000         0.000         0.000         0.000         0.000
+ SC17FIDG       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              SC7FIDG       SC11THAC      SC11TCOM      SC11OBEY      SC11DIST
+              ________      ________      ________      ________      ________
+ SC7FIDG        1.000
+ SC11THAC       0.000         1.000
+ SC11TCOM       0.000         0.000         1.000
+ SC11OBEY       0.000         0.000         0.000         1.000
+ SC11DIST       0.000         0.000         0.000         0.000         1.000
+ SC11TEMP       0.000         0.000         0.000         0.000         0.000
+ SC11REST       0.000         0.000         0.000         0.000         0.000
+ SC11FIDG       0.000         0.000         0.000         0.000         0.000
+ SC14THAC       0.000         0.000         0.000         0.000         0.000
+ SC14TCOM       0.000         0.000         0.000         0.000         0.000
+ SC14OBEY       0.000         0.000         0.000         0.000         0.000
+ SC14DIST       0.000         0.000         0.000         0.000         0.000
+ SC14TEMP       0.000         0.000         0.000         0.000         0.000
+ SC14REST       0.000         0.000         0.000         0.000         0.000
+ SC14FIDG       0.000         0.000         0.000         0.000         0.000
+ SC17THAC       0.000         0.000         0.000         0.000         0.000
+ SC17TCOM       0.000         0.000         0.000         0.000         0.000
+ SC17OBEY       0.000         0.000         0.000         0.000         0.000
+ SC17DIST       0.000         0.000         0.000         0.000         0.000
+ SC17TEMP       0.000         0.000         0.000         0.000         0.000
+ SC17REST       0.000         0.000         0.000         0.000         0.000
+ SC17FIDG       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              SC11TEMP      SC11REST      SC11FIDG      SC14THAC      SC14TCOM
+              ________      ________      ________      ________      ________
+ SC11TEMP       1.000
+ SC11REST       0.000         1.000
+ SC11FIDG       0.000         0.000         1.000
+ SC14THAC       0.000         0.000         0.000         1.000
+ SC14TCOM       0.000         0.000         0.000         0.000         1.000
+ SC14OBEY       0.000         0.000         0.000         0.000         0.000
+ SC14DIST       0.000         0.000         0.000         0.000         0.000
+ SC14TEMP       0.000         0.000         0.000         0.000         0.000
+ SC14REST       0.000         0.000         0.000         0.000         0.000
+ SC14FIDG       0.000         0.000         0.000         0.000         0.000
+ SC17THAC       0.000         0.000         0.000         0.000         0.000
+ SC17TCOM       0.000         0.000         0.000         0.000         0.000
+ SC17OBEY       0.000         0.000         0.000         0.000         0.000
+ SC17DIST       0.000         0.000         0.000         0.000         0.000
+ SC17TEMP       0.000         0.000         0.000         0.000         0.000
+ SC17REST       0.000         0.000         0.000         0.000         0.000
+ SC17FIDG       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              SC14OBEY      SC14DIST      SC14TEMP      SC14REST      SC14FIDG
+              ________      ________      ________      ________      ________
+ SC14OBEY       1.000
+ SC14DIST       0.000         1.000
+ SC14TEMP       0.000         0.000         1.000
+ SC14REST       0.000         0.000         0.000         1.000
+ SC14FIDG       0.000         0.000         0.000         0.000         1.000
+ SC17THAC       0.000         0.000         0.000         0.000         0.000
+ SC17TCOM       0.000         0.000         0.000         0.000         0.000
+ SC17OBEY       0.000         0.000         0.000         0.000         0.000
+ SC17DIST       0.000         0.000         0.000         0.000         0.000
+ SC17TEMP       0.000         0.000         0.000         0.000         0.000
+ SC17REST       0.000         0.000         0.000         0.000         0.000
+ SC17FIDG       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              SC17THAC      SC17TCOM      SC17OBEY      SC17DIST      SC17TEMP
+              ________      ________      ________      ________      ________
+ SC17THAC       1.000
+ SC17TCOM       0.000         1.000
+ SC17OBEY       0.000         0.000         1.000
+ SC17DIST       0.000         0.000         0.000         1.000
+ SC17TEMP       0.000         0.000         0.000         0.000         1.000
+ SC17REST       0.000         0.000         0.000         0.000         0.000
+ SC17FIDG       0.000         0.000         0.000         0.000         0.000
+
+
+           THETA
+              SC17REST      SC17FIDG
+              ________      ________
+ SC17REST       1.000
+ SC17FIDG       0.000         1.000
+
+
+           ALPHA
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           ALPHA
+              SC_17         I             S
+              ________      ________      ________
+                0.000         0.000         0.000
+
+
+           BETA
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+ SC_3           0.000         0.000         0.000         0.000         0.000
+ SC_5           0.000         0.000         0.000         0.000         0.000
+ SC_7           0.000         0.000         0.000         0.000         0.000
+ SC_11          0.000         0.000         0.000         0.000         0.000
+ SC_14          0.000         0.000         0.000         0.000         0.000
+ SC_17          0.000         0.000         0.000         0.000         0.000
+ I              0.000         0.000         0.000         0.000         0.000
+ S              0.000         0.000         0.000         0.000         0.000
+
+
+           BETA
+              SC_17         I             S
+              ________      ________      ________
+ SC_3           0.000         1.000         0.000
+ SC_5           0.000         1.000         1.000
+ SC_7           0.000         1.000         1.000
+ SC_11          0.000         1.000         1.000
+ SC_14          0.000         1.000         1.000
+ SC_17          0.000         1.000         1.000
+ I              0.000         0.000         0.000
+ S              0.000         0.000         0.000
+
+
+           GAMMA
+              SCOGA         LBW           INFTEMP       HFAE          BMARRIED
+              ________      ________      ________      ________      ________
+ SC_3           0.000         0.000         0.000         0.000         0.000
+ SC_5           0.000         0.000         0.000         0.000         0.000
+ SC_7           0.000         0.000         0.000         0.000         0.000
+ SC_11          0.000         0.000         0.000         0.000         0.000
+ SC_14          0.000         0.000         0.000         0.000         0.000
+ SC_17          0.000         0.000         0.000         0.000         0.000
+ I              0.000         0.000         0.000         0.000         0.000
+ S              0.000         0.000         0.000         0.000         0.000
+
+
+           GAMMA
+              BRACE         SEX           BPEDU         INCOMEF       IGNORE3
+              ________      ________      ________      ________      ________
+ SC_3           0.000         0.000         0.000         0.000         0.000
+ SC_5           0.000         0.000         0.000         0.000         0.000
+ SC_7           0.000         0.000         0.000         0.000         0.000
+ SC_11          0.000         0.000         0.000         0.000         0.000
+ SC_14          0.000         0.000         0.000         0.000         0.000
+ SC_17          0.000         0.000         0.000         0.000         0.000
+ I              0.000         0.000         0.000         0.000         0.000
+ S              0.000         0.000         0.000         0.000         0.000
+
+
+           GAMMA
+              SMACK3        SHOUT3        BEDROOM3      TREATS3       TELLOFF3
+              ________      ________      ________      ________      ________
+ SC_3           0.000         0.000         0.000         0.000         0.000
+ SC_5           0.000         0.000         0.000         0.000         0.000
+ SC_7           0.000         0.000         0.000         0.000         0.000
+ SC_11          0.000         0.000         0.000         0.000         0.000
+ SC_14          0.000         0.000         0.000         0.000         0.000
+ SC_17          0.000         0.000         0.000         0.000         0.000
+ I              0.000         0.000         0.000         0.000         0.000
+ S              0.000         0.000         0.000         0.000         0.000
+
+
+           GAMMA
+              BRIBE3        PA5           PA7           PA11          PM14
+              ________      ________      ________      ________      ________
+ SC_3           0.000         0.000         0.000         0.000         0.000
+ SC_5           0.000         0.000         0.000         0.000         0.000
+ SC_7           0.000         0.000         0.000         0.000         0.000
+ SC_11          0.000         0.000         0.000         0.000         0.000
+ SC_14          0.000         0.000         0.000         0.000         0.000
+ SC_17          0.000         0.000         0.000         0.000         0.000
+ I              0.000         0.000         0.000         0.000         0.000
+ S              0.000         0.000         0.000         0.000         0.000
+
+
+           GAMMA
+              PM17
+              ________
+ SC_3           0.000
+ SC_5           0.000
+ SC_7           0.000
+ SC_11          0.000
+ SC_14          0.000
+ SC_17          0.000
+ I              0.000
+ S              0.000
+
+
+           PSI
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+ SC_3           0.050
+ SC_5           0.000         0.050
+ SC_7           0.000         0.000         0.050
+ SC_11          0.000         0.000         0.000         0.050
+ SC_14          0.000         0.000         0.000         0.000         0.050
+ SC_17          0.000         0.000         0.000         0.000         0.000
+ I              0.000         0.000         0.000         0.000         0.000
+ S              0.000         0.000         0.000         0.000         0.000
+
+
+           PSI
+              SC_17         I             S
+              ________      ________      ________
+ SC_17          0.050
+ I              0.000         0.050
+ S              0.000         0.000         0.050
+
+
+           DELTA
+              SC3THAC       SC3TCOM       SC3OBEY       SC3DIST       SC3TEMP
+              ________      ________      ________      ________      ________
+                1.000         1.000         1.000         1.000         1.000
+
+
+           DELTA
+              SC3REST       SC3FIDG       SC5THAC       SC5TCOM       SC5OBEY
+              ________      ________      ________      ________      ________
+                1.000         1.000         1.000         1.000         1.000
+
+
+           DELTA
+              SC5DIST       SC5TEMP       SC5REST       SC5FIDG       SC7THAC
+              ________      ________      ________      ________      ________
+                1.000         1.000         1.000         1.000         1.000
+
+
+           DELTA
+              SC7TCOM       SC7OBEY       SC7DIST       SC7TEMP       SC7REST
+              ________      ________      ________      ________      ________
+                1.000         1.000         1.000         1.000         1.000
+
+
+           DELTA
+              SC7FIDG       SC11THAC      SC11TCOM      SC11OBEY      SC11DIST
+              ________      ________      ________      ________      ________
+                1.000         1.000         1.000         1.000         1.000
+
+
+           DELTA
+              SC11TEMP      SC11REST      SC11FIDG      SC14THAC      SC14TCOM
+              ________      ________      ________      ________      ________
+                1.000         1.000         1.000         1.000         1.000
+
+
+           DELTA
+              SC14OBEY      SC14DIST      SC14TEMP      SC14REST      SC14FIDG
+              ________      ________      ________      ________      ________
+                1.000         1.000         1.000         1.000         1.000
+
+
+           DELTA
+              SC17THAC      SC17TCOM      SC17OBEY      SC17DIST      SC17TEMP
+              ________      ________      ________      ________      ________
+                1.000         1.000         1.000         1.000         1.000
+
+
+           DELTA
+              SC17REST      SC17FIDG
+              ________      ________
+                1.000         1.000
+
+
+TECHNICAL 4 OUTPUT
+
+
+     ESTIMATES DERIVED FROM THE MODEL
+
+
+           ESTIMATED MEANS FOR THE LATENT VARIABLES
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+               -0.218        -0.076        -0.217        -0.216         0.405
+
+
+           ESTIMATED MEANS FOR THE LATENT VARIABLES
+              SC_17         I             S
+              ________      ________      ________
+               -0.103         0.166        -0.221
+
+
+           ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+ SC_3           0.132
+ SC_5           0.067         0.075
+ SC_7           0.066         0.063         0.089
+ SC_11          0.061         0.061         0.068         0.101
+ SC_14          0.051         0.054         0.062         0.073         0.122
+ SC_17          0.045         0.050         0.061         0.077         0.096
+ I              0.064         0.061         0.059         0.055         0.049
+ S             -0.019        -0.011         0.003         0.022         0.047
+
+
+           ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              SC_17         I             S
+              ________      ________      ________
+ SC_17          0.150
+ I              0.044         0.063
+ S              0.069        -0.019         0.088
+
+
+           ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+ SC_3           1.000
+ SC_5           0.670         1.000
+ SC_7           0.607         0.775         1.000
+ SC_11          0.525         0.696         0.717         1.000
+ SC_14          0.401         0.563         0.594         0.658         1.000
+ SC_17          0.317         0.471         0.529         0.626         0.712
+ I              0.700         0.892         0.783         0.686         0.561
+ S             -0.176        -0.138         0.030         0.237         0.457
+
+
+           ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              SC_17         I             S
+              ________      ________      ________
+ SC_17          1.000
+ I              0.451         1.000
+ S              0.603        -0.255         1.000
+
+
+     ESTIMATES DERIVED FROM THE MODEL
+
+
+           S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+                0.054         0.039         0.050         0.054         0.105
+
+
+           S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              SC_17         I             S
+              ________      ________      ________
+                0.104         0.025         0.101
+
+
+           EST./S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+               -4.006        -1.966        -4.295        -3.971         3.851
+
+
+           EST./S.E. FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              SC_17         I             S
+              ________      ________      ________
+               -0.991         6.611        -2.176
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+                0.000         0.049         0.000         0.000         0.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED MEANS FOR THE LATENT VARIABLES
+              SC_17         I             S
+              ________      ________      ________
+                0.321         0.000         0.030
+
+
+           S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+ SC_3           0.025
+ SC_5           0.013         0.015
+ SC_7           0.013         0.013         0.018
+ SC_11          0.012         0.012         0.014         0.021
+ SC_14          0.011         0.011         0.013         0.017         0.029
+ SC_17          0.010         0.011         0.014         0.019         0.025
+ I              0.013         0.012         0.012         0.011         0.011
+ S              0.008         0.007         0.008         0.011         0.017
+
+
+           S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              SC_17         I             S
+              ________      ________      ________
+ SC_17          0.042
+ I              0.010         0.012
+ S              0.024         0.008         0.022
+
+
+           EST./S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+ SC_3           5.282
+ SC_5           5.074         5.023
+ SC_7           5.110         5.051         4.981
+ SC_11          5.098         5.029         4.954         4.825
+ SC_14          4.726         4.789         4.686         4.404         4.197
+ SC_17          4.347         4.482         4.384         4.082         3.850
+ I              5.052         5.058         5.072         5.017         4.677
+ S             -2.316        -1.532         0.334         1.975         2.829
+
+
+           EST./S.E. FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              SC_17         I             S
+              ________      ________      ________
+ SC_17          3.566
+ I              4.307         5.038
+ S              2.870        -2.348         3.943
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+ SC_3           0.000
+ SC_5           0.000         0.000
+ SC_7           0.000         0.000         0.000
+ SC_11          0.000         0.000         0.000         0.000
+ SC_14          0.000         0.000         0.000         0.000         0.000
+ SC_17          0.000         0.000         0.000         0.000         0.000
+ I              0.000         0.000         0.000         0.000         0.000
+ S              0.021         0.126         0.739         0.048         0.005
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED COVARIANCE MATRIX FOR THE LATENT VARIABLES
+              SC_17         I             S
+              ________      ________      ________
+ SC_17          0.000
+ I              0.000         0.000
+ S              0.004         0.019         0.000
+
+
+           S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+ SC_3           0.000
+ SC_5           0.017         0.000
+ SC_7           0.017         0.013         0.000
+ SC_11          0.018         0.014         0.013         0.000
+ SC_14          0.023         0.022         0.020         0.018         0.000
+ SC_17          0.024         0.025         0.024         0.020         0.018
+ I              0.021         0.017         0.018         0.024         0.033
+ S              0.077         0.094         0.087         0.085         0.076
+
+
+           S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              SC_17         I             S
+              ________      ________      ________
+ SC_17          0.000
+ I              0.035         0.000
+ S              0.072         0.108         0.000
+
+
+           EST./S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+ SC_3         999.000
+ SC_5          40.183       999.000
+ SC_7          36.534        59.274       999.000
+ SC_11         28.432        49.241        55.904       999.000
+ SC_14         17.247        25.548        29.054        36.755       999.000
+ SC_17         13.025        18.576        22.342        31.722        39.030
+ I             34.122        53.148        42.674        29.007        17.137
+ S             -2.288        -1.474         0.343         2.785         6.045
+
+
+           EST./S.E. FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              SC_17         I             S
+              ________      ________      ________
+ SC_17        999.000
+ I             12.853       999.000
+ S              8.407        -2.373       999.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              SC_3          SC_5          SC_7          SC_11         SC_14
+              ________      ________      ________      ________      ________
+ SC_3           0.000
+ SC_5           0.000         0.000
+ SC_7           0.000         0.000         0.000
+ SC_11          0.000         0.000         0.000         0.000
+ SC_14          0.000         0.000         0.000         0.000         0.000
+ SC_17          0.000         0.000         0.000         0.000         0.000
+ I              0.000         0.000         0.000         0.000         0.000
+ S              0.022         0.141         0.731         0.005         0.000
+
+
+           TWO-TAILED P-VALUE FOR ESTIMATED CORRELATION MATRIX FOR THE LATENT VARIABLES
+              SC_17         I             S
+              ________      ________      ________
+ SC_17          0.000
+ I              0.000         0.000
+ S              0.000         0.018         0.000
+
+
+DIAGRAM INFORMATION
+
+  Use View Diagram under the Diagram menu in the Mplus Editor to view the diagram.
+  If running Mplus from the Mplus Diagrammer, the diagram opens automatically.
+
+  Diagram output
+    c:\users\siyan\onedrive - the pennsylvania state university\dissertation_working\data\mplus\scp_lgbm_pa3.dgm
+
+     Beginning Time:  00:04:58
+        Ending Time:  00:06:07
+       Elapsed Time:  00:01:09
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2019 Muthen & Muthen

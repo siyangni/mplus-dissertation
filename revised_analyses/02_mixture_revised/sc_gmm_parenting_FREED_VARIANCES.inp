@@ -1,0 +1,195 @@
+TITLE: 3-class GMM with parenting effects AND CLASS-SPECIFIC VARIANCES
+       REVISED VERSION: Critical improvement over constrained model
+       - Freed growth variances by class
+       - Freed intercept variance by class
+       - Parenting effects remain class-specific
+
+DATA:
+  FILE = ../../growth_mixture_models/merged_sc_pa_fscores.dat;
+
+VARIABLE:
+  NAMES =
+	SC3THAC SC3TCOM SC3OBEY SC3DIST SC3TEMP SC3REST SC3FIDG
+	SC5THAC SC5TCOM SC5OBEY SC5DIST SC5TEMP SC5REST SC5FIDG
+	SC7THAC SC7TCOM SC7OBEY SC7DIST SC7TEMP SC7REST SC7FIDG
+	SC11THAC SC11TCOM SC11OBEY SC11DIST SC11TEMP SC11REST SC11FIDG
+	SC14THAC SC14TCOM SC14OBEY SC14DIST SC14TEMP SC14REST SC14FIDG
+	SC17THAC SC17TCOM SC17OBEY SC17DIST SC17TEMP SC17REST SC17FIDG
+	IGNORE3 SMACK3 SHOUT3 BEDROOM3 TREATS3 TELLOFF3 BRIBE3
+	IGNORE5 SMACK5 SHOUT5 BEDROOM5 TREATS5 TELLOFF5 BRIBE5
+	REASON5 RINDOOR5 DINNER5 CLOSE5 READ5 STORY5 MUSIC5
+	PAINT5 ACTIVE5 GAMES5 PARK5 IGNORE7 SMACK7 SHOUT7
+	BEDROOM7 TREATS7 TELLOFF7 BRIBE7 REASON7 RINDOOR7 DINNER7
+	CLOSE7 READ7 STORY7 MUSIC7 PAINT7 ACTIVE7 GAMES7
+	PARK7 TVRULES7 BEDROOM11 TREATS11 REASON11 CLOSE11 ACTIVE11
+	GAMES11 PWHERE14 PWHO14 PWHAT14 CMWHERE14 CMWHO14 CMWHAT14
+	CMWHERE17 CMTBACK17 PWHERE17 PTBACK17 LIVEWP17 PEDU BPEDU
+	SEX RACE BRACE BMARRIED INCOMEC INCOMEL INCOMEF
+	LBW NAMHAPNA NAMUNFAA NAMBRUSA NAMFEEDA NAMINJUA NAMBATHA
+	NAMWARYA NAMBSHYA NAMFRETA NAMSLEEA NAMMILKA NAMSLTIA NAMNAPSA
+	NAMSOFOA INFTEMPR INFTEMP DFPW DUPD DUPW HFAE
+	COGA SCOGA AGE3 AGE5 AGE7 AGE11 AGE14
+	AGE17 SC_3 SC_3_SE SC_5 SC_5_SE SC_7 SC_7_SE
+	SC_11 SC_11_SE SC_14 SC_14_SE SC_17 SC_17_SE H3
+	H3_SE H5 H5_SE H7 H7_SE H11 H11_SE
+	MON14 MON14_SE MON17_K MON17_K_SE CURFEW17 CURFEW17_SE GOVWT1
+	MCSID PTTYPE2 SPTN00;
+
+  USEVARIABLES =
+    SC_3 SC_5 SC_7 SC_11 SC_14 SC_17
+    H3 H5 H7 H11 MON14 MON17_K CURFEW17;
+
+  IDVARIABLE = MCSID;
+  MISSING = *;
+
+  STRATIFICATION = PTTYPE2;
+  CLUSTER       = SPTN00;
+  WEIGHT        = GOVWT1;
+  SUBPOPULATION = (GOVWT1 > 0);
+
+  CLASSES = c(3);
+
+  ! Predictors of class membership
+  AUXILIARY =
+    scoga (R3STEP)
+    lbw (R3STEP)
+    inftemp (R3STEP)
+    hfae (R3STEP)
+    bmarried (R3STEP)
+    brace (R3STEP)
+    sex (R3STEP)
+    bpedu (R3STEP)
+    incomef (R3STEP);
+
+ANALYSIS:
+  TYPE = COMPLEX MIXTURE;
+  ESTIMATOR = MLR;
+  PROCESSORS = 12;
+  STARTS = 2000 500;     ! Reduced for initial testing
+  STITERATIONS = 50;
+  STSEED = 20251021;
+
+MODEL:
+  %OVERALL%
+
+  ! Growth model structure (time scores constrained for stability with parenting)
+  i s | SC_3@0 SC_5* SC_7* SC_11* SC_14* SC_17@1;
+
+  ! Parenting effects at each wave (contemporaneous + lagged)
+  SC_3  ON H3;
+  SC_5  ON H5 H3;
+  SC_7  ON H7 H5;
+  SC_11 ON H11 H7;
+  SC_14 ON MON14 H11;
+  SC_17 ON MON17_K CURFEW17;
+
+  ! CLASS-SPECIFIC PARAMETERS
+  %C#1%
+    [i] (mi1);
+    [s] (ms1);
+
+    ! FREED: Class 1 specific growth variances
+    i* (vari_c1);
+    s* (vars_c1);
+    i WITH s* (covis_c1);
+
+    ! Residual variances for Class 1
+    SC_3* (rv3_c1);
+    SC_5* (rv5_c1);
+    SC_7* (rv7_c1);
+    SC_11* (rv11_c1);
+    SC_14* (rv14_c1);
+    SC_17* (rv17_c1);
+
+    ! Class-1 specific parenting effects
+    SC_3  ON H3         (bH3now_c1);
+    SC_5  ON H5         (bH5now_c1)
+             H3         (bH3lag_c1);
+    SC_7  ON H7         (bH7now_c1)
+             H5         (bH5lag_c1);
+    SC_11 ON H11        (bH11now_c1)
+             H7         (bH7lag_c1);
+    SC_14 ON MON14      (bM14now_c1)
+             H11        (bH11lag_c1);
+    SC_17 ON MON17_K    (bMK17now_c1)
+             CURFEW17   (bCF17now_c1);
+
+  %C#2%
+    [i] (mi2);
+    [s] (ms2);
+
+    ! FREED: Class 2 specific growth variances
+    i* (vari_c2);
+    s* (vars_c2);
+    i WITH s* (covis_c2);
+
+    ! Residual variances for Class 2
+    SC_3* (rv3_c2);
+    SC_5* (rv5_c2);
+    SC_7* (rv7_c2);
+    SC_11* (rv11_c2);
+    SC_14* (rv14_c2);
+    SC_17* (rv17_c2);
+
+    ! Class-2 specific parenting effects
+    SC_3  ON H3         (bH3now_c2);
+    SC_5  ON H5         (bH5now_c2)
+          H3            (bH3lag_c2);
+    SC_7  ON H7         (bH7now_c2)
+          H5            (bH5lag_c2);
+    SC_11 ON H11        (bH11now_c2)
+          H7            (bH7lag_c2);
+    SC_14 ON MON14      (bM14now_c2)
+             H11        (bH11lag_c2);
+    SC_17 ON MON17_K    (bMK17now_c2)
+             CURFEW17   (bCF17now_c2);
+
+  %C#3%
+    [i] (mi3);
+    [s] (ms3);
+
+    ! FREED: Class 3 specific growth variances
+    i* (vari_c3);
+    s* (vars_c3);
+    i WITH s* (covis_c3);
+
+    ! Residual variances for Class 3
+    SC_3* (rv3_c3);
+    SC_5* (rv5_c3);
+    SC_7* (rv7_c3);
+    SC_11* (rv11_c3);
+    SC_14* (rv14_c3);
+    SC_17* (rv17_c3);
+
+    ! Class-3 specific parenting effects
+    SC_3  ON H3         (bH3now_c3);
+    SC_5  ON H5         (bH5now_c3)
+          H3            (bH3lag_c3);
+    SC_7  ON H7         (bH7now_c3)
+          H5            (bH5lag_c3);
+    SC_11 ON H11        (bH11now_c3)
+          H7            (bH7lag_c3);
+    SC_14 ON MON14      (bM14now_c3)
+             H11        (bH11lag_c3);
+    SC_17 ON MON17_K    (bMK17now_c3)
+             CURFEW17   (bCF17now_c3);
+
+MODEL CONSTRAINT:
+  ! Calculate standardized correlations between i and s for each class
+  NEW(cor_is_c1 cor_is_c2 cor_is_c3);
+  cor_is_c1 = covis_c1 / SQRT(vari_c1 * vars_c1);
+  cor_is_c2 = covis_c2 / SQRT(vari_c2 * vars_c2);
+  cor_is_c3 = covis_c3 / SQRT(vari_c3 * vars_c3);
+
+MODEL TEST:
+  ! OMNIBUS TEST: Any class differences in contemporaneous parenting effects?
+  ! Test H3 effects across all classes
+  0 = bH3now_c1  - bH3now_c2;
+  0 = bH3now_c1  - bH3now_c3;
+
+OUTPUT:
+  TECH1 TECH4 STANDARDIZED(STDYX) SVALUES;
+
+SAVEDATA:
+  FILE = sc_gmm_parentFS_FREED_cprobs.dat;
+  SAVE = CPROBABILITIES;

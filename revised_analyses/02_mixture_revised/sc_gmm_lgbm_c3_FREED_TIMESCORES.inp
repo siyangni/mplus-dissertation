@@ -1,0 +1,108 @@
+TITLE: Three-class GMM with CLASS-SPECIFIC time scores
+       REVISED: Allows each class to have different trajectory SHAPES
+       This permits qualitatively different developmental patterns
+
+DATA:
+  FILE = ../../growth_mixture_models/sc_wave_fscores.dat;
+
+VARIABLE:
+  NAMES ARE
+	SC3THAC  SC3TCOM  SC3OBEY  SC3DIST  SC3TEMP  SC3REST  SC3FIDG  SC5THAC
+	SC5TCOM  SC5OBEY  SC5DIST  SC5TEMP  SC5REST  SC5FIDG  SC7THAC  SC7TCOM
+	SC7OBEY  SC7DIST  SC7TEMP  SC7REST  SC7FIDG  SC11THAC SC11TCOM SC11OBEY
+	SC11DIST SC11TEMP SC11REST SC11FIDG SC14THAC SC14TCOM SC14OBEY SC14DIST
+	SC14TEMP SC14REST SC14FIDG SC17THAC SC17TCOM SC17OBEY SC17DIST SC17TEMP
+	SC17REST SC17FIDG SC_3     SC_3_SE  SC_5     SC_5_SE  SC_7     SC_7_SE
+	SC_11    SC_11_SE SC_14    SC_14_SE SC_17    SC_17_SE GOVWT1   MCSID
+	PTTYPE2  SPTN00;
+
+  USEVARIABLES = mcsid pttype2 sptn00 govwt1 SC_3 SC_5 SC_7 SC_11 SC_14 SC_17;
+
+  IDVARIABLE = mcsid;
+  MISSING = *;
+
+  STRATIFICATION = pttype2;
+  CLUSTER       = sptn00;
+  WEIGHT        = govwt1;
+  SUBPOPULATION = (govwt1 > 0);
+
+  CLASSES = c(3);
+
+ANALYSIS:
+  TYPE = COMPLEX MIXTURE;
+  ESTIMATOR = MLR;
+  PROCESSORS = 12;
+  STARTS = 4000 1000;
+  STITERATIONS = 50;
+  STSEED = 20251021;
+
+MODEL:
+  %OVERALL%
+
+  ! Residual variances equal across classes for identification
+  SC_3* (resvar_3);
+  SC_5* (resvar_5);
+  SC_7* (resvar_7);
+  SC_11* (resvar_11);
+  SC_14* (resvar_14);
+  SC_17* (resvar_17);
+
+  ! CLASS-SPECIFIC TRAJECTORIES WITH DIFFERENT SHAPES
+  %c#1%
+    ! Growth model for Class 1 with class-specific time scores
+    i_c1 s_c1 | SC_3@0 SC_5* (t5_c1) SC_7* (t7_c1) SC_11* (t11_c1)
+                SC_14* (t14_c1) SC_17@1;
+
+    [i_c1] (mi1);
+    [s_c1] (ms1);
+    i_c1* s_c1*;
+    i_c1 WITH s_c1*;
+
+  %c#2%
+    ! Growth model for Class 2 with class-specific time scores
+    i_c2 s_c2 | SC_3@0 SC_5* (t5_c2) SC_7* (t7_c2) SC_11* (t11_c2)
+                SC_14* (t14_c2) SC_17@1;
+
+    [i_c2] (mi2);
+    [s_c2] (ms2);
+    i_c2* s_c2*;
+    i_c2 WITH s_c2*;
+
+  %c#3%
+    ! Growth model for Class 3 with class-specific time scores
+    i_c3 s_c3 | SC_3@0 SC_5* (t5_c3) SC_7* (t7_c3) SC_11* (t11_c3)
+                SC_14* (t14_c3) SC_17@1;
+
+    [i_c3] (mi3);
+    [s_c3] (ms3);
+    i_c3* s_c3*;
+    i_c3 WITH s_c3*;
+
+MODEL TEST:
+  ! Test if time scores differ significantly across classes
+  ! H0: All classes have same trajectory shape
+  0 = t5_c1 - t5_c2;
+  0 = t5_c1 - t5_c3;
+  0 = t5_c2 - t5_c3;
+
+  0 = t7_c1 - t7_c2;
+  0 = t7_c1 - t7_c3;
+  0 = t7_c2 - t7_c3;
+
+  0 = t11_c1 - t11_c2;
+  0 = t11_c1 - t11_c3;
+  0 = t11_c2 - t11_c3;
+
+  0 = t14_c1 - t14_c2;
+  0 = t14_c1 - t14_c3;
+  0 = t14_c2 - t14_c3;
+
+OUTPUT:
+  TECH1 TECH4 TECH8 TECH11 STANDARDIZED SVALUES;
+
+PLOT:
+  TYPE = PLOT2 PLOT3;
+
+SAVEDATA:
+  FILE = sc_gmm3_FREED_TIMESCORES_cprobs.dat;
+  SAVE = CPROB;

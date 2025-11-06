@@ -1,0 +1,88 @@
+TITLE: SENSITIVITY ANALYSIS: 3-class GMM WITHOUT survey weights
+       Purpose: Test if class enumeration is affected by survey weights
+       Compare with main analysis to assess weight influence on class structure
+
+DATA:
+  FILE = ../../growth_mixture_models/sc_wave_fscores.dat;
+
+VARIABLE:
+  NAMES ARE
+	SC3THAC  SC3TCOM  SC3OBEY  SC3DIST  SC3TEMP  SC3REST  SC3FIDG  SC5THAC
+	SC5TCOM  SC5OBEY  SC5DIST  SC5TEMP  SC5REST  SC5FIDG  SC7THAC  SC7TCOM
+	SC7OBEY  SC7DIST  SC7TEMP  SC7REST  SC7FIDG  SC11THAC SC11TCOM SC11OBEY
+	SC11DIST SC11TEMP SC11REST SC11FIDG SC14THAC SC14TCOM SC14OBEY SC14DIST
+	SC14TEMP SC14REST SC14FIDG SC17THAC SC17TCOM SC17OBEY SC17DIST SC17TEMP
+	SC17REST SC17FIDG SC_3     SC_3_SE  SC_5     SC_5_SE  SC_7     SC_7_SE
+	SC_11    SC_11_SE SC_14    SC_14_SE SC_17    SC_17_SE GOVWT1   MCSID
+	PTTYPE2  SPTN00;
+
+  ! NOTE: Not using survey design features
+  USEVARIABLES = mcsid SC_3 SC_5 SC_7 SC_11 SC_14 SC_17;
+
+  IDVARIABLE = mcsid;
+  MISSING = *;
+
+  CLASSES = c(3);
+
+ANALYSIS:
+  TYPE = MIXTURE;          ! No COMPLEX specification
+  ESTIMATOR = MLR;
+  PROCESSORS = 12;
+  STARTS = 4000 1000;
+  STITERATIONS = 50;
+  LRTSTARTS = 800 200 2000 500;
+  STSEED = 20251021;
+
+MODEL:
+  %OVERALL%
+
+  i s | SC_3@0 SC_5* SC_7* SC_11* SC_14* SC_17@1;
+
+  SC_3*; SC_5*; SC_7*; SC_11*; SC_14*; SC_17*;
+
+  i* s*;
+  i WITH s;
+
+  %c#1%
+    [i s];
+
+  %c#2%
+    [i s];
+
+  %c#3%
+	[i s];
+
+OUTPUT:
+  TECH1 TECH4 TECH8 TECH11 TECH14 STANDARDIZED SVALUES;
+
+PLOT:
+  TYPE = PLOT2 PLOT3;
+
+SAVEDATA:
+  FILE = sc_gmm3_NOWEIGHTS_cprobs.dat;
+  SAVE = CPROB;
+
+! ==============================================================================
+! INTERPRETATION GUIDE:
+! ==============================================================================
+!
+! Compare this model with weighted version:
+!
+! 1. CLASS PROPORTIONS:
+!    - Do unweighted proportions differ substantially?
+!    - Weights correct for sampling design, so differences expected
+!
+! 2. TRAJECTORY SHAPES:
+!    - Are class means and slopes similar?
+!    - Large differences suggest weight-dependent class structure
+!
+! 3. CLASS ENUMERATION:
+!    - Does BIC still favor 3-class solution?
+!    - If different optimal k, weights are influencing class structure
+!
+! 4. RECOMMENDATION:
+!    - Use weighted results for inference
+!    - Report unweighted as sensitivity check
+!    - Cite: Asparouhov & Muthen (2021) on survey weights in mixture models
+!
+! ==============================================================================

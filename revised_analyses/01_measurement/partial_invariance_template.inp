@@ -1,0 +1,137 @@
+TITLE: PARTIAL MEASUREMENT INVARIANCE MODEL
+       Purpose: Relax specific non-invariant constraints identified in strong invariance
+       This is a TEMPLATE - modify based on modification indices from strong_invariance.out
+
+DATA:
+  FILE = ../../recoded_only_sc_pa_cov.dat;
+
+VARIABLE:
+  Names are
+     pttype2 nh2 bovwt1 covwt1 dovwt1 eovwt1 fovwt1 govwt1 sptn00 sc3thac
+     sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg sc5thac sc5tcom sc5obey
+     sc5dist sc5temp sc5rest sc5fidg sc5lyin sc7thac sc7tcom sc7obey sc7dist
+     sc7temp sc7rest sc7fidg sc7lyin sc11thac sc11tcom sc11obey sc11dist
+     sc11temp sc11rest sc11fidg sc11lyin sc14thac sc14tcom sc14obey sc14dist
+     sc14temp sc14rest sc14fidg sc14lyin sc17thac sc17tcom sc17obey sc17dist
+     sc17temp sc17rest sc17fidg sc17lyin ignore3 smack3 shout3 bedroom3
+     treats3 telloff3 bribe3 ignore5 smack5 shout5 bedroom5 treats5 telloff5
+     bribe5 reason5 rindoor5 dinner5 close5 read5 story5 music5 paint5
+     active5 games5 park5 ignore7 smack7 shout7 bedroom7 treats7 telloff7
+     bribe7 reason7 rindoor7 dinner7 close7 read7 story7 music7 paint7
+     active7 games7 park7 tvrules7 bedroom11 treats11 reason11 close11
+     active11 games11 pwhere14 pwho14 pwhat14 cmwhere14 cmwho14 cmwhat14
+     cmwhere17 cmtback17 pwhere17 ptback17 livewp17 pedu bpedu sex race
+     brace bmarried incomec incomel incomef lbw namhapna0 namunfaa0 nambrusa0
+     namfeeda0 naminjua0 nambatha0 namwarya0 nambshya0 namfreta0 namsleea0
+     nammilka0 namsltia0 namnapsa0 namsofoa0 inftempr inftemp dfpw dupd
+     dupw hfae coga scoga age3 age5 age7 age11 age14 age17 mcsid;
+
+  USEVARIABLES =
+      sc3thac sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg
+      sc5thac sc5tcom sc5obey sc5dist sc5temp sc5rest sc5fidg
+      sc7thac sc7tcom sc7obey sc7dist sc7temp sc7rest sc7fidg
+      sc11thac sc11tcom sc11obey sc11dist sc11temp sc11rest sc11fidg
+      sc14thac sc14tcom sc14obey sc14dist sc14temp sc14rest sc14fidg
+      sc17thac sc17tcom sc17obey sc17dist sc17temp sc17rest sc17fidg;
+
+  CATEGORICAL = ALL;
+  MISSING ARE ALL (-9999);
+  IDVARIABLE IS mcsid;
+
+  STRATIFICATION = pttype2;
+  CLUSTER       = sptn00;
+  WEIGHT        = govwt1;
+  SUBPOPULATION = (govwt1 > 0);
+
+ANALYSIS:
+  TYPE = COMPLEX;
+  ESTIMATOR = WLSMV;
+  PARAMETERIZATION = DELTA;
+  DIFFTEST = strong_invariance.dif;  ! For chi-square difference test
+
+MODEL:
+  ! Start with strong invariance model structure
+  SC_3  BY sc3thac* sc3tcom sc3obey sc3dist sc3temp sc3rest sc3fidg;
+  SC_5  BY sc5thac* sc5tcom sc5obey sc5dist sc5temp sc5rest sc5fidg;
+  SC_7  BY sc7thac* sc7tcom sc7obey sc7dist sc7temp sc7rest sc7fidg;
+  SC_11 BY sc11thac* sc11tcom sc11obey sc11dist sc11temp sc11rest sc11fidg;
+  SC_14 BY sc14thac* sc14tcom sc14obey sc14dist sc14temp sc14rest sc14fidg;
+  SC_17 BY sc17thac* sc17tcom sc17obey sc17dist sc17temp sc17rest sc17fidg;
+
+  SC_3@1; SC_5*; SC_7*; SC_11*; SC_14*; SC_17*;
+  [SC_3-SC_17@0];
+
+  ! Equal loadings across time (from strong invariance)
+  SC_3  BY sc3thac-sc3fidg*    (l1-l7);
+  SC_5  BY sc5thac-sc5fidg*    (l1-l7);
+  SC_7  BY sc7thac-sc7fidg*    (l1-l7);
+  SC_11 BY sc11thac-sc11fidg*  (l1-l7);
+  SC_14 BY sc14thac-sc14fidg*  (l1-l7);
+  SC_17 BY sc17thac-sc17fidg*  (l1-l7);
+
+  ! EQUAL THRESHOLDS - Modify based on modification indices
+  ! EXAMPLE: If sc3temp$1 shows non-invariance at wave 17, free it:
+
+  ! For items with INVARIANT thresholds, constrain as usual:
+  [sc3thac$1] (t_thac1);  [sc5thac$1] (t_thac1);  [sc7thac$1] (t_thac1);
+  [sc11thac$1] (t_thac1); [sc14thac$1] (t_thac1); [sc17thac$1] (t_thac1);
+  [sc3thac$2] (t_thac2);  [sc5thac$2] (t_thac2);  [sc7thac$2] (t_thac2);
+  [sc11thac$2] (t_thac2); [sc14thac$2] (t_thac2); [sc17thac$2] (t_thac2);
+
+  ! TEMPLATE: Free non-invariant thresholds (EXAMPLE ONLY - MODIFY):
+  ! If "temper" shows non-invariance at age 17:
+  ! [sc3temp$1] (t_temp1);  [sc5temp$1] (t_temp1);  [sc7temp$1] (t_temp1);
+  ! [sc11temp$1] (t_temp1); [sc14temp$1] (t_temp1);
+  ! [sc17temp$1];  ! <- Freed at wave 17 only
+
+  ! For all other items, use equal constraints like strong invariance:
+  [sc3tcom$1](t_tcom1);  [sc5tcom$1](t_tcom1);  [sc7tcom$1](t_tcom1);
+  [sc11tcom$1](t_tcom1); [sc14tcom$1](t_tcom1); [sc17tcom$1](t_tcom1);
+  [sc3tcom$2](t_tcom2);  [sc5tcom$2](t_tcom2);  [sc7tcom$2](t_tcom2);
+  [sc11tcom$2](t_tcom2); [sc14tcom$2](t_tcom2); [sc17tcom$2](t_tcom2);
+
+  ! Continue for remaining items...
+  ! (See strong_invariance.inp for full threshold specifications)
+
+  ! Adjacent correlated residuals
+  sc3thac WITH sc5thac;  sc5thac WITH sc7thac;  sc7thac WITH sc11thac;
+  sc11thac WITH sc14thac; sc14thac WITH sc17thac;
+  sc3tcom WITH sc5tcom;  sc5tcom WITH sc7tcom;  sc7tcom WITH sc11tcom;
+  sc11tcom WITH sc14tcom; sc14tcom WITH sc17tcom;
+  ! (Continue for all items)
+
+OUTPUT: STANDARDIZED MODINDICES(10) TECH1 TECH4;
+
+SAVEDATA:
+  FILE = ../../growth_mixture_models/sc_wave_fscores_PARTIAL.dat;
+  SAVE = FSCORES;
+
+! ==============================================================================
+! STEPS TO USE THIS TEMPLATE:
+! ==============================================================================
+!
+! 1. Review strong_invariance.out modification indices
+!    - Look for MI > 10 for threshold constraints
+!    - Identify specific items/waves with large MI
+!
+! 2. Free the most problematic constraint
+!    - Typically highest MI threshold
+!    - Free for specific wave(s) only
+!
+! 3. Re-run model and check fit improvement
+!    - Use DIFFTEST to compare with strong invariance
+!    - Check if CFI improves by > .01
+!
+! 4. Repeat steps 1-3 until acceptable fit
+!    - Stop when: ΔCFI < .01 or RMSEA < .06
+!    - Follow recommendations of Putnick & Bornstein (2016)
+!
+! 5. CRITICAL: Do not free more than 20% of constraints
+!    - Partial invariance requires majority of constraints hold
+!    - Document which constraints were freed and why
+!
+! 6. Use resulting factor scores for growth modeling
+!    - Factor scores from partial invariance model
+!    - More appropriate than strong invariance if that fails
+!
+! ==============================================================================

@@ -1,0 +1,100 @@
+TITLE: External validation of 3-class trajectory solution
+       Test associations between latent classes and outcomes
+       Using R3STEP approach (Asparouhov & Muthen, 2014)
+
+DATA:
+  FILE = ../../growth_mixture_models/sc_gmm3_fscores_cprobs.dat;
+
+VARIABLE:
+  NAMES ARE
+    SC_3 SC_5 SC_7 SC_11 SC_14 SC_17
+    GOVWT1 MCSID PTTYPE2 SPTN00
+    CPROB1 CPROB2 CPROB3 CLASS;
+
+  ! Add outcome variables here (examples shown)
+  ! Adjust based on available MCS data:
+  !   - Academic achievement (GCSE scores, Key Stage assessments)
+  !   - Behavioral outcomes (antisocial behavior, substance use)
+  !   - Mental health (SDQ scores, depression)
+  !   - Employment/education status at age 17
+
+  USEVARIABLES =
+    SC_3 SC_5 SC_7 SC_11 SC_14 SC_17
+    CLASS
+    ! Add outcome variables below:
+    ! GCSE_SCORE       ! Academic achievement
+    ! ANTISOCIAL_17    ! Antisocial behavior age 17
+    ! SUBSTANCE_17     ! Substance use age 17
+    ! SDQ_EMO_17       ! SDQ emotional problems
+    ! SDQ_CONDUCT_17   ! SDQ conduct problems
+    ;
+
+  CLASSES = c(3);
+  MISSING = *;
+
+  IDVARIABLE = MCSID;
+  STRATIFICATION = PTTYPE2;
+  CLUSTER = SPTN00;
+  WEIGHT = GOVWT1;
+  SUBPOPULATION = (GOVWT1 > 0);
+
+  ! Use known class membership from previous GMM
+  KNOWNCLASS = c(CLASS = 1 2 3);
+
+  ! Outcomes for validation (continuous and categorical)
+  ! AUXILIARY =
+  !   GCSE_SCORE (R3STEP)
+  !   ANTISOCIAL_17 (R3STEP)
+  !   SUBSTANCE_17 (R3STEP)
+  !   SDQ_EMO_17 (R3STEP)
+  !   SDQ_CONDUCT_17 (R3STEP);
+
+ANALYSIS:
+  TYPE = COMPLEX MIXTURE;
+  ESTIMATOR = MLR;
+  PROCESSORS = 4;
+  STARTS = 0;  ! Use known classes, no random starts needed
+
+MODEL:
+  %OVERALL%
+  i s | SC_3@0 SC_5* SC_7* SC_11* SC_14* SC_17@1;
+
+  ! Class-specific means (from previous model)
+  %c#1%
+    [i s];
+  %c#2%
+    [i s];
+  %c#3%
+    [i s];
+
+OUTPUT:
+  TECH1 TECH4 STANDARDIZED;
+
+SAVEDATA:
+  FILE = validation_results.dat;
+  SAVE = CPROBABILITIES;
+
+! ==============================================================================
+! INSTRUCTIONS FOR USE:
+! ==============================================================================
+!
+! 1. Merge outcome variables into the dataset with class assignments
+!
+! 2. Uncomment and modify AUXILIARY section with actual outcome variable names
+!
+! 3. The R3STEP approach will:
+!    - Test mean differences across classes for continuous outcomes
+!    - Test proportions across classes for categorical outcomes
+!    - Adjust for classification uncertainty
+!
+! 4. Interpret results:
+!    - Classes should differ meaningfully on theoretically-relevant outcomes
+!    - High SC trajectory class should show:
+!      * Better academic achievement
+!      * Lower antisocial behavior
+!      * Lower substance use
+!      * Better mental health
+!
+! 5. Report effect sizes (Cohen's d or odds ratios) for class differences
+!
+! ==============================================================================

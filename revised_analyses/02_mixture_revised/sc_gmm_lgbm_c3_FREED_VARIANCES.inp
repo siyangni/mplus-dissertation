@@ -1,0 +1,100 @@
+TITLE: Three-class GMM with CLASS-SPECIFIC growth variances
+       REVISED: Addresses critical issue of equal variance constraints
+       This model allows intercept and slope variances to differ by class
+
+DATA:
+  FILE = ../../growth_mixture_models/sc_wave_fscores.dat;
+
+VARIABLE:
+  NAMES ARE
+	SC3THAC  SC3TCOM  SC3OBEY  SC3DIST  SC3TEMP  SC3REST  SC3FIDG  SC5THAC
+	SC5TCOM  SC5OBEY  SC5DIST  SC5TEMP  SC5REST  SC5FIDG  SC7THAC  SC7TCOM
+	SC7OBEY  SC7DIST  SC7TEMP  SC7REST  SC7FIDG  SC11THAC SC11TCOM SC11OBEY
+	SC11DIST SC11TEMP SC11REST SC11FIDG SC14THAC SC14TCOM SC14OBEY SC14DIST
+	SC14TEMP SC14REST SC14FIDG SC17THAC SC17TCOM SC17OBEY SC17DIST SC17TEMP
+	SC17REST SC17FIDG SC_3     SC_3_SE  SC_5     SC_5_SE  SC_7     SC_7_SE
+	SC_11    SC_11_SE SC_14    SC_14_SE SC_17    SC_17_SE GOVWT1   MCSID
+	PTTYPE2  SPTN00;
+
+  USEVARIABLES = mcsid pttype2 sptn00 govwt1 SC_3 SC_5 SC_7 SC_11 SC_14 SC_17;
+
+  IDVARIABLE = mcsid;
+  MISSING = *;
+
+  ! Complex survey design retained in mixture
+  STRATIFICATION = pttype2;
+  CLUSTER       = sptn00;
+  WEIGHT        = govwt1;
+  SUBPOPULATION = (govwt1 > 0);
+
+  CLASSES = c(3);
+
+ANALYSIS:
+  TYPE = COMPLEX MIXTURE;
+  ESTIMATOR = MLR;
+  PROCESSORS = 12;
+  STARTS = 4000 1000;
+  STITERATIONS = 50;        ! Increased from 30 for better convergence
+  STSEED = 20251021;
+
+MODEL:
+  %OVERALL%
+
+  ! Latent growth factors over wave factor scores
+  ! Non-linear slope via free time scores; time centered at age 3 (0 -> 1)
+  i s | SC_3@0 SC_5* SC_7* SC_11* SC_14* SC_17@1;
+
+  ! CRITICAL REVISION: Residual variances equal across classes (for stability)
+  ! These are placed in OVERALL section to be shared
+  SC_3* (resvar_3);
+  SC_5* (resvar_5);
+  SC_7* (resvar_7);
+  SC_11* (resvar_11);
+  SC_14* (resvar_14);
+  SC_17* (resvar_17);
+
+  ! CLASS-SPECIFIC GROWTH PARAMETERS
+  %c#1%
+    [i] (mi1);
+    [s] (ms1);
+
+    ! FREED: Class-specific growth variances and covariance
+    i* (vari_c1);
+    s* (vars_c1);
+    i WITH s* (covis_c1);
+
+  %c#2%
+    [i] (mi2);
+    [s] (ms2);
+
+    ! FREED: Class-specific growth variances and covariance
+    i* (vari_c2);
+    s* (vars_c2);
+    i WITH s* (covis_c2);
+
+  %c#3%
+	[i] (mi3);
+	[s] (ms3);
+
+	! FREED: Class-specific growth variances and covariance
+	i* (vari_c3);
+	s* (vars_c3);
+	i WITH s* (covis_c3);
+
+MODEL CONSTRAINT:
+  ! Calculate standardized correlation between i and s for each class
+  NEW(cor_is_c1 cor_is_c2 cor_is_c3);
+  cor_is_c1 = covis_c1 / SQRT(vari_c1 * vars_c1);
+  cor_is_c2 = covis_c2 / SQRT(vari_c2 * vars_c2);
+  cor_is_c3 = covis_c3 / SQRT(vari_c3 * vars_c3);
+
+OUTPUT:
+  TECH1 TECH4 TECH8 TECH11 STANDARDIZED SVALUES;
+
+PLOT:
+  TYPE = PLOT2 PLOT3;
+  SERIES = SC_3(0) SC_5(*) SC_7(*) SC_11(*) SC_14(*) SC_17(1);
+
+SAVEDATA:
+  FILE = sc_gmm3_FREED_cprobs.dat;
+  SAVE = CPROB;
